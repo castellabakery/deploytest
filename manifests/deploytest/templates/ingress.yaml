@@ -20,6 +20,6 @@ spec:
             path: "/"
             backend:
               service:
-                name: {{ .Values.app }}
+                name: {{ .Values.app }}-svc
                 port:
                   number: {{ .Values.servicePort }}

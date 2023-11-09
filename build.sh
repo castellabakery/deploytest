@@ -12,4 +12,4 @@ sudo ctr i rm $registry/$imageName:$version
 sudo ctr i import $buildPath/$tarName
 sudo ctr i push $registry/$imageName:$version
 
-sudo rm -rf $buildPath/*
+#sudo rm -rf $buildPath/*

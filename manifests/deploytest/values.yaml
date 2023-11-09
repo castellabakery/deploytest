@@ -6,7 +6,9 @@ imageRegistry: localhost:32500
 
 moduleVersion: 0.0.3
 
-servicePort: 80
+servicePort0: 80
+servicePort1: 443
+servicePort2: 8080
 
 subDomain: "deploytest"
 domain: "pastelcloud.store"

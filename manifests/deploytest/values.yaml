@@ -1,0 +1,21 @@
+app: deploytest
+
+namespace: deploytest
+
+imageRegistry: localhost:32500
+
+moduleVersion: 0.0.1
+
+subDomain: "deploytest"
+domain: "pastelcloud.store"
+
+secretName: letsencrypt-prod
+
+persistence:
+  hostPath: /data/deploytest
+
+livenessProbe:
+  path: /
+
+readinessProbe:
+  path: /

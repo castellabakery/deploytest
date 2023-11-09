@@ -11,7 +11,7 @@ data:
     }
 
     server {
-      listen 443;
+      listen 443 ssl;
       server_name deploytest.pastelcloud.store;
 
       location / {

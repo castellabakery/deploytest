@@ -8,6 +8,7 @@ buildPath="/build/deploytest"
 
 sudo docker build -t $registry/$imageName:$version $buildPath
 sudo docker save -o $buildPath/$tarName $registry/$imageName:$version
+sudo ctr i rm $registry/$imageName:$version
 sudo ctr i import $buildPath/$tarName
 sudo ctr i push $registry/$imageName:$version
 

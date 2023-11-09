@@ -23,7 +23,7 @@ spec:
               containerPort: {{ .Values.servicePort }}
           volumeMounts:
             - name: {{ .Values.app }}-volume
-              mountPath: /
+              mountPath: /build
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.path }}

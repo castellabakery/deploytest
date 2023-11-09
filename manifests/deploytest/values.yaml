@@ -4,7 +4,7 @@ namespace: deploytest
 
 imageRegistry: localhost:32500
 
-moduleVersion: 0.0.1
+moduleVersion: 0.0.2
 
 subDomain: "deploytest"
 domain: "pastelcloud.store"

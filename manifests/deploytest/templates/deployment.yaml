@@ -19,10 +19,10 @@ spec:
         - name: {{ .Values.app }}
           image: {{ .Values.imageRegistry }}/deploytest:{{ .Values.moduleVersion }}
           ports:
-            - name: service-port
+            - name: {{ .Values.app }}-port
               containerPort: {{ .Values.servicePort }}
           volumeMounts:
-            - name: service-volume
+            - name: {{ .Values.app }}-volume
               mountPath: /
           livenessProbe:
             httpGet:
@@ -39,7 +39,7 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
       volumes:
-        - name: service-volume
+        - name: {{ .Values.app }}-volume
           hostPath:
             path: {{ .Values.persistence.hostPath }}
             type: DirectoryOrCreate

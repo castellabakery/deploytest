@@ -4,9 +4,9 @@ namespace: deploytest
 
 imageRegistry: localhost:32500
 
-moduleVersion: 0.0.9
+moduleVersion: 0.1.0
 
-servicePort0: 80
+servicePort0: 443
 servicePort1: 443
 
 subDomain: "deploytest"

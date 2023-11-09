@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="0.0.9"
+version="0.1.0"
 registry="localhost:32500"
 imageName="deploytest"
 tarName="deploytest.tar"

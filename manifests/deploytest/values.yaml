@@ -4,11 +4,10 @@ namespace: deploytest
 
 imageRegistry: localhost:32500
 
-moduleVersion: 0.0.7
+moduleVersion: 0.0.8
 
 servicePort0: 80
 servicePort1: 443
-servicePort2: 8080
 
 subDomain: "deploytest"
 domain: "pastelcloud.store"

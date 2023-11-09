@@ -14,6 +14,3 @@ spec:
     - name: {{ .Values.app }}-1
       port: {{ .Values.servicePort1 }}
       targetPort: {{ .Values.servicePort1 }}
-    - name: {{ .Values.app }}-2
-      port: {{ .Values.servicePort2 }}
-      targetPort: {{ .Values.servicePort2 }}

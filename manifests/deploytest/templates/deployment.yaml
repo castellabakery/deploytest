@@ -23,8 +23,6 @@ spec:
                 containerPort: {{ .Values.servicePort0 }}
               - name: service-port1
                 containerPort: {{ .Values.servicePort1 }}
-              - name: service-port2
-                containerPort: {{ .Values.servicePort2 }}
           volumeMounts:
             - name: service-volume
               mountPath: /data

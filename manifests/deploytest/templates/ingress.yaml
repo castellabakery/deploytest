@@ -14,7 +14,7 @@ spec:
   ingressClassName: "nginx"
   rules:
     - host: "{{ .Values.subDomain }}.{{ .Values.domain }}"
-      https:
+      http:
         paths:
           - pathType: Prefix
             path: "/"

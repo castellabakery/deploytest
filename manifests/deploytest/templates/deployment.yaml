@@ -20,21 +20,21 @@ spec:
           image: {{ .Values.imageRegistry }}/deploytest:{{ .Values.moduleVersion }}
           ports:
               - name: service-port
-                containerPort: 80
+                containerPort: {{ .Values.servicePort }}
           volumeMounts:
             - name: service-volume
               mountPath: /data
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.path }}
-              port: 80
+              port: {{ .Values.servicePort }}
             initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: {{ .Values.readinessProbe.path }}
-              port: 80
+              port: {{ .Values.servicePort }}
             initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3

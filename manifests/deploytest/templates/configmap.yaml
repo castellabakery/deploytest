@@ -5,7 +5,7 @@ metadata:
 data:
   nginx.conf: |
     server {
-      listen 80;
+      listen 80 ssl;
       server_name deploytest.pastelcloud.store;
       return 301 https://deploytest.pastelcloud.store$request_uri;
     }

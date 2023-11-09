@@ -19,30 +19,25 @@ spec:
         - name: {{ .Values.app }}
           image: {{ .Values.imageRegistry }}/deploytest:{{ .Values.moduleVersion }}
           ports:
-              - name: service-port0
-                containerPort: {{ .Values.servicePort0 }}
-              - name: service-port1
-                containerPort: {{ .Values.servicePort1 }}
+            - name: service-port
+              containerPort: {{ .Values.servicePort }}
           volumeMounts:
             - name: service-volume
-              mountPath: /data
+              mountPath: /
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.path }}
-              port: {{ .Values.servicePort0 }}
+              port: {{ .Values.servicePort }}
             initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: {{ .Values.readinessProbe.path }}
-              port: {{ .Values.servicePort0 }}
+              port: {{ .Values.servicePort }}
             initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3
-          envFrom:
-            - configMapRef:
-                name: nginx-conf
       volumes:
         - name: service-volume
           hostPath:

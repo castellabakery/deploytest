@@ -4,15 +4,14 @@ namespace: deploytest
 
 imageRegistry: localhost:32500
 
-moduleVersion: 0.1.0
+moduleVersion: 0.1.1
 
-servicePort0: 443
-servicePort1: 443
+servicePort: 443
 
 subDomain: "deploytest"
 domain: "pastelcloud.store"
 
-secretName: letsencrypt-prod
+secretName: deploytest-clusterissue
 
 persistence:
   hostPath: /data/deploytest

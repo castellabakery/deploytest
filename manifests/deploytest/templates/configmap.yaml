@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  nginx.conf: |
+    server {
+      listen 80;
+      server_name deploytest.pastelcloud.store;
+      return 301 https://deploytest.pastelcloud.store$request_uri;
+    }
+
+    server {
+      listen 443;
+      server_name deploytest.pastelcloud.store;
+
+      location / {
+        root    /app/build;
+        index   index.html;
+        try_files $uri $uri/ /index.html;
+      }
+    }
+
+    server {
+      listen 8080;
+      server_name deploytest.pastelcloud.store;
+
+      location / {
+        root    /app/build;
+        index   index.html;
+        try_files $uri $uri/ /index.html;
+      }
+    }

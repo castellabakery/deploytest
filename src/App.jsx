@@ -3,9 +3,19 @@ import './App.css';
 
 import {Axios} from "../../component";
 import {NewPromise} from "../../component/Common";
-export const getMineral = (data) => NewPromise(Axios.get('/mineral?name='+data.mineral));
+export const getMineral = (data) => NewPromise(Axios.get('/mineral?name='+data.name));
 
 function App() {
+  const [count, setCount] = useState(mineral);
+  const mineral = (name) => {
+    getMineral({
+      name: "mineral"
+    }).then(res => {
+      console.log(res);
+      setCount(res.count);
+    })
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -21,7 +31,7 @@ function App() {
         >
           Learn React
         </a>
-
+        <p>{count}</p>
       </header>
     </div>
   );

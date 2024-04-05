@@ -48,7 +48,7 @@ const Axios = CommonAxios.create({
   }
 });
 
-export const getMineral = (data) => NewPromise(Axios.get('/mineral?name='+data.name));
+export const getMineral = (data) => NewPromise(Axios.get('https://consumebatch.pastelcloud.store/mineral?name='+data.name));
 
 function App() {
   const mineral = (name) => {
@@ -56,7 +56,7 @@ function App() {
       name: "mineral"
     }).then(res => {
       console.log(res);
-      setCount(res.count);
+      setCount(res.data.count);
     })
   }
 

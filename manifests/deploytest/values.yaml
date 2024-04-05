@@ -1,5 +1,7 @@
 app: deploytest
-
+consumeBatch:
+  externalName: consumebatch-ext
+  servicePort: 8080
 namespace: deploytest
 
 imageRegistry: registry.pastelcloud.store

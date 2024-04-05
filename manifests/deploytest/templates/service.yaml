@@ -11,3 +11,11 @@ spec:
     - name: {{ .Values.app }}-port
       port: {{ .Values.servicePort }}
       targetPort: {{ .Values.servicePort }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.consumeBatch.externalName }}
+spec:
+  type: ExternalName
+  externalName: consumebatch.consumebatch.svc.cluster.local

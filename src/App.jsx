@@ -1,6 +1,10 @@
 import logo from './logo.svg';
 import './App.css';
 
+import {Axios} from "../../component";
+import {NewPromise} from "../../component/Common";
+export const getMineral = (data) => NewPromise(Axios.get('/mineral?name='+data.mineral));
+
 function App() {
   return (
     <div className="App">
@@ -17,6 +21,7 @@ function App() {
         >
           Learn React
         </a>
+
       </header>
     </div>
   );

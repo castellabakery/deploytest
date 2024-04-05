@@ -18,6 +18,7 @@ spec:
       containers:
         - name: {{ .Values.app }}
           image: {{ .Values.imageRegistry }}/deploytest:{{ .Values.moduleVersion }}
+          imagePullPolicy: Always
           ports:
             - name: {{ .Values.app }}-port
               containerPort: {{ .Values.servicePort }}

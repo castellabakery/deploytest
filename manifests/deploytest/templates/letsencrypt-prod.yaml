@@ -10,7 +10,7 @@ spec:
     email: castellabakery@gmail.com
     # Name of a secret used to store the ACME account private key
     privateKeySecretRef:
-      name: letsencrypt-prod
+      name: letsencrypt-prod3
     # Enable the HTTP-01 challenge provider
     solvers:
       - http01:

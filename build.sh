@@ -1,7 +1,7 @@
 #!/bin/bash
 
 version="0.1.2"
-registry="registry.pastelcloud.store"
+registry="registry.pastelcloud.shop"
 imageName="deploytest"
 tarName="deploytest.tar"
 buildPath="/build/deploytest"

@@ -4,14 +4,14 @@ consumeBatch:
   servicePort: 8080
 namespace: deploytest
 
-imageRegistry: registry.pastelcloud.store
+imageRegistry: registry.pastelcloud.shop
 
 moduleVersion: 0.1.2
 
 servicePort: 443
 
 subDomain: "deploytest"
-domain: "pastelcloud.store"
+domain: "pastelcloud.shop"
 
 secretName: deploytest-clusterissue
 

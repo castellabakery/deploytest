@@ -101,6 +101,11 @@ function App() {
       //   fov: 100
       // }
     });
+    naver.maps.Event.addListener(pano, "pano_changed", function() {
+      console.log("pano_changed1", pano.getLocation());
+      pano.getLocation.photodate = "2023-04-23 11:44:16";
+      console.log("pano_changed2", pano.getLocation());
+    });
     // naver.maps.onJSContentLoaded = function() {
     //   // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
     //   pano = new naver.maps.Panorama("pano", {
@@ -192,8 +197,8 @@ function App() {
         <p>{count}</p>
       </header>
       <div id={"street"} style={{ width: '100%', height: '500px' }} />
-      <div id={"map"} style={{ width: '100%', height: '500px' }} />
-      <div id={"pano"} style={{ width: '100%', height: '500px' }} />
+      <div id={"map"} style={{ width: '90%', height: '500px' }} />
+      <div id={"pano"} style={{ width: '90%', height: '500px' }} />
     </div>
   );
 }

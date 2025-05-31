@@ -1,6 +1,6 @@
 import React from 'react';
-import './App.css';
-import robotImage from 'gourdbot.png'; // 그림 파일 이름에 맞게 변경
+import './Card.css';
+import robotImage from './gourdbot.png'; // 그림 파일 이름에 맞게 변경
 
 export function Card({ title, children }) {
     return (

@@ -28,8 +28,8 @@ pipeline {
     }
     environment {
         DOCKERHUB_CREDENTIALS = credentials('my-nex-docker-registry')
-        VERSION = '1.0.0'
-        IMAGE = 'body'
+        VERSION = '0.1.2'
+        IMAGE = 'deploytest'
     }
     stages {
         stage('0. clean workspace') {

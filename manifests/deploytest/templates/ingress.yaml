@@ -9,11 +9,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "{{ .Values.subDomain }}.{{ .Values.domain }}"
+        - "{{ .Values.subDomain }}{{ .Values.domain }}"
       secretName: {{ .Values.secretName }}
   ingressClassName: "nginx"
   rules:
-    - host: "{{ .Values.subDomain }}.{{ .Values.domain }}"
+    - host: "{{ .Values.subDomain }}{{ .Values.domain }}"
       http:
         paths:
           - pathType: Prefix
@@ -34,11 +34,11 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "{{ .Values.subDomain }}.{{ .Values.domain }}"
+        - "{{ .Values.subDomain }}{{ .Values.domain }}"
       secretName: {{ .Values.secretName }}
   ingressClassName: "nginx"
   rules:
-    - host: "{{ .Values.subDomain }}.{{ .Values.domain }}"
+    - host: "{{ .Values.subDomain }}{{ .Values.domain }}"
       http:
         paths:
           - pathType: Prefix

@@ -1,6 +1,6 @@
 {
   "name": "deploytest",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
@@ -13,7 +13,13 @@
     "react-https-redirect": "^1.1.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4",
-    "@types/navermaps": "^3.7.5"
+    "@types/navermaps": "^3.7.5",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "tailwind-variants": "^0.1.0",
+    "lucide-react": "^0.276.0",
+    "react-router-dom": "^6.22.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "scripts": {
     "start": "react-scripts start",

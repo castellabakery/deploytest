@@ -10,7 +10,7 @@ moduleVersion: 0.1.2
 
 servicePort: 443
 
-subDomain: "deploytest"
+subDomain: ""
 domain: "pastelcloud.store"
 
 secretName: deploytest-clusterissue

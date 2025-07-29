@@ -1,206 +1,171 @@
-import logo from './logo.svg';
-import './App.css';
-import React, {useEffect, useState} from 'react';
-import CommonAxios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
+import SockJS from 'sockjs-client';
+import { over } from 'stompjs';
+import './ChatApp.css';
 
-const { naver } = window;
+const SERVER_URL = 'https://chitchat.pastelcloud.store/chat';
+const MESSAGE_API = 'https://chitchat.pastelcloud.store/message/list';
+const SEND_INTERVAL = 100; // 0.1초
 
-const NewPromise = (promise) => {
-  return new Promise(function (resolve, reject) {
-    promise
-        .then((response) => {
-          if (200 === response.status) {
-            resolve(response.data);
-          } else {
-            reject({error: {}, message: response.statusText});
-          }
-        })
-        .catch((error) => {
-          const errorMessage = extractErrorMessage(error);
-          reject({error: error, message: errorMessage});
-        });
-  });
-};
+const ChatApp = () => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [stompClient, setStompClient] = useState(null);
+  const [username, setUsername] = useState('');
+  const [askingName, setAskingName] = useState(true);
+  const [warnFastTyping, setWarnFastTyping] = useState(false);
+  const lastSendTimeRef = useRef(0);
+  const chatRef = useRef(null);
+  const scrollRef = useRef(null);
 
-const extractErrorMessage = (error) => {
-  if (!error) {
-    return null;
-  }
-
-  const response = error.response;
-  let message;
-  if (undefined !== response) {
-    message = error.response.data;
-    if (typeof (message) === 'object') {
-      message = message.message;
-    }
-  } else {
-    message = error.message;
-  }
-
-  return message;
-};
-
-const Axios = CommonAxios.create({
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json; charset=UTF-8;',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': '*'
-  }
-});
-
-export const getMineral = (data) => NewPromise(Axios.get('/api/mineral?name='+data.name));
-
-function App() {
   useEffect(() => {
-    const location = new naver.maps.LatLng(37.481222, 126.952750);
-    // 지도에 표시할 위치의 위도와 경도 설정
-
-    // const mapOptions = {
-    //   center: location,
-    //   // 중앙에 배치할 위치
-    //   zoom: 17,
-    //   // 확대 단계
-    // };
-    // const map = new naver.maps.Map('map', mapOptions);
-    const map = new naver.maps.Map('map', {
-      center: new naver.maps.LatLng(37.481222, 126.952750),
-      zoom: 17
-    });
-    // DOM 요소에 지도 삽입 (지도를 삽입할 HTML 요소의 id, 지도의 옵션 객체)
-    new naver.maps.Marker({
-      map,
-      position: location,
-    });
-    // 지도에 마커 생성
-
-    // 오버레이 추가
-    var rect = new naver.maps.Rectangle({
-      map: map,
-      bounds: [126.952750,37.481222,126.9590537,37.4864781],
-      // bounds: [126.96744,37.561622,126.9737437,37.5668781],
-      fillColor: '#ff0000',
-      fillOpacity: 0.4,
-      strokeWeight: 2,
-      strokeColor: '#ff0000'
-    });
-    var drawingManager;
-    naver.maps.Event.once(map, 'init', function() {
-      drawingManager = new naver.maps.drawing.DrawingManager({map: map});
-      drawingManager.addDrawing(rect, naver.maps.drawing.DrawingMode.RECTANGLE, 'my-id');
-      // drawingManager.addDrawing(polygon, naver.maps.drawing.DrawingMode.POLYGON);
-    });
-
-    var pano = null;
-    pano = new naver.maps.Panorama("pano", {
-      position: new naver.maps.LatLng(37.481222, 126.952750),
-      // pov: {
-      //   pan: -133,
-      //   tilt: 0,
-      //   fov: 100
-      // }
-    });
-    naver.maps.Event.addListener(pano, "pano_changed", function() {
-      console.log("pano_changed1", pano.getLocation());
-      pano.getLocation.photodate = "2023-04-23 11:44:16";
-      console.log("pano_changed2", pano.getLocation());
-    });
-    // naver.maps.onJSContentLoaded = function() {
-    //   // 아이디 혹은 지도 좌표로 파노라마를 표시할 수 있습니다.
-    //   pano = new naver.maps.Panorama("pano", {
-    //     position: new naver.maps.LatLng(37.481222, 126.952750),
-    //     // pov: {
-    //     //   pan: -133,
-    //     //   tilt: 0,
-    //     //   fov: 100
-    //     // }
-    //   });
-    //
-    //   // 파노라마 위치가 갱신되었을 때 발생하는 이벤트를 받아 지도의 중심 위치를 갱신합니다.
-    //   // naver.maps.Event.addListener(pano, 'pano_changed', function() {
-    //   //   var latlng = pano.getPosition();
-    //   //
-    //   //   if (!latlng.equals(map.getCenter())) {
-    //   //     map.setCenter(latlng);
-    //   //   }
-    //   // });
-    // };
-
-// 거리뷰 레이어를 생성합니다.
-    var streetLayer = new naver.maps.StreetLayer();
-    naver.maps.Event.once(map, 'init', function() {
-      streetLayer.setMap(map);
-    });
-
-// 거리뷰 버튼에 이벤트를 바인딩합니다.
-    var btn = document.getElementById('street');
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-
-      // 거리뷰 레이어가 지도 위에 있으면 거리뷰 레이어를 지도에서 제거하고,
-      // 거리뷰 레이어가 지도 위에 없으면 거리뷰 레이어를 지도에 추가합니다.
-      if (streetLayer.getMap()) {
-        streetLayer.setMap(null);
-      } else {
-        streetLayer.setMap(map);
-      }
-    });
-
-// 거리뷰 레이어가 변경되면 발생하는 이벤트를 지도로부터 받아 버튼의 상태를 변경합니다.
-//     naver.maps.Event.addListener(map, 'streetLayer_changed', function(streetLayer) {
-//       if (streetLayer) {
-//         btn.classList.add('control-on');
-//       } else {
-//         btn.classList.remove('control-on');
-//       }
-//     });
-
-// 지도를 클릭했을 때 발생하는 이벤트를 받아 파노라마 위치를 갱신합니다. 이때 거리뷰 레이어가 있을 때만 갱신하도록 합니다.
-    naver.maps.Event.addListener(map, 'click', (e) => {
-      if (streetLayer.getMap()) {
-        var latlng = e.coord;
-
-        // 파노라마의 setPosition()은 해당 위치에서 가장 가까운 파노라마(검색 반경 300미터)를 자동으로 설정합니다.
-        console.log("test2>"+pano);
-        pano.setPosition(latlng);
-      }
-    });
+    const storedName = localStorage.getItem('chatUsername');
+    if (storedName) {
+      setUsername(storedName);
+      setAskingName(false);
+    }
   }, []);
 
-  const mineral = (name) => {
-    getMineral({
-      name: "mineral"
-    }).then(res => {
-      console.log(res);
-      setCount(res.data.count);
-    })
+  useEffect(() => {
+    if (!askingName && username) {
+      connect();
+      loadMessages();
+    }
+  }, [askingName, username]);
+
+  const handleSetUsername = () => {
+    if (username.trim()) {
+      localStorage.setItem('chatUsername', username.trim());
+      setUsername(username.trim());
+      setAskingName(false);
+    }
+  };
+
+  const changeUsername = () => {
+    setAskingName(true);
+  };
+
+  const connect = () => {
+    const socket = new SockJS(SERVER_URL);
+    const client = over(socket);
+    client.connect({}, () => {
+      client.subscribe('/topic/public', (msg) => {
+        const message = JSON.parse(msg.body);
+        setMessages(prev => {
+          const exists = prev.some(
+              (m) => m.sender === message.sender && m.content === message.content && JSON.stringify(m.createDateTime) === JSON.stringify(message.createDateTime)
+          );
+          return exists ? prev : [...prev, message];
+        });
+        setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
+      });
+      setStompClient(client);
+    });
+  };
+
+  const sendMessage = () => {
+    const now = Date.now();
+    if (now - lastSendTimeRef.current < SEND_INTERVAL) {
+      setWarnFastTyping(true);
+      return;
+    }
+    setWarnFastTyping(false);
+    lastSendTimeRef.current = now;
+
+    if (!input.trim() || !stompClient) return;
+    const message = {
+      sender: username,
+      content: input.trim(),
+      type: "CHAT"
+    };
+    stompClient.send("/app/sendMessage", {}, JSON.stringify(message));
+    setInput('');
+  };
+
+  const loadMessages = async () => {
+    try {
+      const res = await fetch(`${MESSAGE_API}?page=0&size=100`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const unique = data.filter(
+          (msg, index, self) =>
+              index === self.findIndex(
+                  (m) => m.sender === msg.sender && m.content === msg.content && JSON.stringify(m.createDateTime) === JSON.stringify(msg.createDateTime)
+              )
+      );
+      setMessages(unique);
+      setTimeout(() => {
+        if (chatRef.current) {
+          chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }
+      }, 0);
+    } catch {
+      console.error('Failed to load messages');
+    }
+  };
+
+  const formatTime = (array) => {
+    if (!Array.isArray(array) || array.length < 6) return '';
+    const [y, m, d, h, min, s] = array;
+    const date = new Date(y, m - 1, d, h, min, s);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  if (askingName) {
+    return (
+        <div className="app">
+          <header>Chit Chat</header>
+          <div className="username-prompt styled-modal">
+            <h2>닉네임을 입력하세요</h2>
+            <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
+                placeholder="닉네임 입력"
+            />
+            <button onClick={handleSetUsername}>입장하기</button>
+          </div>
+        </div>
+    );
   }
 
-  const [count, setCount] = useState(mineral);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <p>{count}</p>
-      </header>
-      <div id={"street"} style={{ width: '100%', height: '500px' }} />
-      <div id={"map"} style={{ width: '90%', height: '500px' }} />
-      <div id={"pano"} style={{ width: '90%', height: '500px' }} />
-    </div>
+      <div className="app">
+        <header>
+          <span>Chit Chat</span>
+          <br/>
+          <button className="change-name-btn" onClick={changeUsername}>
+            🖊️ 닉네임 변경
+          </button>
+        </header>
+        <div id="chat" ref={chatRef}>
+          {messages.map((msg, idx) => (
+              <div key={`${msg.sender}-${msg.content}-${msg.createDateTime?.join?.('-') || idx}`} className={`message ${msg.sender === username ? 'me' : 'other'}`}>
+                {msg.content}
+                <span>{msg.sender}</span>
+                {msg.createDateTime && <span>{formatTime(msg.createDateTime)}</span>}
+              </div>
+          ))}
+          <div ref={scrollRef}></div>
+        </div>
+        <footer>
+          {warnFastTyping && (
+              <div style={{ color: 'red', fontSize: '0.8rem', marginBottom: '4px' }}>
+                메시지를 너무 빠르게 입력하고 있어요. 잠시만 기다려 주세요.
+              </div>
+          )}
+          <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+              placeholder="Type a message..."
+          />
+          <button onClick={sendMessage}>Send</button>
+        </footer>
+      </div>
   );
-}
+};
 
-export default App;
+export default ChatApp;

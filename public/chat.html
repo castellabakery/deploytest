@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chit Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f1f1f1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: #4a90e2;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        #chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .message.me {
+            align-self: flex-end;
+            background: #dcf8c6;
+        }
+
+        .message.other {
+            align-self: flex-start;
+            background: #ffffff;
+        }
+
+        .message span {
+            font-size: 0.8rem;
+            color: #555;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        footer {
+            display: flex;
+            padding: 0.5rem;
+            background: #ffffff;
+            border-top: 1px solid #ccc;
+        }
+
+        #message {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        #sendBtn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: #4a90e2;
+            color: white;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        #sendBtn:disabled {
+            background: #aaa;
+        }
+
+        #chat::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
+        }
+
+        .message span {
+            font-size: 0.75rem;
+            color: #777;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>Chit Chat</header>
+
+<div id="chat"></div>
+
+<footer>
+    <input type="text" id="message" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button id="sendBtn" onclick="sendMessage()">Send</button>
+</footer>
+
+<input type="hidden" id="serverUrl" value="https://chitchat.pastelcloud.store/chat" />
+
+<script>
+    let isServerConnected = false;
+    let stompClient = null;
+    const userId = "user_" + Math.floor(Math.random() * 10000);
+    let currentPage = 0;
+    const pageSize = 20;
+    let isLoading = false;
+    let hasMoreMessages = true;
+
+    function connect() {
+        const serverUrl = document.getElementById('serverUrl').value;
+        const socket = new SockJS(serverUrl);
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function () {
+            stompClient.subscribe('/topic/public', function (message) {
+                showMessage(JSON.parse(message.body));
+            });
+            isServerConnected = true;
+        });
+
+        loadPreviousMessages(); // 첫 페이지 메시지 로딩
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('message');
+        const message = input.value.trim();
+        if (!message || !stompClient) return;
+
+        stompClient.send("/app/sendMessage", {}, JSON.stringify({
+            sender: userId,
+            content: message,
+            type: "CHAT"
+        }));
+        input.value = "";
+    }
+
+    function formatDateTime(datetimeStr) {
+        const date = new Date(datetimeStr);
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showMessage(message, prepend = false) {
+        const chat = document.getElementById('chat');
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+
+        const sender = message.sender === userId ? "me" : "other";
+        messageElement.classList.add(sender);
+
+        const time = message.createDateTime ? `<span>${formatDateTime(message.createDateTime)}</span>` : "";
+
+        messageElement.innerHTML = `
+            ${message.content}
+            <span>${message.sender}</span>
+            ${time}
+        `;
+
+        if (prepend) {
+            chat.insertBefore(messageElement, chat.firstChild);
+        } else {
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+    }
+
+    async function loadPreviousMessages() {
+        if (isLoading || !hasMoreMessages) return;
+        isLoading = true;
+
+        const chat = document.getElementById('chat');
+        const previousScrollHeight = chat.scrollHeight;
+
+        try {
+            const response = await fetch(`https://chitchat.pastelcloud.store/message/list?page=${currentPage}&size=${pageSize}`);
+            if (!response.ok) throw new Error('Failed to load messages');
+
+            const messages = await response.json();
+
+            if (messages.length < pageSize) hasMoreMessages = false;
+            currentPage++;
+
+            messages.reverse().forEach(msg => showMessage(msg, true));
+
+            // 스크롤 위치 유지
+            setTimeout(() => {
+                chat.scrollTop = chat.scrollHeight - previousScrollHeight;
+            }, 0);
+
+        } catch (error) {
+            console.error('Error loading previous messages:', error);
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    // 무한 스크롤 이벤트 리스너
+    document.addEventListener('DOMContentLoaded', () => {
+        const chat = document.getElementById('chat');
+        chat.addEventListener('scroll', () => {
+            if (chat.scrollTop === 0) {
+                loadPreviousMessages();
+            }
+        });
+    });
+
+    connect();
+</script>
+
+
+<!--<script>-->
+<!--    let isServerConnected = false;-->
+<!--    let stompClient = null;-->
+<!--    const userId = "user_" + Math.floor(Math.random() * 10000);-->
+
+<!--    function connect() {-->
+<!--        const serverUrl = document.getElementById('serverUrl').value;-->
+<!--        const socket = new SockJS(serverUrl);-->
+<!--        stompClient = Stomp.over(socket);-->
+<!--        stompClient.connect({}, function () {-->
+<!--            stompClient.subscribe('/topic/public', function (message) {-->
+<!--                showMessage(JSON.parse(message.body));-->
+<!--            });-->
+<!--            isServerConnected = true;-->
+<!--        });-->
+<!--    }-->
+
+<!--    function sendMessage() {-->
+<!--        const input = document.getElementById('message');-->
+<!--        const message = input.value.trim();-->
+<!--        if (!message || !stompClient) return;-->
+
+<!--        stompClient.send("/app/sendMessage", {}, JSON.stringify({-->
+<!--            sender: userId,-->
+<!--            content: message,-->
+<!--            type: "CHAT"-->
+<!--        }));-->
+<!--        input.value = "";-->
+<!--    }-->
+
+<!--    function showMessage(message) {-->
+<!--        const chat = document.getElementById('chat');-->
+<!--        const messageElement = document.createElement('div');-->
+<!--        messageElement.classList.add('message');-->
+
+<!--        const sender = message.sender === userId ? "me" : "other";-->
+<!--        messageElement.classList.add(sender);-->
+
+<!--        messageElement.innerHTML = `-->
+<!--            ${message.content}-->
+<!--            <span>${message.sender}</span>-->
+<!--        `;-->
+
+<!--        chat.appendChild(messageElement);-->
+<!--        chat.scrollTop = chat.scrollHeight;-->
+<!--    }-->
+
+<!--    connect();-->
+<!--</script>-->
+
+</body>
+</html>

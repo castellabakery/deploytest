@@ -1,0 +1,102 @@
+import java.text.SimpleDateFormat
+
+pipeline {
+    agent {
+        label 'Host'
+    }
+    parameters {
+        string(
+            name: 'BRANCH_NAME',
+            defaultValue: params.BRANCH_NAME ?: '*/main',
+            description: '[REQUIRED] 빌드를 원하는 브랜치명을 정확히 입력해주세요. (ex. */develop, */feature/test-branch) (tag도 가능. ex. tags/{태그명})'
+        )
+        string(
+            name: 'OVERRIDE_ADDITIONAL_TAG',
+            description: '[OPTIONAL] 원하는 형식의 태그가 있다면 입력해주세요. 태그 없이 완제품을 빌드할 때는 @notag@를 입력하세요. (버전 뒤 \'-\' 또한 함께 입력해야 적용됩니다.)'
+        )
+        choice(
+            choices: ['', '-develop', '@notag@'],
+            name: 'ADDITIONAL_TAG',
+            description: '[REQUIRED] 날짜 태그는 빈값, develop 브랜치는 -develop 을 선택해주세요.'
+        )
+
+        string(
+            name: 'DOCKER_REGISTRY',
+            defaultValue: params.DOCKER_REGISTRY ?: 'registry.pastelcloud.store',
+            description: '[docker_hosted image push] 관리자외 수정 금지'
+        )
+    }
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('my-nex-docker-registry')
+        VERSION = '0.1.2'
+        IMAGE = 'deploytest'
+    }
+    stages {
+        stage('0. clean workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('1. Check Parameters') {
+            steps{
+                script {
+                    if(params.DOCKER_REGISTRY.isEmpty()) {
+                        error("Environment Parameters is Empty.")
+                    }
+                    if(params.BRANCH_NAME.isEmpty()) {
+                        error("BRANCH_NAME is Empty")
+                    }
+                }
+            }
+        }
+        stage('2. Git Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "${params.BRANCH_NAME}"]],
+                    userRemoteConfigs: [[credentialsId: 'github-token-password', url: 'https://github.com/castellabakery/deploytest.git']]
+                ])
+            }
+        }
+        stage('3. Npm Build') {
+            steps {
+                script {
+                    sh "npm install"
+                    sh "npm run build"
+                }
+            }
+        }
+        stage('4. Docker Build') {
+            steps {
+                script {
+                    app = docker.build("${params.DOCKER_REGISTRY}/${env.IMAGE}")
+                }
+            }
+        }
+        stage('5. Docker Push') {
+            steps {
+                script {
+                    ADDITIONAL_TAG = ""
+                    if(params.ADDITIONAL_TAG == null || params.ADDITIONAL_TAG == "") {
+                        def dateFormat = new SimpleDateFormat("yyyyMMddHHmmss")
+                        def date = new Date()
+                        ADDITIONAL_TAG = "-" + dateFormat.format(date)
+                    }
+                    if(params.ADDITIONAL_TAG == "@notag@") {
+                        ADDITIONAL_TAG = ""
+                    }
+                    if(params.OVERRIDE_ADDITIONAL_TAG != null && params.OVERRIDE_ADDITIONAL_TAG != "") {
+                        ADDITIONAL_TAG = params.OVERRIDE_ADDITIONAL_TAG
+                    }
+                    if(params.OVERRIDE_ADDITIONAL_TAG == "@notag@") {
+                        ADDITIONAL_TAG = ""
+                    }
+
+                    docker.withRegistry("https://${DOCKER_REGISTRY}", 'my-nex-docker-registry') {
+                        app.push("${env.VERSION}$ADDITIONAL_TAG")
+                    }
+                }
+            }
+        }
+    }
+}

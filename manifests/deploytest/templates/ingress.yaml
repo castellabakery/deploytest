@@ -34,15 +34,15 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "{{ .Values.subDomain }}.{{ .Values.domain }}"
+        - "{{ .Values.domain }}"
       secretName: {{ .Values.secretName }}
   ingressClassName: "nginx"
   rules:
-    - host: "{{ .Values.subDomain }}.{{ .Values.domain }}"
+    - host: "{{ .Values.domain }}"
       http:
         paths:
           - pathType: Prefix
-            path: "/api"
+            path: "/"
             backend:
               service:
                 name: {{ .Values.consumeBatch.externalName }}

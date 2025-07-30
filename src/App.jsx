@@ -1,23 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
-import './ChatApp.css';
+import './ChatApp.css'; // 새로운 CSS 파일을 사용합니다.
 
 const SERVER_HOST = 'https://chitchat.pastelcloud.store';
 const SERVER_URL = SERVER_HOST + '/chat';
 const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
 
-const PAGE_SIZE = 50;
-const SEND_INTERVAL = 500; // 1초 간격
+const PAGE_SIZE = 5;
 
 const renderTextWithLinks = (text) => {
+  if (typeof text !== 'string') return text;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   const parts = text.split(urlRegex);
 
   return parts.map((part, index) =>
       urlRegex.test(part) ? (
-          <a key={index} href={part} target="_blank" rel="noopener noreferrer">
+          <a key={index} href={part} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
             {part}
           </a>
       ) : (
@@ -25,7 +25,6 @@ const renderTextWithLinks = (text) => {
       )
   );
 };
-
 
 const ChatApp = () => {
   const [messages, setMessages] = useState([]);
@@ -45,13 +44,6 @@ const ChatApp = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
-
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  //      도배 방지 관련 상태 및 ref 다시 추가
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  const [warnFastTyping, setWarnFastTyping] = useState(false);
-  const lastSendTimeRef = useRef(0);
-
 
   useEffect(() => {
     const storedName = localStorage.getItem('chatUsername');
@@ -132,45 +124,39 @@ const ChatApp = () => {
     setAskingName(true);
   };
 
+// App.jsx 파일의 다른 부분은 그대로 두고, 이 함수만 교체하세요.
+
   const connect = () => {
     const socket = new SockJS(SERVER_URL);
     const client = over(socket);
     client.connect({}, () => {
       client.subscribe('/topic/public', (msg) => {
+        // --- 디버깅을 위한 로그 추가 ---
+        console.log("✅ 새 메시지 수신 (웹소켓):", msg.body);
+
         const message = JSON.parse(msg.body);
-        setMessages(prev => [...prev, message]);
-        setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'smooth' }), 0);
+
+        setMessages(prev => {
+          // 함수형 업데이트를 사용하여 이전 상태를 기반으로 새 상태를 안전하게 반환
+          const newState = [...prev, message];
+          console.log(`- 메시지 상태 업데이트: 이전 ${prev.length}개 -> 새 ${newState.length}개`);
+          return newState;
+        });
+
+        // 스크롤 로직은 그대로 유지
+        setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
       });
       setStompClient(client);
     });
   };
 
   const sendMessage = (content, type) => {
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    //      공용 전송 함수에 도배 방지 로직 추가
-    // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    const now = Date.now();
-    if (now - lastSendTimeRef.current < SEND_INTERVAL) {
-      setWarnFastTyping(true);
-      return;
-    }
-    setWarnFastTyping(false);
-    lastSendTimeRef.current = now;
-
     if (!content || !stompClient) return;
-    const clientDate = new Date();
+
     const message = {
       sender: username,
       content: content,
       type: type,
-      createDateTime: [
-        clientDate.getFullYear(),
-        clientDate.getMonth() + 1,
-        clientDate.getDate(),
-        clientDate.getHours(),
-        clientDate.getMinutes(),
-        clientDate.getSeconds(),
-      ]
     };
     stompClient.send("/app/sendMessage", {}, JSON.stringify(message));
   };
@@ -214,7 +200,6 @@ const ChatApp = () => {
       if (newMessages && newMessages.length > 0) {
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
-        const scrollTopBefore = chatContainer?.scrollTop;
 
         if (isInitial) {
           setMessages(newMessages);
@@ -227,7 +212,7 @@ const ChatApp = () => {
 
         if (chatContainer && !isInitial) {
           requestAnimationFrame(() => {
-            chatContainer.scrollTop = chatContainer.scrollHeight - scrollHeightBefore + scrollTopBefore;
+            chatContainer.scrollTop = chatContainer.scrollHeight - scrollHeightBefore;
           });
         } else if (chatContainer) {
           setTimeout(() => {
@@ -237,8 +222,7 @@ const ChatApp = () => {
       } else {
         setHasMore(false);
       }
-    } catch (error)
-    {
+    } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
@@ -246,10 +230,9 @@ const ChatApp = () => {
   };
 
   const formatTime = (array) => {
-    if (!Array.isArray(array) || array.length < 6) return new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-    const [y, m, d, h, min, s] = array;
-    const date = new Date(y, m - 1, d, h, min, s);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (!Array.isArray(array) || array.length < 6) return '...';
+    const [y, m, d, h, min] = array;
+    return `${y}년 ${m}월 ${d}일 - ${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
   };
 
   const openModal = (src) => {
@@ -265,102 +248,103 @@ const ChatApp = () => {
   const renderMessageContent = (msg) => {
     if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
       return (
-          <img
-              src={msg.content}
-              alt="전송된 이미지"
-              className="message-image"
-              style={{ cursor: 'pointer' }}
-              onClick={() => openModal(msg.content)}
-          />
+          <div className="image-result-box" onClick={() => openModal(msg.content)}>
+            <img src={msg.content} alt="이미지 검색 결과" />
+            <p>이미지 검색 결과</p>
+          </div>
       );
     }
 
     if (typeof msg.content === 'string') {
-      return renderTextWithLinks(msg.content);
+      return <span className="search-result-snippet">{renderTextWithLinks(msg.content)}</span>;
     }
 
-    return msg.content;
+    return <span className="search-result-snippet">{msg.content}</span>;
   };
 
   if (askingName) {
     return (
-        <div className="app">
-          <header>Chit Chat</header>
-          <div className="username-prompt styled-modal">
-            <h2>닉네임을 입력하세요</h2>
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
-                placeholder="닉네임 입력"
-            />
-            <button onClick={handleSetUsername}>입장하기</button>
+        <div className="google-ui-app">
+          <div className="username-prompt">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" style={{width: '150px', marginBottom: '20px'}}/>
+            <h2>Chit-Chat 서비스 사용을 위해 닉네임을 입력하세요.</h2>
+            <div className="search-bar-container" style={{maxWidth: '400px', margin: '20px auto'}}>
+              <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
+                  placeholder="닉네임 입력"
+              />
+            </div>
+            <button className="search-button" onClick={handleSetUsername}>입장하기</button>
           </div>
         </div>
     );
   }
 
   return (
-      <div className="app">
-        <header>
-          <span>Chit Chat</span>
-          <br/>
-          <button className="change-name-btn" onClick={changeUsername}>
-            🖊️ 닉네임 변경
-          </button>
-        </header>
-        <div id="chat" ref={chatRef}>
-          {loading && <div className="loading-indicator">로딩 중...</div>}
-
-          {showLoadMoreButton && !loading && (
-              <div style={{ textAlign: 'center', padding: '10px' }}>
-                <button onClick={() => loadMessages(nextPage)} className="load-more-btn">
-                  이전 대화 불러오기
-                </button>
-              </div>
-          )}
-
-          {!hasMore && !loading && messages.length > 0 && <div className="loading-indicator">- 모든 대화를 불러왔습니다 -</div>}
-
-          {messages.map((msg, idx) => (
-              <div key={msg.id || idx} className={`message ${msg.sender === username ? 'me' : 'other'}`}>
-                {renderMessageContent(msg)}
-                <span>{msg.sender}</span>
-                {/*{msg.createDateTime && <span>{formatTime(msg.createDateTime)}</span>}*/}
-                <span>{formatTime(msg.createDateTime)}</span>
-              </div>
-          ))}
-          <div ref={scrollRef}></div>
-        </div>
-        <footer>
-          {/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */}
-          {/* 경고 메시지 표시 부분 다시 추가       */}
-          {/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */}
-          {warnFastTyping && (
-              <div style={{ color: 'red', fontSize: '0.8rem', width: '100%', textAlign: 'center', marginBottom: '4px' }}>
-                메시지를 너무 빠르게 보내고 있습니다.
-              </div>
-          )}
-          <div style={{ display: 'flex', width: '100%'}}>
-            <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                accept="image/*"
-                onChange={handleFileChange}
-            />
-            <button className="attach-btn" onClick={() => fileInputRef.current.click()}>📎</button>
+      <div className="google-ui-app">
+        {/* Header */}
+        <div className="search-header">
+          <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo"/>
+          <div className="search-bar-container">
             <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()}
-                placeholder="Type a message..."
             />
-            <button onClick={sendTextMessage}>Send</button>
+            <div className="search-bar-icons">
+              <span className="icon" onClick={() => fileInputRef.current.click()}>📷</span>
+              {/*<span className="icon">🎤</span>*/}
+              <div className="user-profile-icon" onClick={changeUsername}>
+                {username.charAt(0).toUpperCase()}
+              </div>
+            </div>
           </div>
-        </footer>
+          <button className="search-button" onClick={sendTextMessage}>검색</button>
+          <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept="image/*"
+              onChange={handleFileChange}
+          />
+        </div>
+        <div className="search-options-bar">
+          <span>전체</span>
+          <span>이미지</span>
+          <span>뉴스</span>
+          <span>동영상</span>
+          <span>더보기</span>
+        </div>
+
+        {/* Body */}
+        <div className="search-results-container" ref={chatRef}>
+          {loading && <div className="loading-indicator">결과를 로드하는 중...</div>}
+          {showLoadMoreButton && !loading && (
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <button onClick={() => loadMessages(nextPage)} className="search-button">
+                  이전 결과 더보기
+                </button>
+              </div>
+          )}
+
+          {messages.map((msg, idx) => (
+              <div key={msg.id || idx} className="search-result-item">
+                <div className="search-result-url">
+                  https://mail.google.com/chat/{msg.sender} › {formatTime(msg.createDateTime)}
+                </div>
+                <h3 className="search-result-title">{msg.sender}님의 메시지</h3>
+                {renderMessageContent(msg)}
+              </div>
+          ))}
+
+          {!hasMore && !loading && messages.length > 0 && <div className="loading-indicator" style={{padding: '20px'}}>- 더 이상 이전 대화가 없습니다 -</div>}
+          <div ref={scrollRef}></div>
+        </div>
+
         {isModalOpen && (
             <div className="modal" onClick={closeModal}>
               <div className="modal-content">

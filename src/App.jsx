@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
-import './ChatApp.css'; // 새로운 CSS 파일을 사용합니다.
+import './ChatApp.css';
 
-const SERVER_HOST = 'https://chitchat.pastelcloud.store';
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+//       API 주소 설정을 원래대로 되돌렸습니다.
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+const SERVER_HOST = 'http://localhost:8080';
 const SERVER_URL = SERVER_HOST + '/chat';
+const ROOM_API = SERVER_HOST + '/room';
+const ROOM_LIST_API = SERVER_HOST + '/room/list';
+const CHECK_PASSWORD_API = SERVER_HOST + '/room/check/password';
 const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 50;
 
 const renderTextWithLinks = (text) => {
   if (typeof text !== 'string') return text;
@@ -30,8 +36,8 @@ const ChatApp = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [stompClient, setStompClient] = useState(null);
-  const [username, setUsername] = useState('');
-  const [askingName, setAskingName] = useState(true);
+  const [username, setUsername] = useState(localStorage.getItem('chatUsername'));
+  const [askingName, setAskingName] = useState(false);
 
   const chatRef = useRef(null);
   const scrollRef = useRef(null);
@@ -40,47 +46,42 @@ const ChatApp = () => {
   const [nextPage, setNextPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [showLoadMoreButton, setShowLoadMoreButton] = useState(false);
+  const [showLoadMoreButton, setShowLoadMoreButton] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
 
+  const [rooms, setRooms] = useState([]);
+  const [currentRoom, setCurrentRoom] = useState(null);
+  const [passwordModal, setPasswordModal] = useState({ visible: false, room: null, error: '' });
+  const [passwordInput, setPasswordInput] = useState('');
+
+  const [createRoomModal, setCreateRoomModal] = useState({ visible: false, error: '' });
+  const [newRoomName, setNewRoomName] = useState('');
+  const [newRoomPassword, setNewRoomPassword] = useState('');
+
   useEffect(() => {
-    const storedName = localStorage.getItem('chatUsername');
-    if (storedName) {
-      setUsername(storedName);
-      setAskingName(false);
-    }
+      loadRooms();
+      // connect();
   }, []);
 
   useEffect(() => {
-    if (!askingName && username) {
-      const initializeChat = async () => {
-        setLoading(true);
-        try {
-          const countRes = await fetch(COUNT_API);
-          const totalCount = await countRes.json();
-
-          if (totalCount > 0) {
-            const lastPage = Math.floor((totalCount - 1) / PAGE_SIZE);
-            await loadMessages(lastPage, true);
-            setNextPage(lastPage - 1);
-            setHasMore(lastPage > 0);
-          } else {
-            setHasMore(false);
-          }
-        } catch (error) {
-          console.error("채팅 초기화 실패:", error);
-          setHasMore(false);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      connect();
+    if (currentRoom) {
       initializeChat();
+      connect();
     }
-  }, [askingName, username]);
+  }, [currentRoom]);
+
+  useEffect(() => {
+    const chatElement = chatRef.current;
+    if (loading || !chatElement) return;
+    const canScroll = chatElement.scrollHeight > chatElement.clientHeight;
+    if (hasMore && !canScroll) {
+      setShowLoadMoreButton(true);
+    } else {
+      setShowLoadMoreButton(false);
+    }
+  }, [messages, loading, hasMore]);
 
   useEffect(() => {
     const chatElement = chatRef.current;
@@ -100,65 +101,170 @@ const ChatApp = () => {
     };
   }, [loading, hasMore, nextPage]);
 
-  useEffect(() => {
-    const chatElement = chatRef.current;
-    if (loading || !chatElement) return;
-    const canScroll = chatElement.scrollHeight > chatElement.clientHeight;
-    if (hasMore && !canScroll) {
-      setShowLoadMoreButton(true);
-    } else {
-      setShowLoadMoreButton(false);
-    }
-  }, [messages, loading, hasMore]);
-
-
-  const handleSetUsername = () => {
-    if (username.trim()) {
-      localStorage.setItem('chatUsername', username.trim());
-      setUsername(username.trim());
-      setAskingName(false);
+  const loadRooms = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(ROOM_LIST_API);
+      if (!res.ok) throw new Error('방 목록 로딩 실패');
+      const data = await res.json();
+      setRooms(data);
+    } catch (error) {
+      console.error("방 목록 로딩 실패:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const changeUsername = () => {
-    setAskingName(true);
+  const initializeChat = async () => {
+    if (!currentRoom) return;
+    setLoading(true);
+    try {
+      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+      //       API 주소를 원래대로 사용합니다.
+      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+      const countRes = await fetch(COUNT_API + "?roomId="+currentRoom.id);
+      const totalCount = await countRes.json();
+
+      if (totalCount > 0) {
+        const lastPage = Math.floor((totalCount - 1) / PAGE_SIZE);
+        await loadMessages(lastPage, true);
+        setNextPage(lastPage - 1);
+        setHasMore(lastPage > 0);
+      } else {
+        setMessages([]);
+        setNextPage(-1);
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("채팅 초기화 실패:", error);
+      setMessages([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
-// App.jsx 파일의 다른 부분은 그대로 두고, 이 함수만 교체하세요.
+  const handleRoomClick = (room) => {
+    setPasswordModal({ visible: true, room: room, error: '' });
+  };
+
+  const closePasswordModal = () => {
+    setPasswordModal({ visible: false, room: null, error: '' });
+    setPasswordInput('');
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!passwordInput) return;
+
+    try {
+      const res = await fetch(CHECK_PASSWORD_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: passwordModal.room.id,
+          roomPassword: passwordInput,
+        }),
+      });
+
+      const isValid = await res.json();
+
+
+      if (res.ok && isValid.code !== '1007') {
+        setCurrentRoom({
+          id: passwordModal.room.id,
+          name: passwordModal.room.name,
+          password: passwordInput,
+        });
+        closePasswordModal();
+      } else {
+        setPasswordModal(prev => ({ ...prev, error: '비밀번호가 올바르지 않습니다.' }));
+      }
+    } catch (error) {
+      console.error("비밀번호 확인 실패:", error);
+      setPasswordModal(prev => ({ ...prev, error: '인증 중 오류가 발생했습니다.' }));
+    }
+  };
+
+  const openCreateRoomModal = () => {
+    setCreateRoomModal({ visible: true, error: '' });
+  };
+
+  const closeCreateRoomModal = () => {
+    setCreateRoomModal({ visible: false, error: '' });
+    setNewRoomName('');
+    setNewRoomPassword('');
+  };
+
+  const handleCreateRoomSubmit = async () => {
+    if (!newRoomName || !newRoomPassword) {
+      setCreateRoomModal(prev => ({ ...prev, error: '방 이름과 비밀번호를 모두 입력하세요.' }));
+      return;
+    }
+
+    try {
+      const res = await fetch(ROOM_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newRoomName,
+          password: newRoomPassword,
+        }),
+      });
+
+      if (res.ok) {
+        closeCreateRoomModal();
+        loadRooms();
+      } else {
+        const errorData = await res.json();
+        setCreateRoomModal(prev => ({ ...prev, error: errorData.message || '방 생성에 실패했습니다.' }));
+      }
+    } catch (error) {
+      console.error("방 생성 실패:", error);
+      setCreateRoomModal(prev => ({ ...prev, error: '방 생성 중 오류가 발생했습니다.' }));
+    }
+  };
+
+  const handleExitRoom = () => {
+    setCurrentRoom(null);
+    setMessages([]);
+    setNextPage(0);
+    setHasMore(true);
+    loadRooms();
+  };
 
   const connect = () => {
+    if (!currentRoom) return;
     const socket = new SockJS(SERVER_URL);
     const client = over(socket);
     client.connect({}, () => {
-      client.subscribe('/topic/public', (msg) => {
-        // --- 디버깅을 위한 로그 추가 ---
-        console.log("✅ 새 메시지 수신 (웹소켓):", msg.body);
-
+      client.subscribe('/topic/public/'+currentRoom.id, (msg) => {
         const message = JSON.parse(msg.body);
-
-        setMessages(prev => {
-          // 함수형 업데이트를 사용하여 이전 상태를 기반으로 새 상태를 안전하게 반환
-          const newState = [...prev, message];
-          console.log(`- 메시지 상태 업데이트: 이전 ${prev.length}개 -> 새 ${newState.length}개`);
-          return newState;
-        });
-
-        // 스크롤 로직은 그대로 유지
-        setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
+        if (currentRoom && message.roomId === currentRoom.id) {
+          setMessages(prev => [...prev, message]);
+          setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
+        }
+      });
+      // ✅ [중요] 자신의 에러 큐를 구독합니다.
+      // 서버의 @SendToUser("/queue/errors") 경로와 일치해야 합니다.
+      client.subscribe('/topic/public/errors', function (error) {
+        // 서버로부터 받은 에러 메시지를 처리합니다.
+        alert("에러 발생: " + error.body);
       });
       setStompClient(client);
     });
   };
 
   const sendMessage = (content, type) => {
-    if (!content || !stompClient) return;
+    if (!content || !stompClient || !currentRoom) return;
 
     const message = {
       sender: username,
       content: content,
       type: type,
+      roomId: currentRoom.id,
+      roomPassword: currentRoom.password,
     };
-    stompClient.send("/app/sendMessage", {}, JSON.stringify(message));
+    stompClient.send("/app/sendMessage/"+currentRoom.id, {}, JSON.stringify(message));
   };
 
   const sendTextMessage = () => {
@@ -184,14 +290,17 @@ const ChatApp = () => {
   };
 
   const loadMessages = async (pageNum, isInitial = false) => {
-    if (pageNum < 0) {
+    if (pageNum < 0 || !currentRoom) {
       setHasMore(false);
       return;
     }
     setLoading(true);
-    setShowLoadMoreButton(false);
+    // setShowLoadMoreButton(false);
     try {
-      const url = `${MESSAGE_API}?page=${pageNum}&size=${PAGE_SIZE}`;
+      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+      //       API 주소를 원래대로 사용합니다.
+      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+      const url = `${MESSAGE_API}?page=${pageNum}&size=${PAGE_SIZE}&roomId=${currentRoom.id}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('메시지 로딩 실패');
 
@@ -201,11 +310,13 @@ const ChatApp = () => {
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
 
-        if (isInitial) {
-          setMessages(newMessages);
-        } else {
-          setMessages(prev => [...newMessages, ...prev]);
-        }
+        // if (newMessages.roomId === currentRoom.id) {
+          if (isInitial) {
+            setMessages(newMessages);
+          } else {
+            setMessages(prev => [...newMessages, ...prev]);
+          }
+        // }
 
         setNextPage(pageNum - 1);
         setHasMore(pageNum > 0);
@@ -262,12 +373,24 @@ const ChatApp = () => {
     return <span className="search-result-snippet">{msg.content}</span>;
   };
 
+  const handleSetUsername = () => {
+    if (username.trim()) {
+      localStorage.setItem('chatUsername', username.trim());
+      setUsername(username.trim());
+      setAskingName(false);
+    }
+  };
+
+  const changeUsername = () => {
+    setAskingName(true);
+  };
+
   if (askingName) {
     return (
         <div className="google-ui-app">
           <div className="username-prompt">
             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" style={{width: '150px', marginBottom: '20px'}}/>
-            <h2>Chit-Chat 서비스 사용을 위해 닉네임을 입력하세요.</h2>
+            <h2>서비스 사용을 위해 닉네임을 입력하세요.</h2>
             <div className="search-bar-container" style={{maxWidth: '400px', margin: '20px auto'}}>
               <input
                   type="text"
@@ -283,11 +406,92 @@ const ChatApp = () => {
     );
   }
 
+  if (!currentRoom) {
+    return (
+        <div className="google-ui-app">
+          <div className="search-header">
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo"/>
+            <div className="user-profile-icon" onClick={changeUsername}>
+              {username.charAt(0).toUpperCase()}
+            </div>
+          </div>
+          <div className="search-options-bar">
+            <span>채팅방 목록</span>
+          </div>
+
+          <div className="search-results-container">
+            {loading && <div className="loading-indicator">방 목록을 불러오는 중...</div>}
+            {rooms.map(room => (
+                <div key={room.id} className="search-result-item" onClick={() => handleRoomClick(room)}>
+                  <div className="search-result-url">
+                    https://mail.google.com/chat/room/{room.id}
+                  </div>
+                  <h3 className="search-result-title">{room.name}</h3>
+                </div>
+            ))}
+          </div>
+
+          <button className="create-room-button" onClick={openCreateRoomModal}>+</button>
+
+          {passwordModal.visible && (
+              <div className="modal" onClick={closePasswordModal}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <h3>'{passwordModal.room.name}' 입장</h3>
+                  <p>비밀번호를 입력하세요.</p>
+                  <div className="search-bar-container" style={{maxWidth: '300px', margin: '20px auto'}}>
+                    <input
+                        type="password"
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                        placeholder="비밀번호"
+                        autoFocus
+                    />
+                  </div>
+                  {passwordModal.error && <p className="error-message">{passwordModal.error}</p>}
+                  <button className="search-button" onClick={handlePasswordSubmit}>입장</button>
+                  <button className="close-button" onClick={closePasswordModal}>&times;</button>
+                </div>
+              </div>
+          )}
+
+          {createRoomModal.visible && (
+              <div className="modal" onClick={closeCreateRoomModal}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <h3>새 채팅방 만들기</h3>
+                  <div className="form-group">
+                    <input
+                        type="text"
+                        value={newRoomName}
+                        onChange={(e) => setNewRoomName(e.target.value)}
+                        placeholder="방 이름"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <input
+                        type="password"
+                        value={newRoomPassword}
+                        onChange={(e) => setNewRoomPassword(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleCreateRoomSubmit()}
+                        placeholder="비밀번호"
+                    />
+                  </div>
+                  {createRoomModal.error && <p className="error-message">{createRoomModal.error}</p>}
+                  <button className="search-button" onClick={handleCreateRoomSubmit}>만들기</button>
+                  <button className="close-button" onClick={closeCreateRoomModal}>&times;</button>
+                </div>
+              </div>
+          )}
+        </div>
+    );
+  }
+
   return (
       <div className="google-ui-app">
-        {/* Header */}
         <div className="search-header">
+          <span className="back-button" onClick={handleExitRoom}>←</span>
           <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo"/>
+          <h1 className="room-title">{currentRoom.name}</h1>
           <div className="search-bar-container">
             <input
                 type="text"
@@ -296,14 +500,10 @@ const ChatApp = () => {
                 onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()}
             />
             <div className="search-bar-icons">
-              <span className="icon" onClick={() => fileInputRef.current.click()}>📷</span>
-              {/*<span className="icon">🎤</span>*/}
-              <div className="user-profile-icon" onClick={changeUsername}>
-                {username.charAt(0).toUpperCase()}
-              </div>
+              <span className="icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>📷</span>
             </div>
           </div>
-          <button className="search-button" onClick={sendTextMessage}>검색</button>
+          <button className="search-button" onClick={sendTextMessage}>전송</button>
           <input
               type="file"
               ref={fileInputRef}
@@ -311,17 +511,13 @@ const ChatApp = () => {
               accept="image/*"
               onChange={handleFileChange}
           />
-        </div>
-        <div className="search-options-bar">
-          <span>전체</span>
-          <span>이미지</span>
-          <span>뉴스</span>
-          <span>동영상</span>
-          <span>더보기</span>
+          <div className="user-profile-icon" onClick={changeUsername}>
+            {username.charAt(0).toUpperCase()}
+          </div>
         </div>
 
-        {/* Body */}
         <div className="search-results-container" ref={chatRef}>
+          {!hasMore && !loading && messages.length > 0 && <div className="loading-indicator" style={{padding: '20px'}}>- 더 이상 이전 대화가 없습니다 -</div>}
           {loading && <div className="loading-indicator">결과를 로드하는 중...</div>}
           {showLoadMoreButton && !loading && (
               <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -341,7 +537,6 @@ const ChatApp = () => {
               </div>
           ))}
 
-          {!hasMore && !loading && messages.length > 0 && <div className="loading-indicator" style={{padding: '20px'}}>- 더 이상 이전 대화가 없습니다 -</div>}
           <div ref={scrollRef}></div>
         </div>
 

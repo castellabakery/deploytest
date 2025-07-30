@@ -233,3 +233,44 @@
 .user-profile-icon:hover {
     filter: brightness(0.9);
 }
+
+
+
+
+/* 방 만들기 버튼 */
+.create-room-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    font-size: 36px;
+    line-height: 60px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.create-room-button:hover {
+    transform: scale(1.05);
+    background-color: #2b7de9;
+}
+
+/* 방 만들기 모달 내부 폼 스타일 */
+.modal-content .form-group {
+    margin: 15px 0;
+}
+
+.modal-content .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #dfe1e5;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+}

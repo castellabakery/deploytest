@@ -60,9 +60,14 @@ const ChatApp = () => {
   const [newRoomName, setNewRoomName] = useState('');
   const [newRoomPassword, setNewRoomPassword] = useState('');
 
+  // S  채팅방 삭제 기능 추가
+  const [deleteRoomModal, setDeleteRoomModal] = useState({ visible: false, room: null, error: '' });
+  const [deletePasswordInput, setDeletePasswordInput] = useState('');
+  // E  채팅방 삭제 기능 추가
+
   useEffect(() => {
-      loadRooms();
-      // connect();
+    loadRooms();
+    // connect();
   }, []);
 
   useEffect(() => {
@@ -224,6 +229,47 @@ const ChatApp = () => {
     }
   };
 
+  // S  채팅방 삭제 기능 추가
+  const openDeleteModal = (room) => {
+    setDeleteRoomModal({ visible: true, room: room, error: '' });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteRoomModal({ visible: false, room: null, error: '' });
+    setDeletePasswordInput('');
+  };
+
+  const handleDeleteRoomSubmit = async () => {
+    if (!deletePasswordInput) {
+      setDeleteRoomModal(prev => ({ ...prev, error: '비밀번호를 입력하세요.' }));
+      return;
+    }
+
+    try {
+      const res = await fetch(ROOM_API, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: deleteRoomModal.room.id,
+          password: deletePasswordInput,
+        }),
+      });
+
+      if (res.ok) {
+        closeDeleteModal();
+        loadRooms(); // 성공 시 방 목록 새로고침
+      } else {
+        // 서버에서 받은 에러 메시지를 사용하려고 시도
+        const errorData = await res.json().catch(() => null);
+        setDeleteRoomModal(prev => ({ ...prev, error: errorData?.message || '방 삭제에 실패했습니다.' }));
+      }
+    } catch (error) {
+      console.error("방 삭제 실패:", error);
+      setDeleteRoomModal(prev => ({ ...prev, error: '방 삭제 중 오류가 발생했습니다.' }));
+    }
+  };
+  // E  채팅방 삭제 기능 추가
+
   const handleExitRoom = () => {
     setCurrentRoom(null);
     setMessages([]);
@@ -311,11 +357,11 @@ const ChatApp = () => {
         const scrollHeightBefore = chatContainer?.scrollHeight;
 
         // if (newMessages.roomId === currentRoom.id) {
-          if (isInitial) {
-            setMessages(newMessages);
-          } else {
-            setMessages(prev => [...newMessages, ...prev]);
-          }
+        if (isInitial) {
+          setMessages(newMessages);
+        } else {
+          setMessages(prev => [...newMessages, ...prev]);
+        }
         // }
 
         setNextPage(pageNum - 1);
@@ -374,10 +420,13 @@ const ChatApp = () => {
   };
 
   const handleSetUsername = () => {
-    if (username.trim()) {
+    if (username && username.trim()) {
       localStorage.setItem('chatUsername', username.trim());
       setUsername(username.trim());
       setAskingName(false);
+    } else {
+      localStorage.removeItem('chatUsername');
+      setUsername('');
     }
   };
 
@@ -385,7 +434,7 @@ const ChatApp = () => {
     setAskingName(true);
   };
 
-  if (askingName) {
+  if (askingName || !username) {
     return (
         <div className="google-ui-app">
           <div className="username-prompt">
@@ -394,7 +443,7 @@ const ChatApp = () => {
             <div className="search-bar-container" style={{maxWidth: '400px', margin: '20px auto'}}>
               <input
                   type="text"
-                  value={username}
+                  value={username || ''}
                   onChange={(e) => setUsername(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
                   placeholder="닉네임 입력"
@@ -426,7 +475,20 @@ const ChatApp = () => {
                   <div className="search-result-url">
                     https://mail.google.com/chat/room/{room.id}
                   </div>
-                  <h3 className="search-result-title">{room.name}</h3>
+                  <div className="search-result-header">
+                    <h3 className="search-result-title">{room.name}</h3>
+                    {/* S 삭제 버튼 추가 */}
+                    <button
+                        className="result-action-button"
+                        onClick={(e) => {
+                          e.stopPropagation(); // 부모의 onClick 이벤트 전파 방지
+                          openDeleteModal(room);
+                        }}
+                    >
+                      삭제
+                    </button>
+                    {/* E 삭제 버튼 추가 */}
+                  </div>
                 </div>
             ))}
           </div>
@@ -482,9 +544,34 @@ const ChatApp = () => {
                 </div>
               </div>
           )}
+
+          {/* S 삭제 모달 JSX 추가 */}
+          {deleteRoomModal.visible && (
+              <div className="modal" onClick={closeDeleteModal}>
+                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <h3>'{deleteRoomModal.room.name}' 삭제</h3>
+                  <p>방을 삭제하려면 비밀번호를 입력하세요. 이 작업은 되돌릴 수 없습니다.</p>
+                  <div className="search-bar-container" style={{maxWidth: '300px', margin: '20px auto'}}>
+                    <input
+                        type="password"
+                        value={deletePasswordInput}
+                        onChange={(e) => setDeletePasswordInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleDeleteRoomSubmit()}
+                        placeholder="비밀번호"
+                        autoFocus
+                    />
+                  </div>
+                  {deleteRoomModal.error && <p className="error-message">{deleteRoomModal.error}</p>}
+                  <button className="search-button delete-confirm-button" onClick={handleDeleteRoomSubmit}>삭제 확인</button>
+                  <button className="close-button" onClick={closeDeleteModal}>&times;</button>
+                </div>
+              </div>
+          )}
+          {/* E 삭제 모달 JSX 추가 */}
         </div>
     );
   }
+
 
   return (
       <div className="google-ui-app">

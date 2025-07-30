@@ -274,3 +274,63 @@
     font-size: 16px;
     box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
 }
+
+
+
+/* ===================================================== */
+/* ========= 아래 코드를 ChatApp.css 파일에 추가 ========= */
+/* ===================================================== */
+
+.search-result-item {
+    cursor: pointer; /* 전체 아이템이 클릭 가능함을 표시 */
+}
+
+/* 채팅방 제목과 삭제 버튼을 한 줄에 정렬하기 위한 컨테이너 */
+.search-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-result-url {
+    padding-bottom: 2px; /* 제목과의 간격 조정 */
+}
+
+/* 채팅방 목록의 삭제 버튼 스타일 */
+.result-action-button {
+    background: none;
+    border: 1px solid #dadce0;
+    color: #5f6368;
+    font-family: inherit;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 16px; /* 제목과의 간격 */
+    flex-shrink: 0; /* 버튼 크기가 줄어들지 않도록 설정 */
+}
+
+.result-action-button:hover {
+    background-color: #f8f9fa;
+    border-color: #c6c6c6;
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+}
+
+/* 모달의 에러 메시지 스타일 */
+.error-message {
+    color: #d93025;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* 삭제 확인 모달의 버튼 스타일 (파괴적인 액션 강조) */
+.delete-confirm-button {
+    background-color: #d93025; /* Google의 삭제/에러 표시 빨간색 */
+    border-color: #d93025;
+}
+
+.delete-confirm-button:hover {
+    background-color: #c5221f;
+    border-color: #b0281a;
+}

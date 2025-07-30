@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
 import './ChatApp.css';
@@ -135,7 +135,7 @@ const ChatApp = () => {
     }
   };
 
-  const initializeChat = async () => {
+  const initializeChat = useCallback(async () => {
     if (!currentRoom) return;
     setLoading(true);
     try {
@@ -159,7 +159,7 @@ const ChatApp = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentRoom]);
 
   const handleRoomClick = (room) => {
     setPasswordModal({ visible: true, room: room, error: '' });
@@ -286,7 +286,7 @@ const ChatApp = () => {
     loadRooms();
   };
 
-  const connect = () => {
+  const connect = useCallback(() => {
     if (!currentRoom) return;
     const socket = new SockJS(SERVER_URL);
     const client = over(socket);
@@ -303,7 +303,7 @@ const ChatApp = () => {
       });
       setStompClient(client);
     });
-  };
+  }, [currentRoom]);
 
   const sendMessage = (content, type) => {
     if (!content || !stompClient || !currentRoom) return;
@@ -340,7 +340,7 @@ const ChatApp = () => {
     event.target.value = null;
   };
 
-  const loadMessages = async (pageNum, isInitial = false) => {
+  const loadMessages = useCallback(async (pageNum, isInitial = false) => {
     if (pageNum < 0 || !currentRoom) {
       setHasMore(false);
       return;
@@ -383,7 +383,7 @@ const ChatApp = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentRoom]);
 
   const formatTime = (array) => {
     if (!Array.isArray(array) || array.length < 6) return '...';

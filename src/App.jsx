@@ -307,13 +307,21 @@ const ChatApp = () => {
 
   const sendMessage = (content, type) => {
     if (!content || !stompClient || !currentRoom) return;
-
+    const clientDate = new Date();
     const message = {
       sender: username,
       content: content,
       type: type,
       roomId: currentRoom.id,
       roomPassword: currentRoom.password,
+      createDateTime: [
+        clientDate.getFullYear(),
+        clientDate.getMonth() + 1,
+        clientDate.getDate(),
+        clientDate.getHours(),
+        clientDate.getMinutes(),
+        clientDate.getSeconds(),
+      ]
     };
     stompClient.send("/app/sendMessage/"+currentRoom.id, {}, JSON.stringify(message));
   };
@@ -386,7 +394,7 @@ const ChatApp = () => {
   };
 
   const formatTime = (array) => {
-    if (!Array.isArray(array) || array.length < 6) return '...';
+    if (!Array.isArray(array) || array.length < 6) return array;
     const [y, m, d, h, min] = array;
     return `${y}년 ${m}월 ${d}일 - ${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
   };

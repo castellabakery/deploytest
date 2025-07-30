@@ -1,47 +1,124 @@
-/* Google UI App General Layout */
+/* ===================================================== */
+/* ChatApp.css (수정 완료)                 */
+/* ===================================================== */
+
+/* --- 1. 테마 변수 정의 (변경 없음) --- */
+:root {
+    --bg-color: #fff;
+    --bg-color-hover: #f8f9fa;
+    --text-color-primary: #202124;
+    --text-color-secondary: #4d5156;
+    --text-color-tertiary: #5f6368;
+    --text-color-link: #1a0dab;
+    --text-color-link-active: #1a73e8;
+
+    --border-color-primary: #dfe1e5;
+    --border-color-hover: #c6c6c6;
+    --border-color-active: #1a73e8;
+
+    --button-primary-bg: #4285f4;
+    --button-primary-text: #fff;
+    --button-primary-border: #4285f4;
+    --button-primary-bg-hover: #3367d6;
+    --button-primary-border-hover: #2a56c6;
+
+    --button-danger-bg: #d93025;
+    --button-danger-border: #d93025;
+    --button-danger-bg-hover: #c5221f;
+    --button-danger-border-hover: #b0281a;
+
+    --shadow-color: rgba(32, 33, 36, 0.28);
+    --profile-icon-bg: #8ab4f8;
+    --create-button-bg: #1a73e8;
+    --create-button-bg-hover: #2b7de9;
+}
+
+[data-theme='dark'] {
+    --bg-color: #202124;
+    --bg-color-hover: #303134;
+    --text-color-primary: #e8eaed;
+    --text-color-secondary: #bdc1c6;
+    --text-color-tertiary: #969ba1;
+    --text-color-link: #8ab4f8;
+    --text-color-link-active: #8ab4f8;
+
+    --border-color-primary: #3c4043;
+    --border-color-hover: #5f6368;
+    --border-color-active: #8ab4f8;
+
+    --button-primary-bg: #8ab4f8;
+    --button-primary-text: #202124;
+    --button-primary-border: #8ab4f8;
+    --button-primary-bg-hover: #9ac0f9;
+    --button-primary-border-hover: #9ac0f9;
+
+    --button-danger-bg: #f28b82;
+    --button-danger-border: #f28b82;
+    --button-danger-bg-hover: #f17c70;
+    --button-danger-border-hover: #f17c70;
+
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --profile-icon-bg: #4285f4;
+    --create-button-bg: #8ab4f8;
+    --create-button-bg-hover: #9ac0f9;
+}
+
+/* --- 2. 기본 레이아웃 및 폰트 (변경 없음) --- */
 .google-ui-app {
     font-family: Arial, sans-serif;
-    color: #202124;
-    background-color: #fff;
+    color: var(--text-color-primary);
+    background-color: var(--bg-color);
+    transition: background-color 0.3s, color 0.3s;
+    min-height: 100vh;
 }
 
-/* Username Prompt Screen */
-.username-prompt {
-    text-align: center;
-    padding-top: 100px;
-}
-.username-prompt h2 {
-    font-size: 1rem;
-    color: #5f6368;
-    font-weight: 400;
-}
-
-/* Header */
+/* --- 3. 헤더 영역 (변경 없음) --- */
 .search-header {
     display: flex;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #dfe1e5;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color-primary);
+    gap: 15px;
 }
 
 .header-logo {
     width: 92px;
     height: 30px;
-    margin-right: 20px;
+}
+
+.back-button {
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--text-color-tertiary);
+}
+.back-button:hover {
+    color: var(--text-color-primary);
+}
+.room-title {
+    font-size: 18px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
 }
 
 .search-bar-container {
     flex-grow: 1;
     display: flex;
     align-items: center;
-    border: 1px solid #dfe1e5;
+    border: 1px solid var(--border-color-primary);
     border-radius: 24px;
     padding: 0 15px;
     max-width: 600px;
+    background-color: var(--bg-color);
 }
-.search-bar-container:hover {
-    box-shadow: 0 1px 6px rgba(32,33,36,.28);
-    border-color: rgba(223,225,229,0);
+.search-bar-container:hover,
+.search-bar-container:focus-within {
+    box-shadow: 0 1px 6px var(--shadow-color);
+    border-color: transparent;
+    background-color: var(--bg-color);
 }
 
 .search-bar-container input {
@@ -51,24 +128,20 @@
     padding: 10px 0;
     font-size: 16px;
     background: transparent;
-}
-
-.search-bar-icons {
-    display: flex;
-    align-items: center;
+    color: var(--text-color-primary);
 }
 
 .search-bar-icons .icon {
     padding: 0 8px;
     cursor: pointer;
     font-size: 20px;
-    color: #70757a;
+    color: var(--text-color-tertiary);
 }
 
 .search-button {
-    background-color: #4285f4;
-    color: white;
-    border: 1px solid #4285f4;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border: 1px solid var(--button-primary-border);
     border-radius: 4px;
     padding: 0 16px;
     height: 36px;
@@ -76,18 +149,37 @@
     text-align: center;
     cursor: pointer;
     font-size: 14px;
-    margin-left: 10px;
+    font-weight: bold;
 }
 .search-button:hover {
     box-shadow: 0 1px 1px rgba(0,0,0,.1);
-    background-color: #3367d6;
-    border-color: #2a56c6;
+    background-color: var(--button-primary-bg-hover);
+    border-color: var(--button-primary-border-hover);
 }
 
+.user-profile-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--profile-icon-bg);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px; /* 테마 버튼과의 간격 */
+}
+.user-profile-icon:hover {
+    filter: brightness(0.9);
+}
+
+/* --- 4. 컨텐츠 영역 (변경 없음) --- */
 .search-options-bar {
-    padding: 10px 20px;
-    border-bottom: 1px solid #dfe1e5;
-    color: #70757a;
+    padding: 10px 40px;
+    border-bottom: 1px solid var(--border-color-primary);
+    color: var(--text-color-tertiary);
     font-size: 14px;
 }
 .search-options-bar span {
@@ -95,32 +187,35 @@
     cursor: pointer;
 }
 .search-options-bar span:first-child {
-    color: #1a73e8;
-    border-bottom: 3px solid #1a73e8;
+    color: var(--text-color-link-active);
+    border-bottom: 3px solid var(--border-color-active);
     padding-bottom: 8px;
+    font-weight: bold;
 }
 
-
-/* Search Results (Chat Body) */
 .search-results-container {
-    padding: 20px;
-    max-width: 600px;
-    height: calc(100vh - 145px); /* 전체 높이에서 헤더와 옵션바 높이를 뺌 */
+    padding: 20px 40px;
+    height: calc(100vh - 125px);
     overflow-y: auto;
 }
 
 .search-result-item {
-    margin-bottom: 25px;
+    margin-bottom: 30px;
+}
+
+.search-result-item .search-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .search-result-url {
-    color: #202124;
+    color: var(--text-color-secondary);
     font-size: 14px;
     padding-bottom: 4px;
 }
-
 .search-result-title {
-    color: #1a0dab;
+    color: var(--text-color-link);
     font-size: 20px;
     font-weight: 400;
     margin: 0;
@@ -129,26 +224,26 @@
 .search-result-title:hover {
     text-decoration: underline;
 }
-
 .search-result-snippet {
-    color: #4d5156;
+    color: var(--text-color-secondary);
     font-size: 14px;
     line-height: 1.57;
+    margin-top: 4px;
 }
 .search-result-snippet a {
-    color: #1a0dab;
+    color: var(--text-color-link);
 }
 
-/* Image Result Style */
 .image-result-box {
     display: inline-block;
-    border: 1px solid #dfe1e5;
+    border: 1px solid var(--border-color-primary);
     border-radius: 8px;
     padding: 10px;
     cursor: pointer;
+    margin-top: 5px;
 }
 .image-result-box:hover {
-    box-shadow: 0 1px 6px rgba(32,33,36,.28);
+    box-shadow: 0 1px 6px var(--shadow-color);
 }
 .image-result-box img {
     max-width: 150px;
@@ -158,86 +253,144 @@
 .image-result-box p {
     margin: 5px 0 0 0;
     font-size: 14px;
-    color: #4d5156;
+    color: var(--text-color-secondary);
 }
 
+.result-action-button {
+    background: none;
+    border: 1px solid var(--border-color-primary);
+    color: var(--text-color-tertiary);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 16px;
+    flex-shrink: 0;
+}
+.result-action-button:hover {
+    background-color: var(--bg-color-hover);
+    border-color: var(--border-color-hover);
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+}
 
-/* Modal Style */
+.chat-message-item {
+    cursor: default;
+}
+.chat-message-item .search-result-title {
+    cursor: text;
+}
+.chat-message-item .search-result-title:hover {
+    text-decoration: none;
+}
+
+/* --- 5. 모달(Modal) 창 스타일 (변경 없음) --- */
 .modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 .modal-content {
-    background-color: #fff;
+    background-color: var(--bg-color);
     border-radius: 8px;
-    padding: 20px;
+    padding: 20px 25px;
     max-width: 90vw;
     max-height: 90vh;
     overflow: auto;
     position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    text-align: center;
 }
+.modal-content h3 {
+    color: var(--text-color-primary);
+    margin-top: 10px;
+}
+.modal-content p {
+    color: var(--text-color-secondary);
+}
+
 .modal-content img {
     display: block;
     width: 100%;
     height: auto;
 }
+
 .close-button {
     position: absolute;
-    top: -15px;
-    right: -15px;
-    background: white;
-    border: 1px solid #ccc;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
     border-radius: 50%;
     width: 35px;
     height: 35px;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
-    color: #555;
+    color: var(--text-color-tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
-    padding: 0;
 }
 .close-button:hover {
-    color: #000;
-    border-color: #000;
+    color: var(--text-color-primary);
+    background-color: var(--bg-color-hover);
 }
 
-
-/* 사용자 프로필 아이콘 스타일 */
-.user-profile-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #8ab4f8; /* 구글 프로필 아이콘과 유사한 색상 */
-    color: white;
+.modal-content .form-group {
+    margin: 20px 0;
+}
+.modal-content .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color-primary);
+    border-radius: 4px;
     font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: auto; /* 헤더 우측 끝으로 밀어내기 */
-    margin-right: 20px;
+    box-sizing: border-box;
+    background-color: var(--bg-color);
+    color: var(--text-color-primary);
+}
+.modal-content .form-group input:focus {
+    outline: none;
+    border-color: var(--border-color-active);
 }
 
-.user-profile-icon:hover {
-    filter: brightness(0.9);
+.error-message {
+    color: var(--button-danger-bg);
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.delete-confirm-button {
+    background-color: var(--button-danger-bg);
+    border-color: var(--button-danger-border);
+    color: var(--button-primary-text);
+}
+.delete-confirm-button:hover {
+    background-color: var(--button-danger-bg-hover);
+    border-color: var(--button-danger-border-hover);
 }
 
 
+/* --- 6. 기타 UI 요소 --- */
+.username-prompt {
+    text-align: center;
+    padding-top: 100px;
+}
+.username-prompt h2 {
+    font-size: 1rem;
+    color: var(--text-color-tertiary);
+    font-weight: 400;
+}
 
-
-/* 방 만들기 버튼 */
 .create-room-button {
     position: fixed;
     bottom: 30px;
@@ -245,7 +398,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background-color: #1a73e8;
+    background-color: var(--create-button-bg);
     color: white;
     border: none;
     font-size: 36px;
@@ -253,84 +406,33 @@
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     cursor: pointer;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
+    z-index: 900;
 }
-
 .create-room-button:hover {
     transform: scale(1.05);
-    background-color: #2b7de9;
-}
-
-/* 방 만들기 모달 내부 폼 스타일 */
-.modal-content .form-group {
-    margin: 15px 0;
-}
-
-.modal-content .form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #dfe1e5;
-    border-radius: 4px;
-    font-size: 16px;
-    box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+    background-color: var(--create-button-bg-hover);
 }
 
 
-
-/* ===================================================== */
-/* ========= 아래 코드를 ChatApp.css 파일에 추가 ========= */
-/* ===================================================== */
-
-.search-result-item {
-    cursor: pointer; /* 전체 아이템이 클릭 가능함을 표시 */
-}
-
-/* 채팅방 제목과 삭제 버튼을 한 줄에 정렬하기 위한 컨테이너 */
-.search-result-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.search-result-url {
-    padding-bottom: 2px; /* 제목과의 간격 조정 */
-}
-
-/* 채팅방 목록의 삭제 버튼 스타일 */
-.result-action-button {
-    background: none;
-    border: 1px solid #dadce0;
-    color: #5f6368;
-    font-family: inherit;
-    font-size: 12px;
-    padding: 6px 12px;
-    border-radius: 4px;
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* 테마 전환 버튼 스타일 수정 (수정된 부분)     */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+.theme-toggle-button {
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
-    margin-left: 16px; /* 제목과의 간격 */
-    flex-shrink: 0; /* 버튼 크기가 줄어들지 않도록 설정 */
+    font-size: 22px;
+    color: var(--text-color-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color 0.2s;
 }
-
-.result-action-button:hover {
-    background-color: #f8f9fa;
-    border-color: #c6c6c6;
-    box-shadow: 0 1px 1px rgba(0,0,0,.1);
-}
-
-/* 모달의 에러 메시지 스타일 */
-.error-message {
-    color: #d93025;
-    font-size: 14px;
-    margin-top: 10px;
-    text-align: center;
-}
-
-/* 삭제 확인 모달의 버튼 스타일 (파괴적인 액션 강조) */
-.delete-confirm-button {
-    background-color: #d93025; /* Google의 삭제/에러 표시 빨간색 */
-    border-color: #d93025;
-}
-
-.delete-confirm-button:hover {
-    background-color: #c5221f;
-    border-color: #b0281a;
+.theme-toggle-button:hover {
+    background-color: var(--bg-color-hover);
 }

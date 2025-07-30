@@ -3,9 +3,7 @@ import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
 import './ChatApp.css';
 
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-//       API 주소 설정을 원래대로 되돌렸습니다.
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// (API 주소 및 외부 함수는 기존과 동일)
 const SERVER_HOST = 'http://localhost:8080';
 const SERVER_URL = SERVER_HOST + '/chat';
 const ROOM_API = SERVER_HOST + '/room';
@@ -32,7 +30,9 @@ const renderTextWithLinks = (text) => {
   );
 };
 
+
 const ChatApp = () => {
+  // (상태 선언 및 모든 함수는 기존과 동일)
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [stompClient, setStompClient] = useState(null);
@@ -60,14 +60,22 @@ const ChatApp = () => {
   const [newRoomName, setNewRoomName] = useState('');
   const [newRoomPassword, setNewRoomPassword] = useState('');
 
-  // S  채팅방 삭제 기능 추가
   const [deleteRoomModal, setDeleteRoomModal] = useState({ visible: false, room: null, error: '' });
   const [deletePasswordInput, setDeletePasswordInput] = useState('');
-  // E  채팅방 삭제 기능 추가
+
+  const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('chatTheme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
 
   useEffect(() => {
     loadRooms();
-    // connect();
   }, []);
 
   useEffect(() => {
@@ -75,6 +83,13 @@ const ChatApp = () => {
       initializeChat();
       connect();
     }
+
+    return () => {
+      if (stompClient) {
+        stompClient.disconnect();
+        setStompClient(null);
+      }
+    };
   }, [currentRoom]);
 
   useEffect(() => {
@@ -124,9 +139,6 @@ const ChatApp = () => {
     if (!currentRoom) return;
     setLoading(true);
     try {
-      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-      //       API 주소를 원래대로 사용합니다.
-      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
       const countRes = await fetch(COUNT_API + "?roomId="+currentRoom.id);
       const totalCount = await countRes.json();
 
@@ -172,7 +184,6 @@ const ChatApp = () => {
       });
 
       const isValid = await res.json();
-
 
       if (res.ok && isValid.code !== '1007') {
         setCurrentRoom({
@@ -229,7 +240,6 @@ const ChatApp = () => {
     }
   };
 
-  // S  채팅방 삭제 기능 추가
   const openDeleteModal = (room) => {
     setDeleteRoomModal({ visible: true, room: room, error: '' });
   };
@@ -257,9 +267,8 @@ const ChatApp = () => {
 
       if (res.ok) {
         closeDeleteModal();
-        loadRooms(); // 성공 시 방 목록 새로고침
+        loadRooms();
       } else {
-        // 서버에서 받은 에러 메시지를 사용하려고 시도
         const errorData = await res.json().catch(() => null);
         setDeleteRoomModal(prev => ({ ...prev, error: errorData?.message || '방 삭제에 실패했습니다.' }));
       }
@@ -268,7 +277,6 @@ const ChatApp = () => {
       setDeleteRoomModal(prev => ({ ...prev, error: '방 삭제 중 오류가 발생했습니다.' }));
     }
   };
-  // E  채팅방 삭제 기능 추가
 
   const handleExitRoom = () => {
     setCurrentRoom(null);
@@ -290,10 +298,7 @@ const ChatApp = () => {
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
         }
       });
-      // ✅ [중요] 자신의 에러 큐를 구독합니다.
-      // 서버의 @SendToUser("/queue/errors") 경로와 일치해야 합니다.
       client.subscribe('/topic/public/errors', function (error) {
-        // 서버로부터 받은 에러 메시지를 처리합니다.
         alert("에러 발생: " + error.body);
       });
       setStompClient(client);
@@ -341,11 +346,7 @@ const ChatApp = () => {
       return;
     }
     setLoading(true);
-    // setShowLoadMoreButton(false);
     try {
-      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-      //       API 주소를 원래대로 사용합니다.
-      // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
       const url = `${MESSAGE_API}?page=${pageNum}&size=${PAGE_SIZE}&roomId=${currentRoom.id}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('메시지 로딩 실패');
@@ -356,13 +357,11 @@ const ChatApp = () => {
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
 
-        // if (newMessages.roomId === currentRoom.id) {
         if (isInitial) {
           setMessages(newMessages);
         } else {
           setMessages(prev => [...newMessages, ...prev]);
         }
-        // }
 
         setNextPage(pageNum - 1);
         setHasMore(pageNum > 0);
@@ -406,17 +405,15 @@ const ChatApp = () => {
     if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
       return (
           <div className="image-result-box" onClick={() => openModal(msg.content)}>
-            <img src={msg.content} alt="이미지 검색 결과" />
-            <p>이미지 검색 결과</p>
+            <img src={msg.content} alt="이미지" />
+            <p>이미지</p>
           </div>
       );
     }
-
     if (typeof msg.content === 'string') {
-      return <span className="search-result-snippet">{renderTextWithLinks(msg.content)}</span>;
+      return <div className="search-result-snippet">{renderTextWithLinks(msg.content)}</div>;
     }
-
-    return <span className="search-result-snippet">{msg.content}</span>;
+    return <div className="search-result-snippet">{msg.content}</div>;
   };
 
   const handleSetUsername = () => {
@@ -434,6 +431,12 @@ const ChatApp = () => {
     setAskingName(true);
   };
 
+  const ThemeToggleButton = () => (
+      <button onClick={toggleTheme} className="theme-toggle-button">
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
+  );
+
   if (askingName || !username) {
     return (
         <div className="google-ui-app">
@@ -447,10 +450,12 @@ const ChatApp = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
                   placeholder="닉네임 입력"
+                  autoFocus
               />
             </div>
             <button className="search-button" onClick={handleSetUsername}>입장하기</button>
           </div>
+          {/* 닉네임 입력 화면에서는 테마 버튼을 숨겨도 좋지만, 일관성을 위해 유지 */}
         </div>
     );
   }
@@ -460,6 +465,8 @@ const ChatApp = () => {
         <div className="google-ui-app">
           <div className="search-header">
             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo"/>
+            <div style={{flexGrow: 1}}></div> {/* 빈 공간 채우기 */}
+            <ThemeToggleButton />
             <div className="user-profile-icon" onClick={changeUsername}>
               {username.charAt(0).toUpperCase()}
             </div>
@@ -472,22 +479,22 @@ const ChatApp = () => {
             {loading && <div className="loading-indicator">방 목록을 불러오는 중...</div>}
             {rooms.map(room => (
                 <div key={room.id} className="search-result-item" onClick={() => handleRoomClick(room)}>
-                  <div className="search-result-url">
-                    https://mail.google.com/chat/room/{room.id}
-                  </div>
                   <div className="search-result-header">
-                    <h3 className="search-result-title">{room.name}</h3>
-                    {/* S 삭제 버튼 추가 */}
+                    <div>
+                      <div className="search-result-url">
+                        https://mail.google.com/chat/room/{room.id}
+                      </div>
+                      <h3 className="search-result-title">{room.name}</h3>
+                    </div>
                     <button
                         className="result-action-button"
                         onClick={(e) => {
-                          e.stopPropagation(); // 부모의 onClick 이벤트 전파 방지
+                          e.stopPropagation();
                           openDeleteModal(room);
                         }}
                     >
                       삭제
                     </button>
-                    {/* E 삭제 버튼 추가 */}
                   </div>
                 </div>
             ))}
@@ -495,24 +502,18 @@ const ChatApp = () => {
 
           <button className="create-room-button" onClick={openCreateRoomModal}>+</button>
 
+          {/* Modal JSX... (변경 없음) */}
           {passwordModal.visible && (
               <div className="modal" onClick={closePasswordModal}>
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <button className="close-button" onClick={closePasswordModal}>&times;</button>
                   <h3>'{passwordModal.room.name}' 입장</h3>
                   <p>비밀번호를 입력하세요.</p>
                   <div className="search-bar-container" style={{maxWidth: '300px', margin: '20px auto'}}>
-                    <input
-                        type="password"
-                        value={passwordInput}
-                        onChange={(e) => setPasswordInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
-                        placeholder="비밀번호"
-                        autoFocus
-                    />
+                    <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()} placeholder="비밀번호" autoFocus />
                   </div>
                   {passwordModal.error && <p className="error-message">{passwordModal.error}</p>}
                   <button className="search-button" onClick={handlePasswordSubmit}>입장</button>
-                  <button className="close-button" onClick={closePasswordModal}>&times;</button>
                 </div>
               </div>
           )}
@@ -520,58 +521,37 @@ const ChatApp = () => {
           {createRoomModal.visible && (
               <div className="modal" onClick={closeCreateRoomModal}>
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <button className="close-button" onClick={closeCreateRoomModal}>&times;</button>
                   <h3>새 채팅방 만들기</h3>
                   <div className="form-group">
-                    <input
-                        type="text"
-                        value={newRoomName}
-                        onChange={(e) => setNewRoomName(e.target.value)}
-                        placeholder="방 이름"
-                    />
+                    <input type="text" value={newRoomName} onChange={(e) => setNewRoomName(e.target.value)} placeholder="방 이름" />
                   </div>
                   <div className="form-group">
-                    <input
-                        type="password"
-                        value={newRoomPassword}
-                        onChange={(e) => setNewRoomPassword(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleCreateRoomSubmit()}
-                        placeholder="비밀번호"
-                    />
+                    <input type="password" value={newRoomPassword} onChange={(e) => setNewRoomPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleCreateRoomSubmit()} placeholder="비밀번호" />
                   </div>
                   {createRoomModal.error && <p className="error-message">{createRoomModal.error}</p>}
                   <button className="search-button" onClick={handleCreateRoomSubmit}>만들기</button>
-                  <button className="close-button" onClick={closeCreateRoomModal}>&times;</button>
                 </div>
               </div>
           )}
 
-          {/* S 삭제 모달 JSX 추가 */}
           {deleteRoomModal.visible && (
               <div className="modal" onClick={closeDeleteModal}>
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                  <button className="close-button" onClick={closeDeleteModal}>&times;</button>
                   <h3>'{deleteRoomModal.room.name}' 삭제</h3>
                   <p>방을 삭제하려면 비밀번호를 입력하세요. 이 작업은 되돌릴 수 없습니다.</p>
                   <div className="search-bar-container" style={{maxWidth: '300px', margin: '20px auto'}}>
-                    <input
-                        type="password"
-                        value={deletePasswordInput}
-                        onChange={(e) => setDeletePasswordInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleDeleteRoomSubmit()}
-                        placeholder="비밀번호"
-                        autoFocus
-                    />
+                    <input type="password" value={deletePasswordInput} onChange={(e) => setDeletePasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleDeleteRoomSubmit()} placeholder="비밀번호" autoFocus />
                   </div>
                   {deleteRoomModal.error && <p className="error-message">{deleteRoomModal.error}</p>}
                   <button className="search-button delete-confirm-button" onClick={handleDeleteRoomSubmit}>삭제 확인</button>
-                  <button className="close-button" onClick={closeDeleteModal}>&times;</button>
                 </div>
               </div>
           )}
-          {/* E 삭제 모달 JSX 추가 */}
         </div>
     );
   }
-
 
   return (
       <div className="google-ui-app">
@@ -580,33 +560,23 @@ const ChatApp = () => {
           <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo"/>
           <h1 className="room-title">{currentRoom.name}</h1>
           <div className="search-bar-container">
-            <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()}
-            />
+            <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()} placeholder="메시지 입력..." />
             <div className="search-bar-icons">
               <span className="icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>📷</span>
             </div>
           </div>
           <button className="search-button" onClick={sendTextMessage}>전송</button>
-          <input
-              type="file"
-              ref={fileInputRef}
-              style={{ display: 'none' }}
-              accept="image/*"
-              onChange={handleFileChange}
-          />
+          <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
+          <ThemeToggleButton />
           <div className="user-profile-icon" onClick={changeUsername}>
             {username.charAt(0).toUpperCase()}
           </div>
         </div>
 
         <div className="search-results-container" ref={chatRef}>
-          {!hasMore && !loading && messages.length > 0 && <div className="loading-indicator" style={{padding: '20px'}}>- 더 이상 이전 대화가 없습니다 -</div>}
-          {loading && <div className="loading-indicator">결과를 로드하는 중...</div>}
-          {showLoadMoreButton && !loading && (
+          {!hasMore && !loading && messages.length > 0 && <div style={{textAlign: 'center', padding: '20px', color: 'var(--text-color-tertiary)'}}>- 더 이상 이전 대화가 없습니다 -</div>}
+          {loading && <div style={{textAlign: 'center', padding: '20px'}}>결과를 로드하는 중...</div>}
+          {showLoadMoreButton && !loading && hasMore && (
               <div style={{ textAlign: 'center', padding: '20px' }}>
                 <button onClick={() => loadMessages(nextPage)} className="search-button">
                   이전 결과 더보기
@@ -615,9 +585,9 @@ const ChatApp = () => {
           )}
 
           {messages.map((msg, idx) => (
-              <div key={msg.id || idx} className="search-result-item">
+              <div key={msg.id || idx} className="search-result-item chat-message-item">
                 <div className="search-result-url">
-                  https://mail.google.com/chat/{msg.sender} › {formatTime(msg.createDateTime)}
+                  {msg.sender} › {formatTime(msg.createDateTime)}
                 </div>
                 <h3 className="search-result-title">{msg.sender}님의 메시지</h3>
                 {renderMessageContent(msg)}
@@ -631,9 +601,7 @@ const ChatApp = () => {
             <div className="modal" onClick={closeModal}>
               <div className="modal-content">
                 <img src={modalImageSrc} alt="원본 이미지" />
-                <button className="close-button" onClick={closeModal}>
-                  &times;
-                </button>
+                <button className="close-button" onClick={closeModal}>&times;</button>
               </div>
             </div>
         )}

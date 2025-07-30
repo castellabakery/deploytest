@@ -82,3 +82,358 @@ footer button {
 footer button:disabled {
     background: #aaa;
 }
+
+
+
+/* 전체 앱 컨테이너를 유연한(flex) 세로 레이아웃으로 만듭니다. */
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
+}
+
+/* 채팅창(#chat)이 헤더와 푸터를 제외한 모든 남은 공간을 차지하고,
+  내용이 많아지면 세로 스크롤바가 생기도록 만듭니다.
+  이 부분이 무한 스크롤의 핵심입니다!
+*/
+#chat {
+    flex-grow: 1;       /* 남은 공간을 모두 차지 */
+    overflow-y: auto;   /* 내용이 넘칠 때만 스크롤바 표시 */
+    height: 100%;         /* 부모(.app) 높이에 맞춰 늘어날 수 있도록 설정 */
+}
+
+/* 이전 메시지 로딩 중 표시될 문구 스타일 */
+.loading-indicator {
+    text-align: center;
+    padding: 15px;
+    color: grey;
+}
+
+
+
+.load-more-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 8px 15px;
+    margin: 10px auto;
+    cursor: pointer;
+    display: block;
+}
+
+.load-more-btn:hover {
+    background-color: #0056b3;
+}
+
+
+
+
+/* 전송된 이미지 스타일 */
+.message-image {
+    max-width: 250px; /* 이미지 최대 너비 */
+    max-height: 250px; /* 이미지 최대 높이 */
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* 파일 첨부 버튼 스타일 */
+.attach-btn {
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 10px;
+    color: #555;
+}
+
+.attach-btn:hover {
+    color: #000;
+}
+
+
+/* ... 기존 CSS ... */
+
+.message-image {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block; /* 이미지가 div처럼 공간을 차지하도록 */
+}
+
+/* 이미지와 에러 아이콘을 담는 컨테이너 */
+.image-container {
+    position: relative;
+    display: inline-block; /* 내용만큼만 크기 차지 */
+}
+
+/* 에러 아이콘 스타일 */
+.error-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+
+/* 메시지 버블 안의 span 태그 (이름, 시간) */
+.message span {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 4px;
+    text-align: right; /* 오른쪽 정렬을 기본으로 */
+}
+
+/* 다른 사람이 보낸 메시지의 span만 왼쪽 정렬 */
+.message.other span {
+    text-align: left;
+}
+
+
+/* ============================================= */
+/* 이미지 메시지 관련 스타일            */
+/* ============================================= */
+
+/* 채팅창 안의 작은 이미지 썸네일 */
+.message-image {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 8px;
+    display: block;
+    object-fit: cover; /* 이미지가 잘리지 않고 채워지도록 */
+    cursor: pointer; /* 클릭 가능함을 표시 */
+}
+
+/* 이미지와 에러 아이콘을 담는 컨테이너 */
+.image-container {
+    position: relative;
+    display: inline-block; /* 내용만큼만 크기 차지 */
+}
+
+/* 전송 실패 시 나타나는 에러 아이콘 */
+.error-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+
+/* ============================================= */
+/* 이미지 확대 모달 관련 스타일         */
+/* ============================================= */
+
+/* 모달 배경 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 모달 내용 (이미지 + 닫기 버튼) */
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 90vw;   /* 화면 너비의 90% */
+    max-height: 90vh;  /* 화면 높이의 90% */
+    overflow: auto;
+    position: relative;
+}
+
+/* 모달 안의 원본 이미지 */
+.modal-content img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* 모달 닫기 버튼 */
+.close-button {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+
+.close-button:hover {
+    color: #000;
+    border-color: #000;
+}
+
+
+/* ============================================= */
+/* 이름/시간 레이아웃 보정용 스타일         */
+/* ============================================= */
+/* (혹시 기존 코드에 이 부분이 다르게 되어있을 경우를 대비해 포함합니다) */
+
+.message span {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 4px;
+    text-align: right;
+    display: block; /* 이름과 시간이 각각 한 줄씩 차지하도록 */
+}
+
+.message.other span {
+    text-align: left;
+}
+
+/* ============================================= */
+/* 전송 실패 알림창 스타일 (dim 없음) */
+/* ============================================= */
+
+.alert-modal {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4d4f; /* 빨간색 배경 */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2000;
+    font-weight: bold;
+    /* 애니메이션 설정 */
+    animation: fadeInOut 5s ease-in-out forwards;
+}
+
+/* 나타났다가 서서히 사라지는 애니메이션 */
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+    10% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    70% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+}
+
+/* ============================================= */
+/* 이미지 및 첨부파일 관련 스타일 (추가) */
+/* ============================================= */
+
+.message-image {
+    max-width: 250px;
+    max-height: 250px;
+    border-radius: 8px;
+    display: block;
+    object-fit: cover;
+}
+
+.attach-btn {
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 10px;
+    color: #555;
+    margin-left: 0;
+    margin-right: 0.5rem;
+}
+
+.attach-btn:hover {
+    color: #000;
+}
+
+
+/* ============================================= */
+/* 이미지 확대 모달 관련 스타일 (추가) */
+/* ============================================= */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+}
+
+.modal-content img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.close-button {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+
+.close-button:hover {
+    color: #000;
+    border-color: #000;
+}

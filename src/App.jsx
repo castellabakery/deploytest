@@ -4,7 +4,7 @@ import { over } from 'stompjs';
 import './ChatApp.css';
 
 // (API 주소 및 외부 함수는 기존과 동일)
-const SERVER_HOST = 'http://localhost:8080';
+const SERVER_HOST = 'https://chitchat.pastelcloud.store';
 const SERVER_URL = SERVER_HOST + '/chat';
 const ROOM_API = SERVER_HOST + '/room';
 const ROOM_LIST_API = SERVER_HOST + '/room/list';

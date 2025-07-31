@@ -425,6 +425,28 @@ const ChatApp = () => {
     loadRooms();
   };
 
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 1. 메시지에 가짜 데이터를 첨부하는 헬퍼 함수
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  const addFakeDataToMessage = (message) => {
+    const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
+    const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
+    const source = javaSourceData[sourceIndex.current % javaSourceData.length];
+    const uuid = uuidv4();
+
+    searchResultTitleIndex.current++;
+    searchResultSnippetIndex.current++;
+    sourceIndex.current++;
+
+    return {
+      ...message,
+      fakeTitle: title,
+      fakeSnippet: snippet,
+      fakeSource: source,
+      uuid: uuid
+    };
+  };
+
   const connect = () => {
     if (!currentRoom) return;
     const socket = new SockJS(SERVER_URL);
@@ -433,7 +455,12 @@ const ChatApp = () => {
       client.subscribe('/topic/public/'+currentRoom.id, (msg) => {
         const message = JSON.parse(msg.body);
         if (currentRoom && message.roomId === currentRoom.id) {
-          setMessages(prev => [...prev, message]);
+          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+          // 3. 새로 받은 메시지에도 가짜 데이터를 '미리' 첨부
+          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+          const augmentedMessage = addFakeDataToMessage(message);
+
+          setMessages(prev => [...prev, augmentedMessage]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
 
           // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
@@ -508,13 +535,18 @@ const ChatApp = () => {
       const newMessages = await res.json();
 
       if (newMessages && newMessages.length > 0) {
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+        // 2. 불러온 메시지에 가짜 데이터를 '미리' 첨부
+        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+        const augmentedMessages = newMessages.map(addFakeDataToMessage);
+
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
 
         if (isInitial) {
-          setMessages(newMessages);
+          setMessages(augmentedMessages);
         } else {
-          setMessages(prev => [...newMessages, ...prev]);
+          setMessages(prev => [...augmentedMessages, ...prev]);
         }
 
         setNextPage(pageNum - 1);
@@ -742,7 +774,9 @@ const ChatApp = () => {
               <span className="icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>📷</span>
             </div>
           </div>
-          <button className="search-button" onClick={sendTextMessage}>전송</button>
+          <button className="search-button" onClick={sendTextMessage}>
+            <span className="KlpaXd z1asCe MZy1Rb"><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></span>
+          </button>
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
           <ThemeToggleButton />
           <div className="user-profile-icon" onClick={changeUsername}>
@@ -766,21 +800,14 @@ const ChatApp = () => {
             // 3. 순서대로 제목을 가져오고, 다음을 위해 인덱스 증가
             // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
             const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
-            searchResultTitleIndex.current++;
-            const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
-            searchResultSnippetIndex.current++;
-            const source = javaSourceData[sourceIndex.current % javaSourceData.length];
-            sourceIndex.current++;
-            const uuid = uuidv4();
-
             return (
               <div key={msg.id || idx} className="search-result-item chat-message-item">
                 {/* 출처 정보 표시 영역 */}
                 <div className="search-result-source">
-                  <span className="source-icon" style={{ backgroundColor: source.color }}>{source.icon}</span>
+                  <span className="source-icon" style={{ backgroundColor: msg.fakeSource.color }}>{msg.fakeSource.icon}</span>
                   <div className="source-details">
-                    <span className="source-name">{source.name}</span>
-                    <span className="source-url">{source.url}</span>
+                    <span className="source-name">{msg.fakeSource.name}</span>
+                    <span className="source-url">{msg.fakeSource.url}</span>
                   </div>
                 </div>
 
@@ -790,10 +817,10 @@ const ChatApp = () => {
                 {/*</div>*/}
 
                 <div className="search-result-url">
-                  https:// {msg.sender} › {formatTime(msg.createDateTime)} /{uuid}... <span style={{fontSize: '20px'}}>⋮</span>
+                  https:// {msg.sender} › {formatTime(msg.createDateTime)} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
                 </div>
                 <h3 className="search-result-title">{title}</h3>
-                  <div className="search-result-snippet">{snippet} ...</div>
+                  <div className="search-result-snippet">{msg.fakeSnippet} ...</div>
                 <div className="search-result-url">
                 {renderMessageContent(msg)}
                 </div>

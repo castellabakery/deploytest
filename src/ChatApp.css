@@ -90,6 +90,20 @@
 .header-logo {
     width: 92px;
     height: 30px;
+    flex-shrink: 0;
+}
+
+/* 기본 상태(라이트 모드)에서는 다크 모드용 로고를 숨김 */
+.logo-dark {
+    display: none;
+}
+
+/* 다크 모드일 때 */
+[data-theme='dark'] .logo-light {
+    display: none; /* 라이트 모드용 로고를 숨김 */
+}
+[data-theme='dark'] .logo-dark {
+    display: block; /* 다크 모드용 로고를 표시 */
 }
 
 .back-button {

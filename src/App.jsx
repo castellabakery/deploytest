@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
+import { v4 as uuidv4 } from 'uuid';
 import './ChatApp.css';
 
 // (API 주소 및 외부 함수는 기존과 동일)
@@ -13,6 +14,72 @@ const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
 
 const PAGE_SIZE = 50;
+
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 1. 고정된 자바 검색 결과 제목 배열
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+const javaSearchResultTitles = [
+  "Java NullPointerException: 원인과 해결 방법 총정리",
+  "Spring Boot @Transactional 어노테이션의 올바른 사용법 - Stack Overflow",
+  "이펙티브 자바 3/E - 아이템 1: 생성자 대신 정적 팩터리 메서드를 고려하라",
+  "ArrayList와 LinkedList의 차이점 및 성능 비교 (Java)",
+  "Java 8 Stream API 튜토리얼 및 실용 예제 | Baeldung",
+  "가비지 컬렉션(GC)의 동작 원리와 종류 (Serial, Parallel, G1GC)",
+  "Java의 정석 - 제네릭(Generics)이란 무엇인가?",
+  "Spring Security JWT 인증 구현하기 (step-by-step)",
+  "CompletableFuture를 이용한 Java 비동기 프로그래밍",
+  "JPA N+1 문제의 원인과 해결 방안 (fetch join, @EntityGraph)",
+  "객체지향의 5가지 원칙: SOLID - 로버트 C. 마틴",
+  "코딩 테스트를 위한 Java 문법 총정리 - programmers",
+  "IntelliJ 디버깅 모드 완벽 가이드: Breakpoint 활용하기",
+  "RESTful API 설계의 모범 사례 (Best Practices)",
+  "Java Reflection API: 동적으로 클래스 정보 수정하기",
+  "Checked Exception과 Unchecked Exception의 차이",
+  "TCP/IP 소켓 프로그래밍 in Java (예제 포함)",
+  "멀티스레드 환경에서의 동기화 문제 해결법 (synchronized, volatile)",
+  "디자인 패턴: 싱글턴(Singleton) 패턴 구현 방법 5가지",
+  "Docker와 Jenkins를 이용한 Spring Boot 애플리케이션 CI/CD 파이프라인 구축"
+];
+
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 1. 고정된 자바 검색 결과 내용(스니펫) 배열 추가
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+const javaSearchResultSnippets = [
+  "2025. 7. 31. — NullPointerException은 객체 참조가 null일 때 발생합니다. 객체 사용 전 null 체크를 추가하거나 Optional 클래스를 사용하",
+  "2025. 6. 10. — Spring의 @Transactional은 AOP 프록시를 통해 작동하므로, public 메서드에만 적용되며 클래스 내부 호출에는 적용되지 않습",
+  "2025. 5. 22. — ArrayList는 내부적으로 배열을 사용해 인덱스 조회 속도가 빠르고, LinkedList는 노드 연결로 이루어져 삽입/삭제가 빈번할 때 유리",
+  "2025. 4. 1. — Java 8의 Stream API는 데이터 컬렉션을 함수형으로 처리할 수 있게 해주는 강력한 도구입니다. map, filter, collect가 주로 사용",
+  "2025. 3. 18. — G1GC는 큰 힙 메모리에서 짧은 GC 일시 중지 시간을 목표로 하는 가비지 컬렉터로, 대부분의 최신 Java 애플리케이션에서 기본으로 사용",
+  "2025. 2. 2. — 제네릭(Generics)은 클래스 내부에서 사용할 데이터 타입을 외부에서 지정하는 기법으로, 컴파일 시 타입 체크를 가능하게 하고 코드 재사용성을 높",
+  "2025. 1. 15. — JWT(JSON Web Token)는 사용자 인증 정보를 안전하게 전송하기 위한 표준입니다. Header, Payload, Signature 세 부분으로 구성됩니",
+  "2024. 12. 5. — CompletableFuture는 자바 5의 Future를 개선한 것으로, 비동기 작업의 조합과 에러 처리를 위한 풍부한 API를 제공합니다.",
+  "2024. 11. 20. — JPA의 N+1 문제는 연관 관계가 설정된 엔티티를 조회할 때, 조회된 엔티티 수만큼 추가 쿼리가 발생하는 현상입니다. fetch join으로 해결할 수 있",
+  "2024. 10. 8. — SOLID 원칙은 유지보수와 확장이 쉬운 소프트웨어를 만들기 위한 다섯 가지 객체지향 설계 원칙(SRP, OCP, LSP, ISP, DIP)을",
+  "2024. 9. 13. — 코딩 테스트에서 시간 복잡도를 줄이는 것은 매우 중요합니다. Java의 HashMap은 평균 O(1)의 시간 복잡도로 데이터 조회/삽",
+  "2024. 8. 21. — IntelliJ의 디버깅 모드에서 'Evaluate Expression' 기능을 사용하면, 실행 중인 코드의 상태를 실시간으로 확인하고 변경할 수",
+  "2024. 7. 30. — RESTful API에서 리소스 상태 변경은 GET이 아닌 POST, PUT, PATCH, DELETE와 같은 HTTP 메서드를 사용해야 합니",
+  "2024. 6. 19. — Java Reflection은 런타임에 클래스의 메타데이터를 얻거나 수정하는 기능입니다. 프레임워크나 라이브러리에서 주로 사용되나, 성능 저하의 원인",
+  "2024. 5. 2. — Checked Exception은 반드시 처리(try-catch)해야 하는 예외이며, Unchecked Exception(RuntimeException)은 명시적인 처리를 강제",
+  "2024. 4. 11. — Java의 소켓 프로그래밍에서 ServerSocket은 클라이언트의 연결 요청을 기다리고, Socket은 실제 데이터 통신을 담당",
+  "2024. 3. 25. — 멀티스레드 환경에서 공유 자원에 대한 동시 접근을 제어하기 위해 synchronized 키워드나 ReentrantLock과 같은 동기화 기법이 사용됩",
+  "2024. 2. 7. — 싱글턴 패턴은 애플리케이션 전체에서 단 하나의 인스턴스만 생성되도록 보장하는 디자인 패턴입니다. private 생성자와 static 메서드로 구현할",
+  "2024. 1. 18. — Docker 이미지는 애플리케이션과 그 실행 환경을 패키징한 것이며, Jenkins 파이프라인을 통해 이 이미지의 빌드 및 배포를 자동화할 수 있",
+  "2023. 12. 1. — Lombok 라이브러리의 @Data 어노테이션은 @Getter, @Setter, @ToString 등을 모두 포함하지만, 불필요한 Setter 생성을 유발할 수 있어 주의"
+];
+
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 1. 가짜 검색 출처 정보 배열 추가
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+const javaSourceData = [
+  { name: 'Tistory', url: 'https://johndoe.tistory.com', icon: 'T', color: '#E96312' },
+  { name: 'velog', url: 'https://velog.io/@jane.doe', icon: 'v', color: '#20C997' },
+  { name: 'Stack Overflow', url: 'https://stackoverflow.com/questions/12345', icon: 'S', color: '#F48024' },
+  { name: 'Baeldung', url: 'https://www.baeldung.com/java-tutorial', icon: 'B', color: '#2a9e54' },
+  { name: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/java', icon: 'G', color: '#2f9433' },
+  { name: '프로그래머스', url: 'https://school.programmers.co.kr/learn', icon: 'P', color: '#4E72B5' },
+  { name: 'DZone', url: 'https://dzone.com/java-jdk', icon: 'D', color: '#688e22' },
+  { name: 'Medium', url: 'https://medium.com/tag/java', icon: 'M', color: '#121212' }
+];
 
 const renderTextWithLinks = (text) => {
   if (typeof text !== 'string') return text;
@@ -30,6 +97,20 @@ const renderTextWithLinks = (text) => {
   );
 };
 
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 1. 파비콘(탭 아이콘)을 가져오거나 새로 만드는 헬퍼 함수
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+const getOrCreateFaviconLink = () => {
+  let link = document.querySelector("link[rel*='icon']");
+  if (link) {
+    return link;
+  }
+  link = document.createElement('link');
+  link.type = 'image/x-icon';
+  link.rel = 'shortcut icon';
+  document.getElementsByTagName('head')[0].appendChild(link);
+  return link;
+};
 
 const ChatApp = () => {
   // (상태 선언 및 모든 함수는 기존과 동일)
@@ -64,6 +145,64 @@ const ChatApp = () => {
   const [deletePasswordInput, setDeletePasswordInput] = useState('');
 
   const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
+
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 2. 검색 결과 제목 인덱스를 추적할 ref 생성
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  const searchResultTitleIndex = useRef(0);
+  const searchResultSnippetIndex = useRef(0);
+  const sourceIndex = useRef(0);
+
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 1. 알림 효과를 위한 Ref 추가
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  const intervalRef = useRef(null);
+  const originalTitleRef = useRef(document.title);
+  const originalFaviconRef = useRef(getOrCreateFaviconLink().href);
+
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 2. 알림 시작 및 종료 함수 추가
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  const stopNotification = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      document.title = originalTitleRef.current;
+      getOrCreateFaviconLink().href = originalFaviconRef.current;
+    }
+  }, []);
+
+  const startNotification = useCallback(() => {
+    if (intervalRef.current) return; // 이미 알림이 실행 중이면 중복 실행 방지
+
+    // const originalTitle = originalTitleRef.current;
+    intervalRef.current = setInterval(() => {
+      // getOrCreateFaviconLink().href = ;
+      // document.title = document.title === originalTitle ? '새 메시지!' : originalTitle;
+    }, 1000); // 1초 간격으로 제목 변경
+  }, []);
+
+
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 3. 사용자가 탭으로 돌아왔을 때 알림을 끄는 로직 추가
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // 사용자가 탭으로 돌아오면 알림 중지
+        stopNotification();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      // 컴포넌트가 사라질 때 알림 정리
+      stopNotification();
+    };
+  }, [stopNotification]);
+
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -296,6 +435,13 @@ const ChatApp = () => {
         if (currentRoom && message.roomId === currentRoom.id) {
           setMessages(prev => [...prev, message]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
+
+          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+          // 4. 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
+          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+          if (document.hidden) {
+            startNotification();
+          }
         }
       });
       client.subscribe('/topic/public/errors', function (error) {
@@ -399,6 +545,12 @@ const ChatApp = () => {
     return `${y}년 ${m}월 ${d}일 - ${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
   };
 
+  const formatTimeForMsg = (array) => {
+    if (!Array.isArray(array) || array.length < 6) return array;
+    const [y, m, d, h, min] = array;
+    return `${y}년 ${m}월 ${d}일`;
+  };
+
   const openModal = (src) => {
     setModalImageSrc(src);
     setIsModalOpen(true);
@@ -409,19 +561,36 @@ const ChatApp = () => {
     setModalImageSrc('');
   };
 
+  // const renderMessageContent = (msg) => {
+  //   if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
+  //     return (
+  //         <div className="image-result-box" onClick={() => openModal(msg.content)}>
+  //           <img src={msg.content} alt="이미지" />
+  //           <p>이미지</p>
+  //         </div>
+  //     );
+  //   }
+  //   if (typeof msg.content === 'string') {
+  //     return <div className="search-result-snippet">{renderTextWithLinks(msg.content)}</div>;
+  //   }
+  //   return <div className="search-result-snippet">{msg.content}</div>;
+  // };
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 3. renderMessageContent 함수 약간 수정 (감싸는 div 제거)
+  //    - 이제 각 메시지 타입을 순수한 JSX 요소로 반환합니다.
+  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
   const renderMessageContent = (msg) => {
     if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
       return (
           <div className="image-result-box" onClick={() => openModal(msg.content)}>
             <img src={msg.content} alt="이미지" />
-            <p>이미지</p>
           </div>
       );
     }
     if (typeof msg.content === 'string') {
-      return <div className="search-result-snippet">{renderTextWithLinks(msg.content)}</div>;
+      return <>{renderTextWithLinks(msg.content)}</>;
     }
-    return <div className="search-result-snippet">{msg.content}</div>;
+    return <>{msg.content}</>;
   };
 
   const handleSetUsername = () => {
@@ -592,15 +761,44 @@ const ChatApp = () => {
               </div>
           )}
 
-          {messages.map((msg, idx) => (
+          {messages.map((msg, idx) => {
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+            // 3. 순서대로 제목을 가져오고, 다음을 위해 인덱스 증가
+            // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+            const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
+            searchResultTitleIndex.current++;
+            const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
+            searchResultSnippetIndex.current++;
+            const source = javaSourceData[sourceIndex.current % javaSourceData.length];
+            sourceIndex.current++;
+            const uuid = uuidv4();
+
+            return (
               <div key={msg.id || idx} className="search-result-item chat-message-item">
-                <div className="search-result-url">
-                  {msg.sender} › {formatTime(msg.createDateTime)}
+                {/* 출처 정보 표시 영역 */}
+                <div className="search-result-source">
+                  <span className="source-icon" style={{ backgroundColor: source.color }}>{source.icon}</span>
+                  <div className="source-details">
+                    <span className="source-name">{source.name}</span>
+                    <span className="source-url">{source.url}</span>
+                  </div>
                 </div>
-                <h3 className="search-result-title">{msg.sender}님의 메시지</h3>
+
+                {/* 제목과 '더보기' 아이콘 표시 영역 */}
+                {/*<div className="search-result-header">*/}
+                {/*  <button className="header-icon more-options-icon">⋮</button>*/}
+                {/*</div>*/}
+
+                <div className="search-result-url">
+                  https:// {msg.sender} › {formatTime(msg.createDateTime)} /{uuid}... <span style={{fontSize: '20px'}}>⋮</span>
+                </div>
+                <h3 className="search-result-title">{title}</h3>
+                  <div className="search-result-snippet">{snippet} ...</div>
+                <div className="search-result-url">
                 {renderMessageContent(msg)}
+                </div>
               </div>
-          ))}
+          )})}
 
           <div ref={scrollRef}></div>
         </div>

@@ -436,3 +436,206 @@
 .theme-toggle-button:hover {
     background-color: var(--bg-color-hover);
 }
+
+/* ... 기존 CSS 코드 ... */
+
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* 실제 메시지를 감싸는 박스 스타일 추가         */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+.real-message-box {
+    margin-top: 12px;
+    padding: 10px;
+    background-color: var(--bg-color-hover);
+    border: 1px solid var(--border-color-primary);
+    border-radius: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.real-message-box .image-result-box {
+    background-color: var(--bg-color);
+}
+
+
+/* ... 기존 CSS 코드 ... */
+
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* 출처 정보 및 더보기 아이콘 스타일 추가         */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+
+/* 기존 .search-result-url은 .search-result-source로 대체 */
+.search-result-source {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px; /* 제목과의 간격 */
+}
+
+.source-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.source-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.source-name {
+    font-size: 14px;
+    color: var(--text-color-primary);
+}
+
+.source-url {
+    font-size: 12px;
+    color: var(--text-color-secondary);
+}
+
+/* 메시지 제목과 '더보기' 아이콘을 감싸는 헤더 */
+.chat-message-item .search-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* '더보기' 아이콘 버튼 */
+.more-options-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+    margin-left: 16px;
+    flex-shrink: 0;
+}
+
+/* 실제 메시지 박스 스타일은 이전과 동일 */
+.real-message-box {
+    margin-top: 12px;
+    padding: 10px;
+    background-color: var(--bg-color-hover);
+    border: 1px solid var(--border-color-primary);
+    border-radius: 8px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+.real-message-box .image-result-box {
+    background-color: var(--bg-color);
+}
+
+
+/* ===================================================== */
+/* ChatApp.css (수정 완료)                 */
+/* ===================================================== */
+
+/* ... (상단 CSS 변수 및 다른 스타일은 모두 동일) ... */
+
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* 채팅 메시지 아이템 스타일 (수정된 부분)      */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+.chat-message-item {
+    cursor: pointer; /* default에서 pointer로 변경 */
+}
+.chat-message-item .search-result-title {
+    cursor: text;
+}
+.chat-message-item .search-result-title:hover {
+    text-decoration: none;
+}
+
+
+/* ... (이하 다른 모든 CSS 스타일은 기존과 동일) ... */
+
+
+/* ===================================================== */
+/* ChatApp.css (수정 완료)                 */
+/* ===================================================== */
+
+/* ... (상단 CSS 변수 및 다른 스타일은 모두 동일) ... */
+
+/* --- 4. 컨텐츠 영역 --- */
+.search-options-bar {
+    /* 기존 40px에서 160px로 좌우 여백 증가 */
+    padding: 10px 160px;
+    border-bottom: 1px solid var(--border-color-primary);
+    color: var(--text-color-tertiary);
+    font-size: 14px;
+}
+.search-options-bar span {
+    margin-right: 20px;
+    cursor: pointer;
+    padding-bottom: 12px;
+}
+.search-options-bar span:first-child {
+    color: var(--text-color-link-active);
+    border-bottom: 3px solid var(--border-color-active);
+    font-weight: bold;
+}
+
+.search-results-container {
+    /* 기존 40px에서 160px로 좌우 여백 증가 */
+    padding: 20px 160px;
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+/* ... (이하 다른 모든 CSS 스타일은 기존과 동일) ... */
+
+
+/* ===================================================== */
+/* 반응형 디자인을 위한 미디어 쿼리 추가       */
+/* ===================================================== */
+
+/* 화면 너비가 1200px 이하일 때 (작은 데스크톱, 큰 태블릿) */
+@media (max-width: 1200px) {
+    .search-options-bar,
+    .search-results-container {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
+}
+
+/* 화면 너비가 768px 이하일 때 (일반적인 태블릿) */
+@media (max-width: 768px) {
+    .search-options-bar,
+    .search-results-container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .search-header {
+        gap: 10px;
+    }
+}
+
+/* 화면 너비가 480px 이하일 때 (모바일) */
+@media (max-width: 480px) {
+    .search-options-bar,
+    .search-results-container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* 모바일에서는 헤더의 검색창이 너무 길어지므로 구조를 살짝 변경 */
+    .search-header {
+        flex-wrap: wrap;
+    }
+
+    .search-header .search-bar-container {
+        order: 3; /* 로고와 아이콘들 아래로 순서 변경 */
+        width: 100%;
+        max-width: none;
+        margin-top: 5px;
+    }
+
+    .search-results-container {
+        /* 헤더 높이가 늘어난 만큼 채팅 영역 높이 재조정 */
+        height: calc(100vh - 175px);
+    }
+}

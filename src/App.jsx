@@ -15,6 +15,21 @@ const COUNT_API = SERVER_HOST + '/message/count';
 
 const PAGE_SIZE = 50;
 
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 1. 알림용 SVG 아이콘을 데이터 URL로 정의
+// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// const NOTIFICATION_FAVICON_SVG = `
+// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+//   <path fill="%239E9E9E" d="M22.56,12.25 C22.56,11.42 22.49,10.62 22.36,9.85 L12,9.85 L12,14.28 L18.17,14.28 C17.91,15.93 17.06,17.34 15.68,18.25 L15.68,21.57 L19.48,21.57 C21.49,19.72 22.56,16.89 22.56,12.25 Z"/>
+//   <path fill="%239E9E9E" d="M12,23 C14.99,23 17.56,22.01 19.48,20.57 L15.68,17.25 C14.59,17.99 13.38,18.43 12,18.43 C9.6,18.43 7.52,16.84 6.73,14.73 L2.79,14.73 L2.79,18.12 C4.7,21.05 8.09,23 12,23 Z"/>
+//   <path fill="%239E9E9E" d="M6.73,13.73 C6.47,13.01 6.34,12.25 6.34,11.5 C6.34,10.75 6.47,9.99 6.73,9.27 L6.73,5.88 L2.79,5.88 C1.8,7.77 1.25,9.92 1.25,11.5 C1.25,13.08 1.8,15.23 2.79,17.12 L6.73,13.73 Z"/>
+//   <path fill="%239E9E9E" d="M12,5.57 C13.48,5.57 14.8,6.08 15.82,7.06 L19.56,3.41 C17.56,1.56 14.99,0.5 12,0.5 C8.09,0.5 4.7,2.45 2.79,5.38 L6.73,8.77 C7.52,6.66 9.6,5.57 12,5.57 Z"/>
+// </svg>
+// `;
+// SVG를 브라우저가 읽을 수 있는 데이터 URL로 변환 (공백 제거, 특수문자 치환)
+// const NOTIFICATION_FAVICON_URL = `data:image/svg+xml,${NOTIFICATION_FAVICON_SVG.replace(/\s+/g, ' ').replace(/#/g, '%23').trim()}`;
+const NOTIFICATION_FAVICON_URL = `https://www.google.com/favicon.ico`;
+
 // 닉네임 앞부분에 사용될 '꾸미는 말' 목록 (100개)
 const descriptors = [
   "피리부는", "파도타는", "코딩하는", "여행하는", "춤추는", "게으른", "용감한", "슬픈", "배고픈", "잠자는",
@@ -198,7 +213,7 @@ const ChatApp = () => {
   // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
   const intervalRef = useRef(null);
   const originalTitleRef = useRef(document.title);
-  const originalFaviconRef = useRef(getOrCreateFaviconLink().href);
+  const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
 
   // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
   // 2. 알림 시작 및 종료 함수 추가
@@ -217,7 +232,18 @@ const ChatApp = () => {
 
     // const originalTitle = originalTitleRef.current;
     intervalRef.current = setInterval(() => {
-      // getOrCreateFaviconLink().href = ;
+      // // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+      // // 3. 알림 시작 시 파비콘을 노란 점으로 변경
+      // // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+      // const canvas = document.createElement('canvas');
+      // canvas.width = 16;
+      // canvas.height = 16;
+      // const ctx = canvas.getContext('2d');
+      // ctx.fillStyle = '#FBC02D'; // 구글 느낌의 노란색
+      // ctx.beginPath();
+      // ctx.arc(8, 8, 8, 0, 2 * Math.PI);
+      // ctx.fill();
+      getOrCreateFaviconLink().href = NOTIFICATION_FAVICON_URL;
       // document.title = document.title === originalTitle ? '새 메시지!' : originalTitle;
     }, 1000); // 1초 간격으로 제목 변경
   }, []);

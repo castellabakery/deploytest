@@ -16,11 +16,14 @@
     --border-color-hover: #c6c6c6;
     --border-color-active: #1a73e8;
 
-    --button-primary-bg: #4285f4;
-    --button-primary-text: #fff;
-    --button-primary-border: #4285f4;
-    --button-primary-bg-hover: #3367d6;
-    --button-primary-border-hover: #2a56c6;
+    /* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+    /* 1. 버튼 스타일을 회색톤으로 변경 (수정된 부분) */
+    /* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+    --button-primary-bg: #f8f9fa;
+    --button-primary-text: #3c4043;
+    --button-primary-border: #f8f9fa;
+    --button-primary-bg-hover: #f1f3f4;
+    --button-primary-border-hover: #e0e0e0;
 
     --button-danger-bg: #d93025;
     --button-danger-border: #d93025;
@@ -46,11 +49,14 @@
     --border-color-hover: #5f6368;
     --border-color-active: #8ab4f8;
 
-    --button-primary-bg: #8ab4f8;
-    --button-primary-text: #202124;
-    --button-primary-border: #8ab4f8;
-    --button-primary-bg-hover: #9ac0f9;
-    --button-primary-border-hover: #9ac0f9;
+    /* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+    /* 1. 버튼 스타일을 회색톤으로 변경 (수정된 부분) */
+    /* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+    --button-primary-bg: #303134;
+    --button-primary-text: #e8eaed;
+    --button-primary-border: #3c4043;
+    --button-primary-bg-hover: #3c4043;
+    --button-primary-border-hover: #55585a;
 
     --button-danger-bg: #f28b82;
     --button-danger-border: #f28b82;
@@ -135,6 +141,13 @@
     padding: 0 8px;
     cursor: pointer;
     font-size: 20px;
+    color: var(--text-color-tertiary);
+}
+
+.camera-icon {
+    padding: 0 10px;
+    cursor: pointer;
+    font-size: 30px;
     color: var(--text-color-tertiary);
 }
 
@@ -638,4 +651,28 @@
         /* 헤더 높이가 늘어난 만큼 채팅 영역 높이 재조정 */
         height: calc(100vh - 175px);
     }
+}
+
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* 2. 프로필 아이콘에 테두리 효과 추가 (수정된 부분) */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+.user-profile-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* 크기를 살짝 키워 테두리 공간 확보 */
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--profile-icon-bg);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+    border: 2px solid transparent; /* 기본 테두리는 투명하게 */
+    transition: border-color 0.2s ease-in-out;
+}
+.user-profile-icon:hover {
+    border-color: var(--bg-color-hover); /* 마우스 오버 시 은은한 테두리 표시 */
+    filter: brightness(1); /* 기존 밝기 효과는 테두리로 대체 */
 }

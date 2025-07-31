@@ -15,6 +15,34 @@ const COUNT_API = SERVER_HOST + '/message/count';
 
 const PAGE_SIZE = 50;
 
+// 닉네임 앞부분에 사용될 '꾸미는 말' 목록 (100개)
+const descriptors = [
+  "피리부는", "파도타는", "코딩하는", "여행하는", "춤추는", "게으른", "용감한", "슬픈", "배고픈", "잠자는",
+  "화성가는", "노래하는", "그림그리는", "책읽는", "커피마시는", "생각하는", "점프하는", "수영하는", "요리하는", "달리는",
+  "숨어있는", "빛나는", "행복한", "우울한", "궁금한", "날아가는", "소리치는", "속삭이는", "꿈꾸는", "별을보는",
+  "코파는", "심심한", "수다떠는", "쇼핑하는", "운동하는", "공부하는", "산책하는", "운전하는", "웃고있는", "울고있는",
+  "화가난", "신나는", "정리하는", "어지르는", "요가하는", "명상하는", "게임하는", "해킹하는", "디버깅하는", "설계하는",
+  "상상하는", "모험하는", "탐험하는", "발명하는", "도망치는", "추격하는", "고민하는", "질문하는", "대답하는", "설득하는",
+  "응원하는", "구경하는", "간식먹는", "야식먹는", "낚시하는", "등산하는", "캠핑하는", "뜨개질하는", "농사짓는", "투자하는",
+  "알바하는", "하품하는", "재채기하는", "딸꾹질하는", "간지럼타는", "빙글빙글", "반짝이는", "두근대는", "어슬렁", "비틀대는",
+  "시를쓰는", "소설읽는", "영화보는", "음악듣는", "코드짜는", "커밋하는", "푸시하는", "머지하는", "배포하는", "롤백하는",
+  "최적화된", "느려터진", "우아한", "단단한", "유연한", "투명한", "불투명한", "오래된", "새로운", "미래의"
+];
+
+// 닉네임 뒷부분에 사용될 '명사' 목록 (100개)
+const nouns = [
+  "거북이", "두루미", "불어펜", "개발자", "감자튀김", "알파카", "쿼카", "라이언", "컴퓨터", "외계인",
+  "고양이", "강아지", "유령", "히어로", "의자", "책상", "모니터", "키보드", "마우스", "충전기",
+  "햄버거", "피자", "치킨", "아이스크림", "솜사탕", "드래곤", "유니콘", "마법사", "요정", "고블린",
+  "탐험가", "우주비행사", "해적", "닌자", "사무라이", "기사", "도둑", "궁수", "사자", "호랑이",
+  "코끼리", "기린", "하마", "펭귄", "북극곰", "판다", "카피바라", "사막여우", "너구리", "오소리",
+  "두더지", "고슴도치", "햄스터", "앵무새", "카나리아", "고래", "상어", "문어", "오징어", "해파리",
+  "감자", "고구마", "옥수수", "아보카도", "브로콜리", "파프리카", "선인장", "해바라기", "민들레", "소나무",
+  "아파트", "빌라", "주택", "궁전", "오두막", "동굴", "우주선", "잠수함", "비행기", "기차",
+  "자전거", "스쿠터", "자동차", "트럭", "로켓", "위성", "블랙홀", "은하수", "초신성", "성운",
+  "먼지", "구름", "안개", "바람", "폭풍", "번개", "지진", "화산", "빙하", "사막"
+];
+
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 // 1. 고정된 자바 검색 결과 제목 배열
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
@@ -97,6 +125,18 @@ const renderTextWithLinks = (text) => {
   );
 };
 
+const generateRandomNickname = () => {
+  // 1. 각 배열에서 무작위로 단어를 선택합니다.
+  const descriptor = descriptors[Math.floor(Math.random() * descriptors.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+
+  // 2. 현재 시간을 밀리초 단위의 숫자로 가져옵니다. (고유성 보장)
+  const timestamp = Date.now();
+
+  // 3. 단어와 타임스탬프를 조합하여 반환합니다.
+  return `${descriptor}_${noun}_${timestamp}`;
+}
+
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 // 1. 파비콘(탭 아이콘)을 가져오거나 새로 만드는 헬퍼 함수
 // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
@@ -117,7 +157,7 @@ const ChatApp = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [stompClient, setStompClient] = useState(null);
-  const [username, setUsername] = useState(localStorage.getItem('chatUsername'));
+  const [username, setUsername] = useState(localStorage.getItem('chatUsername') == null ? generateRandomNickname() : localStorage.getItem('chatUsername'));
   const [askingName, setAskingName] = useState(false);
 
   const chatRef = useRef(null);
@@ -425,28 +465,6 @@ const ChatApp = () => {
     loadRooms();
   };
 
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  // 1. 메시지에 가짜 데이터를 첨부하는 헬퍼 함수
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  const addFakeDataToMessage = (message) => {
-    const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
-    const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
-    const source = javaSourceData[sourceIndex.current % javaSourceData.length];
-    const uuid = uuidv4();
-
-    searchResultTitleIndex.current++;
-    searchResultSnippetIndex.current++;
-    sourceIndex.current++;
-
-    return {
-      ...message,
-      fakeTitle: title,
-      fakeSnippet: snippet,
-      fakeSource: source,
-      uuid: uuid
-    };
-  };
-
   const connect = () => {
     if (!currentRoom) return;
     const socket = new SockJS(SERVER_URL);
@@ -455,10 +473,23 @@ const ChatApp = () => {
       client.subscribe('/topic/public/'+currentRoom.id, (msg) => {
         const message = JSON.parse(msg.body);
         if (currentRoom && message.roomId === currentRoom.id) {
-          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-          // 3. 새로 받은 메시지에도 가짜 데이터를 '미리' 첨부
-          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-          const augmentedMessage = addFakeDataToMessage(message);
+          // 새로 받은 실시간 메시지에도 고유한 가짜 데이터를 '미리' 할당
+          const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
+          const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
+          const source = javaSourceData[sourceIndex.current % javaSourceData.length];
+          const uuid = uuidv4();
+
+          searchResultTitleIndex.current++;
+          searchResultSnippetIndex.current++;
+          sourceIndex.current++;
+
+          const augmentedMessage = {
+            ...message,
+            fakeTitle: title,
+            fakeSnippet: snippet,
+            fakeSource: source,
+            uuid: uuid
+          };
 
           setMessages(prev => [...prev, augmentedMessage]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
@@ -535,10 +566,25 @@ const ChatApp = () => {
       const newMessages = await res.json();
 
       if (newMessages && newMessages.length > 0) {
-        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-        // 2. 불러온 메시지에 가짜 데이터를 '미리' 첨부
-        // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-        const augmentedMessages = newMessages.map(addFakeDataToMessage);
+        // 불러온 메시지 각각에 고유한 가짜 데이터를 '미리' 할당
+        const augmentedMessages = newMessages.map(message => {
+          const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
+          const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
+          const source = javaSourceData[sourceIndex.current % javaSourceData.length];
+          const uuid = uuidv4();
+
+          searchResultTitleIndex.current++;
+          searchResultSnippetIndex.current++;
+          sourceIndex.current++;
+
+          return {
+            ...message,
+            fakeTitle: title,
+            fakeSnippet: snippet,
+            fakeSource: source,
+            uuid: uuid
+          };
+        });
 
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
@@ -641,12 +687,16 @@ const ChatApp = () => {
   };
 
   const ThemeToggleButton = () => (
-      <button onClick={toggleTheme} className="theme-toggle-button">
-        {theme === 'light' ? '🌙' : '☀️'}
+      <button onClick={toggleTheme} className="header-icon theme-toggle-button">
+        {theme === 'light' ? (
+            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+        ) : (
+            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+        )}
       </button>
   );
 
-  if (askingName || !username) {
+  if (askingName) {
     return (
         <div className="google-ui-app">
           <div className="username-prompt">
@@ -771,11 +821,13 @@ const ChatApp = () => {
           <div className="search-bar-container">
             <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()} placeholder="메시지 입력..." />
             <div className="search-bar-icons">
-              <span className="icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>📷</span>
+              <span className="camera-icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
+                <svg className="Gdd5U" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="var(--bbQxAb)" d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"></path></svg>
+              </span>
             </div>
           </div>
           <button className="search-button" onClick={sendTextMessage}>
-            <span className="KlpaXd z1asCe MZy1Rb"><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></span>
+            <span><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></span>
           </button>
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
           <ThemeToggleButton />
@@ -796,10 +848,6 @@ const ChatApp = () => {
           )}
 
           {messages.map((msg, idx) => {
-            // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-            // 3. 순서대로 제목을 가져오고, 다음을 위해 인덱스 증가
-            // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-            const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
             return (
               <div key={msg.id || idx} className="search-result-item chat-message-item">
                 {/* 출처 정보 표시 영역 */}
@@ -819,7 +867,7 @@ const ChatApp = () => {
                 <div className="search-result-url">
                   https:// {msg.sender} › {formatTime(msg.createDateTime)} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
                 </div>
-                <h3 className="search-result-title">{title}</h3>
+                <h3 className="search-result-title">{msg.fakeTitle}</h3>
                   <div className="search-result-snippet">{msg.fakeSnippet} ...</div>
                 <div className="search-result-url">
                 {renderMessageContent(msg)}

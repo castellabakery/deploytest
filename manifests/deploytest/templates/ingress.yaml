@@ -23,28 +23,3 @@ spec:
                 name: {{ .Values.app }}
                 port:
                   number: {{ .Values.servicePort }}
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: {{ .Values.app }}-ingress-ext
-  annotations:
-    app.kubernetes.io/name: "ingress-nginx"
-    cert-manager.io/cluster-issuer: {{ .Values.secretName }}
-spec:
-  tls:
-    - hosts:
-        - "{{ .Values.domain }}"
-      secretName: {{ .Values.secretName }}
-  ingressClassName: "nginx"
-  rules:
-    - host: "{{ .Values.domain }}"
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: {{ .Values.consumeBatch.externalName }}
-                port:
-                  number: {{ .Values.consumeBatch.servicePort }}

@@ -414,7 +414,7 @@
 
 /* --- 6. 기타 UI 요소 --- */
 .username-prompt {
-    text-align: center;
+    text-align: -webkit-center;
     padding-top: 100px;
 }
 .username-prompt h2 {

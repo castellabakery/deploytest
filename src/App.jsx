@@ -13,11 +13,9 @@ const CHECK_PASSWORD_API = SERVER_HOST + '/room/check/password';
 const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 30;
 
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-// 1. 알림용 SVG 아이콘을 데이터 URL로 정의
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 알림용 SVG 아이콘을 데이터 URL로 정의
 // const NOTIFICATION_FAVICON_SVG = `
 // <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 //   <path fill="%239E9E9E" d="M22.56,12.25 C22.56,11.42 22.49,10.62 22.36,9.85 L12,9.85 L12,14.28 L18.17,14.28 C17.91,15.93 17.06,17.34 15.68,18.25 L15.68,21.57 L19.48,21.57 C21.49,19.72 22.56,16.89 22.56,12.25 Z"/>
@@ -28,7 +26,7 @@ const PAGE_SIZE = 50;
 // `;
 // SVG를 브라우저가 읽을 수 있는 데이터 URL로 변환 (공백 제거, 특수문자 치환)
 // const NOTIFICATION_FAVICON_URL = `data:image/svg+xml,${NOTIFICATION_FAVICON_SVG.replace(/\s+/g, ' ').replace(/#/g, '%23').trim()}`;
-const NOTIFICATION_FAVICON_URL = `https://www.google.com/favicon.ico`;
+const NOTIFICATION_FAVICON_URL = `https://cc.pastelcloud.store/favicon.ico`;
 
 // 닉네임 앞부분에 사용될 '꾸미는 말' 목록 (100개)
 const descriptors = [
@@ -58,9 +56,7 @@ const nouns = [
   "먼지", "구름", "안개", "바람", "폭풍", "번개", "지진", "화산", "빙하", "사막"
 ];
 
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-// 1. 고정된 자바 검색 결과 제목 배열
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 고정된 자바 검색 결과 제목 배열
 const javaSearchResultTitles = [
   "Java NullPointerException: 원인과 해결 방법 총정리",
   "Spring Boot @Transactional 어노테이션의 올바른 사용법 - Stack Overflow",
@@ -84,9 +80,7 @@ const javaSearchResultTitles = [
   "Docker와 Jenkins를 이용한 Spring Boot 애플리케이션 CI/CD 파이프라인 구축"
 ];
 
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-// 1. 고정된 자바 검색 결과 내용(스니펫) 배열 추가
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 고정된 자바 검색 결과 내용 배열 추가
 const javaSearchResultSnippets = [
   "2025. 7. 31. — NullPointerException은 객체 참조가 null일 때 발생합니다. 객체 사용 전 null 체크를 추가하거나 Optional 클래스를 사용하",
   "2025. 6. 10. — Spring의 @Transactional은 AOP 프록시를 통해 작동하므로, public 메서드에만 적용되며 클래스 내부 호출에는 적용되지 않습",
@@ -110,9 +104,7 @@ const javaSearchResultSnippets = [
   "2023. 12. 1. — Lombok 라이브러리의 @Data 어노테이션은 @Getter, @Setter, @ToString 등을 모두 포함하지만, 불필요한 Setter 생성을 유발할 수 있어 주의"
 ];
 
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-// 1. 가짜 검색 출처 정보 배열 추가
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 가짜 검색 출처 정보 배열 추가
 const javaSourceData = [
   { name: 'Tistory', url: 'https://johndoe.tistory.com', icon: 'T', color: '#E96312' },
   { name: 'velog', url: 'https://velog.io/@jane.doe', icon: 'v', color: '#20C997' },
@@ -124,6 +116,7 @@ const javaSourceData = [
   { name: 'Medium', url: 'https://medium.com/tag/java', icon: 'M', color: '#121212' }
 ];
 
+// 링크 만드는 함수
 const renderTextWithLinks = (text) => {
   if (typeof text !== 'string') return text;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -140,6 +133,7 @@ const renderTextWithLinks = (text) => {
   );
 };
 
+// 닉네임 만드는 함수
 const generateRandomNickname = () => {
   // 1. 각 배열에서 무작위로 단어를 선택합니다.
   const descriptor = descriptors[Math.floor(Math.random() * descriptors.length)];
@@ -152,9 +146,7 @@ const generateRandomNickname = () => {
   return `${descriptor}_${noun}_${timestamp}`;
 }
 
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-// 1. 파비콘(탭 아이콘)을 가져오거나 새로 만드는 헬퍼 함수
-// ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+// 파비콘(탭 아이콘)을 가져오거나 새로 만드는 헬퍼 함수
 const getOrCreateFaviconLink = () => {
   let link = document.querySelector("link[rel*='icon']");
   if (link) {
@@ -201,23 +193,17 @@ const ChatApp = () => {
 
   const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
 
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  // 2. 검색 결과 제목 인덱스를 추적할 ref 생성
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 검색 결과 제목 인덱스를 추적할 ref 생성
   const searchResultTitleIndex = useRef(0);
   const searchResultSnippetIndex = useRef(0);
   const sourceIndex = useRef(0);
 
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  // 1. 알림 효과를 위한 Ref 추가
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 알림 효과를 위한 Ref 추가
   const intervalRef = useRef(null);
   const originalTitleRef = useRef(document.title);
   const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
 
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  // 2. 알림 시작 및 종료 함수 추가
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 알림 종료 함수 추가
   const stopNotification = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -227,31 +213,15 @@ const ChatApp = () => {
     }
   }, []);
 
+  // 알림 시작 함수 추가
   const startNotification = useCallback(() => {
     if (intervalRef.current) return; // 이미 알림이 실행 중이면 중복 실행 방지
-
-    // const originalTitle = originalTitleRef.current;
     intervalRef.current = setInterval(() => {
-      // // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-      // // 3. 알림 시작 시 파비콘을 노란 점으로 변경
-      // // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-      // const canvas = document.createElement('canvas');
-      // canvas.width = 16;
-      // canvas.height = 16;
-      // const ctx = canvas.getContext('2d');
-      // ctx.fillStyle = '#FBC02D'; // 구글 느낌의 노란색
-      // ctx.beginPath();
-      // ctx.arc(8, 8, 8, 0, 2 * Math.PI);
-      // ctx.fill();
       getOrCreateFaviconLink().href = NOTIFICATION_FAVICON_URL;
-      // document.title = document.title === originalTitle ? '새 메시지!' : originalTitle;
-    }, 1000); // 1초 간격으로 제목 변경
+    }, 1000); // 1초 간격으로 변경
   }, []);
 
-
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  // 3. 사용자가 탭으로 돌아왔을 때 알림을 끄는 로직 추가
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // 사용자가 탭으로 돌아왔을 때 알림을 끄는 로직 추가
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -259,7 +229,6 @@ const ChatApp = () => {
         stopNotification();
       }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
@@ -268,7 +237,6 @@ const ChatApp = () => {
       stopNotification();
     };
   }, [stopNotification]);
-
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -520,9 +488,7 @@ const ChatApp = () => {
           setMessages(prev => [...prev, augmentedMessage]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
 
-          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-          // 4. 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
-          // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+          // 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
           if (document.hidden) {
             startNotification();
           }
@@ -665,24 +631,7 @@ const ChatApp = () => {
     setModalImageSrc('');
   };
 
-  // const renderMessageContent = (msg) => {
-  //   if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
-  //     return (
-  //         <div className="image-result-box" onClick={() => openModal(msg.content)}>
-  //           <img src={msg.content} alt="이미지" />
-  //           <p>이미지</p>
-  //         </div>
-  //     );
-  //   }
-  //   if (typeof msg.content === 'string') {
-  //     return <div className="search-result-snippet">{renderTextWithLinks(msg.content)}</div>;
-  //   }
-  //   return <div className="search-result-snippet">{msg.content}</div>;
-  // };
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-  // 3. renderMessageContent 함수 약간 수정 (감싸는 div 제거)
-  //    - 이제 각 메시지 타입을 순수한 JSX 요소로 반환합니다.
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+  // renderMessageContent 함수 약간 수정 (감싸는 div 제거) - 이제 각 메시지 타입을 순수한 JSX 요소로 반환합니다.
   const renderMessageContent = (msg) => {
     if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
       return (
@@ -726,7 +675,8 @@ const ChatApp = () => {
     return (
         <div className="google-ui-app">
           <div className="username-prompt">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" style={{width: '150px', marginBottom: '20px'}}/>
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{width: '150px', marginBottom: '20px'}}/>
+            <svg style={{width: '150px', marginBottom: '20px'}} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
             <h2>서비스 사용을 위해 닉네임을 입력하세요.</h2>
             <div className="search-bar-container" style={{maxWidth: '400px', margin: '20px auto'}}>
               <input
@@ -738,7 +688,7 @@ const ChatApp = () => {
                   autoFocus
               />
             </div>
-            <button className="search-button" onClick={handleSetUsername}>입장하기</button>
+            <button className="search-button" onClick={handleSetUsername}>변경하기</button>
           </div>
           {/* 닉네임 입력 화면에서는 테마 버튼을 숨겨도 좋지만, 일관성을 위해 유지 */}
         </div>
@@ -750,9 +700,7 @@ const ChatApp = () => {
         <div className="google-ui-app">
           <div className="search-header">
             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light"/>
-            {/*<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo_white.svg/32px-Google_%22G%22_logo_white.svg.png" alt="Google" className="header-logo logo-dark"/>*/}
             <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-            {/*<img src="https://www.gstatic.com/marketing-cms/assets/images/fc/20/494fae814ff5a9870a381ca338e7/google-logo-2x.webp" alt="Google" className="header-logo"/>*/}
 
             <div style={{flexGrow: 1}}></div> {/* 빈 공간 채우기 */}
             <ThemeToggleButton />
@@ -847,9 +795,7 @@ const ChatApp = () => {
         <div className="search-header">
           <span className="back-button" onClick={handleExitRoom}>←</span>
           <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light"/>
-          {/*<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo_white.svg/32px-Google_%22G%22_logo_white.svg.png" alt="Google" className="header-logo logo-dark"/>*/}
           <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-          {/*<img src="https://www.gstatic.com/marketing-cms/assets/images/fc/20/494fae814ff5a9870a381ca338e7/google-logo-2x.webp" alt="Google" className="header-logo"/>*/}
 
           <h1 className="room-title">{currentRoom.name}</h1>
           <div className="search-bar-container">
@@ -892,11 +838,6 @@ const ChatApp = () => {
                     <span className="source-url">{msg.fakeSource.url}</span>
                   </div>
                 </div>
-
-                {/* 제목과 '더보기' 아이콘 표시 영역 */}
-                {/*<div className="search-result-header">*/}
-                {/*  <button className="header-icon more-options-icon">⋮</button>*/}
-                {/*</div>*/}
 
                 <div className="search-result-url">
                   https:// {msg.sender} › {formatTime(msg.createDateTime)} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>

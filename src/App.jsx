@@ -529,9 +529,9 @@ const ChatApp = () => {
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
 
           // 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
-          if (document.hidden) {
+          /*if (document.hidden) {
             startNotification();
-          } else if(isUseWindowFocus) {
+          } else */if(isUseWindowFocus) {
             startNotification();
             setMessageArrived(true);
           }

@@ -13,7 +13,7 @@ const CHECK_PASSWORD_API = SERVER_HOST + '/room/check/password';
 const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 50;
 
 // 알림용 SVG 아이콘을 데이터 URL로 정의
 // const NOTIFICATION_FAVICON_SVG = `
@@ -191,6 +191,9 @@ const ChatApp = () => {
   const [deleteRoomModal, setDeleteRoomModal] = useState({ visible: false, room: null, error: '' });
   const [deletePasswordInput, setDeletePasswordInput] = useState('');
 
+  const [messageArrived, setMessageArrived] = useState(false);
+  const [isModalAlert, setIsModalAlert] = useState(false);
+
   const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
 
   // 검색 결과 제목 인덱스를 추적할 ref 생성
@@ -202,6 +205,39 @@ const ChatApp = () => {
   const intervalRef = useRef(null);
   const originalTitleRef = useRef(document.title);
   const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
+
+  const useWindowFocus = () => {
+    // 윈도우 포커스 여부를 저장하는 state
+    const [isWindowFocused, setIsWindowFocused] = useState(true);
+
+    useEffect(() => {
+      const handleFocus = () => {
+        console.log('✅ 윈도우에 포커스되었습니다.');
+        setIsWindowFocused(true);
+        stopNotification();
+      };
+
+      const handleBlur = () => {
+        console.log('🚫 윈도우 포커스가 해제되었습니다.');
+        setIsWindowFocused(false);
+        setMessageArrived(false);
+      };
+
+      // 이벤트 리스너 등록
+      window.addEventListener('focus', handleFocus);
+      window.addEventListener('blur', handleBlur);
+
+      // 컴포넌트가 언마운트될 때 이벤트 리스너 제거 (메모리 누수 방지)
+      return () => {
+        window.removeEventListener('focus', handleFocus);
+        window.removeEventListener('blur', handleBlur);
+      };
+    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
+
+    return isWindowFocused;
+  };
+
+  const isUseWindowFocus = useWindowFocus();
 
   // 알림 종료 함수 추가
   const stopNotification = useCallback(() => {
@@ -245,6 +281,10 @@ const ChatApp = () => {
 
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  const toggleAlert = () => {
+    setIsModalAlert(prevAlert => !prevAlert);
   };
 
   useEffect(() => {
@@ -491,6 +531,9 @@ const ChatApp = () => {
           // 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
           if (document.hidden) {
             startNotification();
+          } else if(isUseWindowFocus) {
+            startNotification();
+            setMessageArrived(true);
           }
         }
       });
@@ -629,6 +672,8 @@ const ChatApp = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setModalImageSrc('');
+    document.getElementById("coming-modal").style.display = 'none';
+    setMessageArrived(false);
   };
 
   // renderMessageContent 함수 약간 수정 (감싸는 div 제거) - 이제 각 메시지 타입을 순수한 JSX 요소로 반환합니다.
@@ -667,6 +712,16 @@ const ChatApp = () => {
             <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
         ) : (
             <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+        )}
+      </button>
+  );
+
+  const AlertToggleButton = () => (
+      <button onClick={toggleAlert} className="header-icon theme-toggle-button">
+        {isModalAlert ? (
+            <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg>
+        ) : (
+            <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg>
         )}
       </button>
   );
@@ -811,6 +866,7 @@ const ChatApp = () => {
           </button>
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
           <ThemeToggleButton />
+          <AlertToggleButton />
           <div className="user-profile-icon" onClick={changeUsername}>
             {username.charAt(0).toUpperCase()}
           </div>
@@ -858,6 +914,14 @@ const ChatApp = () => {
               <div className="modal-content">
                 <img src={modalImageSrc} alt="원본 이미지" />
                 <button className="close-button" onClick={closeModal}>&times;</button>
+              </div>
+            </div>
+        )}
+
+        {(!isUseWindowFocus && messageArrived && isModalAlert) && (
+            <div id="coming-modal" className="modal-alert" onClick={closeModal}>
+              <div className="modal-content">
+                뭔가 왔습니다.
               </div>
             </div>
         )}

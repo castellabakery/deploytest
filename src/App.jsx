@@ -140,6 +140,10 @@ const getOrCreateFaviconLink = () => {
   return link;
 };
 
+const randomlyStyledText = (probability = 0.1) => {
+  return Math.random() < probability;
+};
+
 const ChatApp = () => {
   // (상태 선언 및 모든 함수는 기존과 동일)
   const [messages, setMessages] = useState([]);
@@ -176,6 +180,8 @@ const ChatApp = () => {
   const [isModalAlert, setIsModalAlert] = useState(false);
 
   const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
+
+  const [isContentsBold, setIsContentsBold] = useState(false);
 
   // 검색 결과 제목 인덱스를 추적할 ref 생성
   const searchResultTitleIndex = useRef(0);
@@ -292,6 +298,10 @@ const ChatApp = () => {
 
   const toggleAlert = () => {
     setIsModalAlert(prevAlert => !prevAlert);
+  };
+
+  const toggleBold = () => {
+    setIsContentsBold(prevBold => !prevBold);
   };
 
   useEffect(() => {
@@ -519,6 +529,7 @@ const ChatApp = () => {
           const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
           const source = javaSourceData[sourceIndex.current % javaSourceData.length];
           const uuid = uuidv4();
+          const randomlyStyled = randomlyStyledText(0.2);
 
           searchResultTitleIndex.current++;
           searchResultSnippetIndex.current++;
@@ -529,7 +540,8 @@ const ChatApp = () => {
             fakeTitle: title,
             fakeSnippet: snippet,
             fakeSource: source,
-            uuid: uuid
+            uuid: uuid,
+            randomlyStyled: randomlyStyled
           };
 
           setMessages(prev => [...prev, augmentedMessage]);
@@ -612,6 +624,7 @@ const ChatApp = () => {
           const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
           const source = javaSourceData[sourceIndex.current % javaSourceData.length];
           const uuid = uuidv4();
+          const randomlyStyled = randomlyStyledText(0.2);
 
           searchResultTitleIndex.current++;
           searchResultSnippetIndex.current++;
@@ -622,7 +635,8 @@ const ChatApp = () => {
             fakeTitle: title,
             fakeSnippet: snippet,
             fakeSource: source,
-            uuid: uuid
+            uuid: uuid,
+            randomlyStyled: randomlyStyled
           };
         });
 
@@ -731,6 +745,16 @@ const ChatApp = () => {
             <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg>
         ) : (
             <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg>
+        )}
+      </button>
+  );
+
+  const BoldToggleButton = () => (
+      <button onClick={toggleBold} className="header-icon theme-toggle-button">
+        {isContentsBold ? (
+            <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg>
+        ) : (
+            <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg>
         )}
       </button>
   );
@@ -876,6 +900,7 @@ const ChatApp = () => {
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
           <ThemeToggleButton />
           <AlertToggleButton />
+          <BoldToggleButton />
           <div className="user-profile-icon" onClick={changeUsername}>
             {username.charAt(0).toUpperCase()}
           </div>
@@ -905,12 +930,22 @@ const ChatApp = () => {
                 </div>
 
                 <div className="search-result-url">
-                  https:// {msg.sender} › {formatTime(msg.createDateTime)} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
+                  https:// {isContentsBold ? <span style={{fontWeight:"bolder"}}>{msg.sender} › {formatTime(msg.createDateTime)}</span> : <>{msg.sender} › {formatTime(msg.createDateTime)}</>} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
                 </div>
-                <h3 className="search-result-title">{msg.fakeTitle}</h3>
+                <h3 className="search-result-title">
+                  {msg.randomlyStyled ? <span className={"logo-light"} style={{color:"#681da8"}}>{msg.fakeTitle} ...</span> : <span className={"logo-light"}>{msg.fakeTitle} ...</span>}
+                  {msg.randomlyStyled ? <span className={"logo-dark"} style={{color:"#c58af9"}}>{msg.fakeTitle} ...</span> : <span className={"logo-dark"}>{msg.fakeTitle} ...</span>}
+                </h3>
                   <div className="search-result-snippet">{msg.fakeSnippet} ...</div>
                 <div className="search-result-url">
-                {renderMessageContent(msg)}
+                {isContentsBold ?
+                    <div className={"logo-light"} style={{fontWeight:"bolder"/*color:"#681da8"*/}}>{renderMessageContent(msg)}</div>
+                    : <span className={"logo-light"}>{renderMessageContent(msg)}</span>
+                }
+                {isContentsBold ?
+                    <div className={"logo-dark"} style={{fontWeight:"bolder"/*color:"#c58af9"*/}}>{renderMessageContent(msg)}</div>
+                    : <span className={"logo-dark"}>{renderMessageContent(msg)}</span>
+                }
                 </div>
               </div>
           )})}

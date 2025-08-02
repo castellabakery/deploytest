@@ -12,20 +12,7 @@ const ROOM_LIST_API = SERVER_HOST + '/room/list';
 const CHECK_PASSWORD_API = SERVER_HOST + '/room/check/password';
 const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
-
 const PAGE_SIZE = 50;
-
-// 알림용 SVG 아이콘을 데이터 URL로 정의
-// const NOTIFICATION_FAVICON_SVG = `
-// <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-//   <path fill="%239E9E9E" d="M22.56,12.25 C22.56,11.42 22.49,10.62 22.36,9.85 L12,9.85 L12,14.28 L18.17,14.28 C17.91,15.93 17.06,17.34 15.68,18.25 L15.68,21.57 L19.48,21.57 C21.49,19.72 22.56,16.89 22.56,12.25 Z"/>
-//   <path fill="%239E9E9E" d="M12,23 C14.99,23 17.56,22.01 19.48,20.57 L15.68,17.25 C14.59,17.99 13.38,18.43 12,18.43 C9.6,18.43 7.52,16.84 6.73,14.73 L2.79,14.73 L2.79,18.12 C4.7,21.05 8.09,23 12,23 Z"/>
-//   <path fill="%239E9E9E" d="M6.73,13.73 C6.47,13.01 6.34,12.25 6.34,11.5 C6.34,10.75 6.47,9.99 6.73,9.27 L6.73,5.88 L2.79,5.88 C1.8,7.77 1.25,9.92 1.25,11.5 C1.25,13.08 1.8,15.23 2.79,17.12 L6.73,13.73 Z"/>
-//   <path fill="%239E9E9E" d="M12,5.57 C13.48,5.57 14.8,6.08 15.82,7.06 L19.56,3.41 C17.56,1.56 14.99,0.5 12,0.5 C8.09,0.5 4.7,2.45 2.79,5.38 L6.73,8.77 C7.52,6.66 9.6,5.57 12,5.57 Z"/>
-// </svg>
-// `;
-// SVG를 브라우저가 읽을 수 있는 데이터 URL로 변환 (공백 제거, 특수문자 치환)
-// const NOTIFICATION_FAVICON_URL = `data:image/svg+xml,${NOTIFICATION_FAVICON_SVG.replace(/\s+/g, ' ').replace(/#/g, '%23').trim()}`;
 const NOTIFICATION_FAVICON_URL = `https://cc.pastelcloud.store/favicon.ico`;
 
 // 닉네임 앞부분에 사용될 '꾸미는 말' 목록 (100개)
@@ -41,7 +28,6 @@ const descriptors = [
   "시를쓰는", "소설읽는", "영화보는", "음악듣는", "코드짜는", "커밋하는", "푸시하는", "머지하는", "배포하는", "롤백하는",
   "최적화된", "느려터진", "우아한", "단단한", "유연한", "투명한", "불투명한", "오래된", "새로운", "미래의"
 ];
-
 // 닉네임 뒷부분에 사용될 '명사' 목록 (100개)
 const nouns = [
   "거북이", "두루미", "불어펜", "개발자", "감자튀김", "알파카", "쿼카", "라이언", "컴퓨터", "외계인",
@@ -55,7 +41,6 @@ const nouns = [
   "자전거", "스쿠터", "자동차", "트럭", "로켓", "위성", "블랙홀", "은하수", "초신성", "성운",
   "먼지", "구름", "안개", "바람", "폭풍", "번개", "지진", "화산", "빙하", "사막"
 ];
-
 // 고정된 자바 검색 결과 제목 배열
 const javaSearchResultTitles = [
   "Java NullPointerException: 원인과 해결 방법 총정리",
@@ -79,7 +64,6 @@ const javaSearchResultTitles = [
   "디자인 패턴: 싱글턴(Singleton) 패턴 구현 방법 5가지",
   "Docker와 Jenkins를 이용한 Spring Boot 애플리케이션 CI/CD 파이프라인 구축"
 ];
-
 // 고정된 자바 검색 결과 내용 배열 추가
 const javaSearchResultSnippets = [
   "2025. 7. 31. — NullPointerException은 객체 참조가 null일 때 발생합니다. 객체 사용 전 null 체크를 추가하거나 Optional 클래스를 사용하",
@@ -102,8 +86,7 @@ const javaSearchResultSnippets = [
   "2024. 2. 7. — 싱글턴 패턴은 애플리케이션 전체에서 단 하나의 인스턴스만 생성되도록 보장하는 디자인 패턴입니다. private 생성자와 static 메서드로 구현할",
   "2024. 1. 18. — Docker 이미지는 애플리케이션과 그 실행 환경을 패키징한 것이며, Jenkins 파이프라인을 통해 이 이미지의 빌드 및 배포를 자동화할 수 있",
   "2023. 12. 1. — Lombok 라이브러리의 @Data 어노테이션은 @Getter, @Setter, @ToString 등을 모두 포함하지만, 불필요한 Setter 생성을 유발할 수 있어 주의"
-];
-
+]
 // 가짜 검색 출처 정보 배열 추가
 const javaSourceData = [
   { name: 'Tistory', url: 'https://johndoe.tistory.com', icon: 'T', color: '#E96312' },
@@ -132,7 +115,6 @@ const renderTextWithLinks = (text) => {
       )
   );
 };
-
 // 닉네임 만드는 함수
 const generateRandomNickname = () => {
   // 1. 각 배열에서 무작위로 단어를 선택합니다.
@@ -145,7 +127,6 @@ const generateRandomNickname = () => {
   // 3. 단어와 타임스탬프를 조합하여 반환합니다.
   return `${descriptor}_${noun}_${timestamp}`;
 }
-
 // 파비콘(탭 아이콘)을 가져오거나 새로 만드는 헬퍼 함수
 const getOrCreateFaviconLink = () => {
   let link = document.querySelector("link[rel*='icon']");
@@ -202,77 +183,46 @@ const ChatApp = () => {
   const sourceIndex = useRef(0);
 
   // 알림 효과를 위한 Ref 추가
-  const intervalRef = useRef(null);
   const originalTitleRef = useRef(document.title);
   const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
 
-  const useWindowFocus = () => {
-    // 윈도우 포커스 여부를 저장하는 state
-    const [isWindowFocused, setIsWindowFocused] = useState(true);
+  // 윈도우 포커스 여부를 저장하는 state
+  const isWindowFocused = useRef(true);
 
-    useEffect(() => {
-      const handleFocus = () => {
-        console.log('✅ 윈도우에 포커스되었습니다.');
-        setIsWindowFocused(true);
-        stopNotification();
-      };
+  useEffect(() => {
+    const handleFocus = () => {
+      isWindowFocused.current = true;
+      setMessageArrived(false);
+      stopNotification();
+    };
 
-      const handleBlur = () => {
-        console.log('🚫 윈도우 포커스가 해제되었습니다.');
-        setIsWindowFocused(false);
-        setMessageArrived(false);
-      };
+    const handleBlur = () => {
+      isWindowFocused.current = false;
+    };
 
-      // 이벤트 리스너 등록
-      window.addEventListener('focus', handleFocus);
-      window.addEventListener('blur', handleBlur);
+    // 이벤트 리스너 등록
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
 
-      // 컴포넌트가 언마운트될 때 이벤트 리스너 제거 (메모리 누수 방지)
-      return () => {
-        window.removeEventListener('focus', handleFocus);
-        window.removeEventListener('blur', handleBlur);
-      };
-    }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
-
-    return isWindowFocused;
-  };
-
-  const isUseWindowFocus = useWindowFocus();
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거 (메모리 누수 방지)
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
 
   // 알림 종료 함수 추가
   const stopNotification = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
       document.title = originalTitleRef.current;
+    if (originalFaviconRef.current) {
       getOrCreateFaviconLink().href = originalFaviconRef.current;
     }
   }, []);
 
   // 알림 시작 함수 추가
   const startNotification = useCallback(() => {
-    if (intervalRef.current) return; // 이미 알림이 실행 중이면 중복 실행 방지
-    intervalRef.current = setInterval(() => {
       getOrCreateFaviconLink().href = NOTIFICATION_FAVICON_URL;
-    }, 1000); // 1초 간격으로 변경
   }, []);
-
-  // 사용자가 탭으로 돌아왔을 때 알림을 끄는 로직 추가
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // 사용자가 탭으로 돌아오면 알림 중지
-        stopNotification();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      // 컴포넌트가 사라질 때 알림 정리
-      stopNotification();
-    };
-  }, [stopNotification]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -529,9 +479,7 @@ const ChatApp = () => {
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
 
           // 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
-          /*if (document.hidden) {
-            startNotification();
-          } else */if(isUseWindowFocus) {
+          if(!isWindowFocused.current) {
             startNotification();
             setMessageArrived(true);
           }
@@ -653,15 +601,16 @@ const ChatApp = () => {
   };
 
   const formatTime = (array) => {
-    if (!Array.isArray(array) || array.length < 6) return array;
+    if (!Array.isArray(array) || array.length < 6 || typeof array === 'string') return new Date(array).toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    });
     const [y, m, d, h, min] = array;
     return `${y}년 ${m}월 ${d}일 - ${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-  };
-
-  const formatTimeForMsg = (array) => {
-    if (!Array.isArray(array) || array.length < 6) return array;
-    const [y, m, d, h, min] = array;
-    return `${y}년 ${m}월 ${d}일`;
   };
 
   const openModal = (src) => {
@@ -709,9 +658,9 @@ const ChatApp = () => {
   const ThemeToggleButton = () => (
       <button onClick={toggleTheme} className="header-icon theme-toggle-button">
         {theme === 'light' ? (
-            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
         ) : (
-            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
         )}
       </button>
   );
@@ -918,7 +867,7 @@ const ChatApp = () => {
             </div>
         )}
 
-        {(!isUseWindowFocus && messageArrived && isModalAlert) && (
+        {(!isWindowFocused.current && messageArrived && isModalAlert) && (
             <div id="coming-modal" className="modal-alert" onClick={closeModal}>
               <div className="modal-content">
                 뭔가 왔습니다.

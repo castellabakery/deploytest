@@ -869,8 +869,8 @@ const ChatApp = () => {
 
         {(!isWindowFocused.current && messageArrived && isModalAlert) && (
             <div id="coming-modal" className="modal-alert" onClick={closeModal}>
-              <div className="modal-content">
-                뭔가 왔습니다.
+              <div className="modal-content-alert">
+                <img alt="" src="https://www.gstatic.com/images/icons/material/system/svg/keyboard_arrow_up_24px.svg" data-atf="false" data-iml="420.5"></img>
               </div>
             </div>
         )}

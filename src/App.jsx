@@ -189,6 +189,63 @@ const ChatApp = () => {
   // 윈도우 포커스 여부를 저장하는 state
   const isWindowFocused = useRef(true);
 
+  const inputRef = useRef(null);
+
+  // 붙여넣기 이벤트를 처리하는 핸들러 함수
+  const handlePaste = (event) => {
+    // 클립보드에 있는 아이템들을 가져옵니다.
+    const items = event.clipboardData.items;
+
+    // 아이템들을 순회하며 이미지 파일이 있는지 확인합니다.
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.kind === 'file' && item.type.startsWith('image/')) {
+
+        // input에 파일 경로 같은 텍스트가 붙여넣어지는 기본 동작을 막습니다.
+        event.preventDefault();
+
+        // 이미지 파일을 File 객체로 가져옵니다.
+        const imageFile = item.getAsFile();
+        if (!imageFile) {
+          return;
+        }
+
+        // FileReader를 사용해 파일을 Base64 데이터 URL로 읽습니다.
+        const reader = new FileReader();
+
+        // 파일 읽기가 완료되면 실행될 콜백 함수
+        reader.onload = (e) => {
+          const base64Image = e.target.result;
+
+          // 부모 컴포넌트로 인코딩된 데이터를 전달합니다.
+          // 이 데이터를 웹소켓으로 보내면 됩니다.
+          sendMessage(base64Image, "IMAGE");
+        };
+
+        // 파일 읽기를 시작합니다.
+        reader.readAsDataURL(imageFile);
+
+        // 이미지 파일을 찾았으므로 반복을 중단합니다.
+        break;
+      }
+    }
+  };
+
+  useEffect(() => {
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      // 컴포넌트가 마운트될 때 input에 paste 이벤트 리스너를 추가합니다.
+      inputElement.addEventListener('paste', handlePaste);
+    }
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거합니다. (메모리 누수 방지)
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener('paste', handlePaste);
+      }
+    };
+  }, [handlePaste]);
+
   useEffect(() => {
     const handleFocus = () => {
       isWindowFocused.current = true;
@@ -621,7 +678,10 @@ const ChatApp = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setModalImageSrc('');
-    document.getElementById("coming-modal").style.display = 'none';
+    const comingModal = document.getElementById("coming-modal");
+    if(comingModal) {
+      comingModal.style.display = 'none';
+    }
     setMessageArrived(false);
   };
 
@@ -803,7 +863,7 @@ const ChatApp = () => {
 
           <h1 className="room-title">{currentRoom.name}</h1>
           <div className="search-bar-container">
-            <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()} />
+            <input type="text" ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()} />
             <div className="search-bar-icons">
               <span className="camera-icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
                 <svg className="Gdd5U" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="var(--bbQxAb)" d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"></path></svg>

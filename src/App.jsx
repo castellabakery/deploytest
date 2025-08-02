@@ -547,7 +547,7 @@ const ChatApp = () => {
           setMessages(prev => [...prev, augmentedMessage]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
 
-          // 메시지 수신 시, 탭이 비활성화 상태이면 알림 시작
+          // 메시지 수신 시, 포커스가 비활성화 상태이면 알림 시작
           if(!isWindowFocused.current) {
             startNotification();
             setMessageArrived(true);
@@ -732,10 +732,12 @@ const ChatApp = () => {
   const ThemeToggleButton = () => (
       <button onClick={toggleTheme} className="header-icon theme-toggle-button">
         {theme === 'light' ? (
-            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+            // <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
         ) : (
-            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
-        )}
+            // <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
+            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+          )}
       </button>
   );
 
@@ -789,9 +791,7 @@ const ChatApp = () => {
           <div className="search-header">
             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light"/>
             <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-
-            <div style={{flexGrow: 1}}></div> {/* 빈 공간 채우기 */}
-            <ThemeToggleButton />
+            <div style={{flexGrow: 1}}></div>
             <div className="user-profile-icon" onClick={changeUsername}>
               {username.charAt(0).toUpperCase()}
             </div>
@@ -826,8 +826,6 @@ const ChatApp = () => {
           </div>
 
           <button className="create-room-button" onClick={openCreateRoomModal}>+</button>
-
-          {/* Modal JSX... (변경 없음) */}
           {passwordModal.visible && (
               <div className="modal" onClick={closePasswordModal}>
                 <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -889,18 +887,22 @@ const ChatApp = () => {
           <div className="search-bar-container">
             <input type="text" ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()} />
             <div className="search-bar-icons">
+              <button className="search-button-bar" onClick={sendTextMessage}>
+                <span className={"logo-light"}><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#5f6368" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></span>
+                <span className={"logo-dark"}><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#bfbfbf" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></span>
+              </button>
+              <span className={"logo-light"} style={{borderLeft:"1px solid #dadce0", height:"65%", color:"transparent"}}>.</span>
+              <span className={"logo-dark"} style={{borderLeft:"1px solid rgba(248, 249, 250, 0.25)", height:"65%", color:"transparent"}}>.</span>
+              <BoldToggleButton />
+              <AlertToggleButton />
               <span className="camera-icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
-                <svg className="Gdd5U" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="var(--bbQxAb)" d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"></path></svg>
+                <svg className="Gdd5U" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"></path></svg>
               </span>
+              <ThemeToggleButton />
             </div>
           </div>
-          <button className="search-button" onClick={sendTextMessage}>
-            <span><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></span>
-          </button>
+
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
-          <ThemeToggleButton />
-          <AlertToggleButton />
-          <BoldToggleButton />
           <div className="user-profile-icon" onClick={changeUsername}>
             {username.charAt(0).toUpperCase()}
           </div>
@@ -919,37 +921,34 @@ const ChatApp = () => {
 
           {messages.map((msg, idx) => {
             return (
-              <div key={msg.id || idx} className="search-result-item chat-message-item">
-                {/* 출처 정보 표시 영역 */}
-                <div className="search-result-source">
-                  <span className="source-icon" style={{ backgroundColor: msg.fakeSource.color }}>{msg.fakeSource.icon}</span>
-                  <div className="source-details">
-                    <span className="source-name">{msg.fakeSource.name}</span>
-                    <span className="source-url">{msg.fakeSource.url}</span>
+                <div key={msg.id || idx} className="search-result-item chat-message-item">
+                  <div className="search-result-source">
+                    <span className="source-icon" style={{ backgroundColor: msg.fakeSource.color }}>{msg.fakeSource.icon}</span>
+                    <div className="source-details">
+                      <span className="source-name">{msg.fakeSource.name}</span>
+                      <span className="source-url">{msg.fakeSource.url}</span>
+                    </div>
+                  </div>
+                  <div className="search-result-url">
+                    https:// {isContentsBold ? <span style={{fontWeight:"bolder"}}>{msg.sender} › {formatTime(msg.createDateTime)}</span> : <>{msg.sender} › {formatTime(msg.createDateTime)}</>} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
+                  </div>
+                  <h3 className="search-result-title">
+                    {msg.randomlyStyled ? <span className={"logo-light"} style={{color:"#681da8"}}>{msg.fakeTitle} ...</span> : <span className={"logo-light"}>{msg.fakeTitle} ...</span>}
+                    {msg.randomlyStyled ? <span className={"logo-dark"} style={{color:"#c58af9"}}>{msg.fakeTitle} ...</span> : <span className={"logo-dark"}>{msg.fakeTitle} ...</span>}
+                  </h3>
+                  <div className="search-result-snippet">{msg.fakeSnippet} ...</div>
+                  <div className="search-result-url">
+                    {isContentsBold ?
+                        <div className={"logo-light"} style={{fontWeight:"bolder"}}>{renderMessageContent(msg)}</div>
+                        : <span className={"logo-light"}>{renderMessageContent(msg)}</span>
+                    }
+                    {isContentsBold ?
+                        <div className={"logo-dark"} style={{fontWeight:"bolder"}}>{renderMessageContent(msg)}</div>
+                        : <span className={"logo-dark"}>{renderMessageContent(msg)}</span>
+                    }
                   </div>
                 </div>
-
-                <div className="search-result-url">
-                  https:// {isContentsBold ? <span style={{fontWeight:"bolder"}}>{msg.sender} › {formatTime(msg.createDateTime)}</span> : <>{msg.sender} › {formatTime(msg.createDateTime)}</>} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
-                </div>
-                <h3 className="search-result-title">
-                  {msg.randomlyStyled ? <span className={"logo-light"} style={{color:"#681da8"}}>{msg.fakeTitle} ...</span> : <span className={"logo-light"}>{msg.fakeTitle} ...</span>}
-                  {msg.randomlyStyled ? <span className={"logo-dark"} style={{color:"#c58af9"}}>{msg.fakeTitle} ...</span> : <span className={"logo-dark"}>{msg.fakeTitle} ...</span>}
-                </h3>
-                  <div className="search-result-snippet">{msg.fakeSnippet} ...</div>
-                <div className="search-result-url">
-                {isContentsBold ?
-                    <div className={"logo-light"} style={{fontWeight:"bolder"/*color:"#681da8"*/}}>{renderMessageContent(msg)}</div>
-                    : <span className={"logo-light"}>{renderMessageContent(msg)}</span>
-                }
-                {isContentsBold ?
-                    <div className={"logo-dark"} style={{fontWeight:"bolder"/*color:"#c58af9"*/}}>{renderMessageContent(msg)}</div>
-                    : <span className={"logo-dark"}>{renderMessageContent(msg)}</span>
-                }
-                </div>
-              </div>
-          )})}
-
+            )})}
           <div ref={scrollRef}></div>
         </div>
 

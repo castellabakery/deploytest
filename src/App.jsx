@@ -16,6 +16,9 @@ const ROOM_LIST_API = SERVER_HOST + '/room/list';
 const CHECK_PASSWORD_API = SERVER_HOST + '/room/check/password';
 const MESSAGE_API = SERVER_HOST + '/message/list';
 const COUNT_API = SERVER_HOST + '/message/count';
+const MY_STATE_API = SERVER_HOST + '/message/chat-rooms'; // GET /chat-rooms/{roomId}/my-state
+const UNREAD_COUNT_API = SERVER_HOST + '/message/unread-count'; // GET /message/unread-count?lastMessageId=...&roomId=...
+
 const PAGE_SIZE = 50;
 const NOTIFICATION_FAVICON_URL = `https://cc.pastelcloud.store/favicon.ico`;
 
@@ -451,6 +454,7 @@ const ChatApp = () => {
 
       if (receivedToken && id) {
         localStorage.setItem('jwtToken', receivedToken);
+        localStorage.setItem('loginId', loginId);
         setToken(receivedToken);
         setUserId(id); // 사용자 ID 상태 설정
         localStorage.setItem('userId', id);
@@ -666,10 +670,47 @@ const ChatApp = () => {
   const loadRooms = async () => {
     setLoading(true);
     try {
-      const res = await fetchWithAuth(ROOM_LIST_API); // 변경
+      // 1. 기본 방 목록을 가져옵니다.
+      const res = await fetchWithAuth(ROOM_LIST_API);
       if (!res.ok) throw new Error('방 목록 로딩 실패');
-      const data = await res.json();
-      setRooms(data);
+      const initialRooms = await res.json();
+
+      // 2. 각 방의 안 읽은 메시지 수를 비동기적으로 가져옵니다.
+      const roomsWithUnreadCount = await Promise.all(
+          initialRooms.map(async (room) => {
+            try {
+              // 2-1. 나의 마지막 읽은 상태(lastReadMessageId)를 가져옵니다.
+              const stateRes = await fetchWithAuth(`${MY_STATE_API}/${room.id}/my-state/${localStorage.getItem('loginId')}`);
+              if (!stateRes.ok) {
+                return { ...room, unreadCount: 0 }; // 상태 조회 실패 시 0으로 처리
+              }
+
+              const stateData = await stateRes.json();
+              const lastMessageId = stateData ? stateData.lastReadMessageId : null;
+
+              // 2-2. lastMessageId로 안 읽은 메시지 개수를 가져옵니다.
+              // lastMessageId가 없으면(null) 전체 메시지 수를 가져옵니다.
+              const unreadCountRes = await fetchWithAuth(
+                  `${UNREAD_COUNT_API}/${room.id}/${lastMessageId}`
+              );
+
+              if (!unreadCountRes.ok) {
+                return { ...room, unreadCount: 0 }; // 개수 조회 실패 시 0으로 처리
+              }
+
+              const countData = await unreadCountRes.json();
+              return { ...room, unreadCount: countData.unreadCount || 0 };
+
+            } catch (e) {
+              console.error(`'${room.name}' 방의 안 읽은 메시지 수 로딩 실패:`, e);
+              return { ...room, unreadCount: 0 }; // 에러 발생 시 0으로 처리
+            }
+          })
+      );
+
+      // 3. 안 읽은 메시지 수가 포함된 최종 목록으로 상태를 업데이트합니다.
+      setRooms(roomsWithUnreadCount);
+
     } catch (error) {
       console.error("방 목록 로딩 실패:", error);
     } finally {
@@ -811,6 +852,11 @@ const ChatApp = () => {
   };
 
   const handleExitRoom = () => {
+    // ✨ Stomp 클라이언트가 존재하면 연결을 명시적으로 끊습니다.
+    if (stompClient) {
+      stompClient.disconnect();
+      setStompClient(null); // 클라이언트 상태도 초기화해주는 것이 좋습니다.
+    }
     setCurrentRoom(null);
     setMessages([]);
     setNextPage(0);
@@ -851,9 +897,6 @@ const ChatApp = () => {
           }
         }
       });
-      client.subscribe('/topic/public/errors', function (error) {
-        alert("에러 발생: " + error.body);
-      });
       setStompClient(client);
     }, (error) => {
       // ★★★ 연결 에러 처리 (인증 실패 등) ★★★
@@ -869,6 +912,7 @@ const ChatApp = () => {
     const clientDate = new Date();
     const message = {
       sender: username,
+      userId: localStorage.getItem('loginId'),
       content: content,
       type: type,
       roomId: currentRoom.id,
@@ -1080,7 +1124,23 @@ const ChatApp = () => {
                   <div className="search-result-header">
                     <div>
                       <div className="search-result-url"> https://mail.google.com/chat/room/{room.id} </div>
-                      <h3 className="search-result-title">{room.name}</h3>
+                      <h3 className="search-result-title">
+                        {room.name}
+                        {/* ✨ 안 읽은 개수 표시 로직 추가 */}
+                        {room.unreadCount > 0 && (
+                            <span style={{
+                              marginLeft: '10px',
+                              backgroundColor: '#F48024',
+                              color: 'white',
+                              borderRadius: '12px',
+                              padding: '2px 8px',
+                              fontSize: '12px',
+                              fontWeight: 'bold'
+                            }}>
+                            {room.unreadCount}
+                          </span>
+                        )}
+                      </h3>
                     </div>
                     <button className="result-action-button" onClick={(e) => { e.stopPropagation(); openDeleteModal(room); }}> 삭제 </button>
                   </div>

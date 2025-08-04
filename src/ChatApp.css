@@ -1111,3 +1111,42 @@
 [data-theme='dark'] .google-login-footer a {
     color: #bdc1c6;
 }
+
+/* ===================================================== */
+/* ★★★ 닉네임 툴팁 스타일 (추가) ★★★                  */
+/* ===================================================== */
+
+.user-profile-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nickname-tooltip {
+    position: absolute;
+    bottom: -35px; /* 아이콘 아래에 위치 */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #616161; /* 어두운 회색 배경 */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap; /* 줄바꿈 방지 */
+    z-index: 10;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    opacity: 0.9;
+}
+
+/* 툴팁의 꼬리 만들기 */
+.nickname-tooltip::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #616161 transparent;
+}

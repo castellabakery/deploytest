@@ -9,6 +9,7 @@ const SERVER_HOST = 'https://chitchat.pastelcloud.store';
 // const SERVER_HOST = 'http://localhost:8080';
 const LOGIN_API = SERVER_HOST + '/authenticate/login'; // 로그인 API 주소 추가
 const SIGNUP_API = SERVER_HOST + '/authenticate';
+const USERNAME_API = SERVER_HOST + '/authenticate/chatname';
 const SERVER_URL = SERVER_HOST + '/chat';
 const ROOM_API = SERVER_HOST + '/room';
 const ROOM_LIST_API = SERVER_HOST + '/room/list';
@@ -285,6 +286,34 @@ const SignUpScreen = ({ onSignUp, loading, error, onSwitchToLogin }) => {
   );
 };
 
+// ★★★ 닉네임 변경 화면 컴포넌트 ★★★
+const ChangeUsernameScreen = ({ onUpdateUsername, currentUsername, onCancel, error }) => {
+  const [newUsername, setNewUsername] = useState(currentUsername || '');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdateUsername(newUsername);
+  };
+
+  return (
+      <div className="google-ui-app">
+        <div className="username-prompt">
+          <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{ width: '150px', marginBottom: '20px' }} />
+          <svg style={{ width: '150px', marginBottom: '20px' }} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
+          <h2>사용할 닉네임을 입력하세요.</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="search-bar-container" style={{ maxWidth: '400px', margin: '20px auto' }}>
+              <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} placeholder="닉네임 입력" autoFocus />
+            </div>
+            {error && <p className="google-error-message">{error}</p>}
+            <button type="button" className="search-button" onClick={onCancel} style={{marginRight: '8px'}}>취소</button>
+            <button className="search-button" type="submit">변경하기</button>
+          </form>
+        </div>
+      </div>
+  );
+};
+
 const ChatApp = () => {
   // ==================================================================
   // ★★★ 인증 관련 상태 추가 ★★★
@@ -292,6 +321,7 @@ const ChatApp = () => {
   const [token, setToken] = useState(localStorage.getItem('jwtToken'));
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   // ★★★ 화면 전환을 위한 상태 추가 ('login' | 'signup') ★★★
   const [view, setView] = useState('login');
   const [successMessage, setSuccessMessage] = useState('');
@@ -300,6 +330,8 @@ const ChatApp = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [stompClient, setStompClient] = useState(null);
+  // ★★★ 사용자 ID와 닉네임 상태 추가 ★★★
+  const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState(localStorage.getItem('chatUsername') == null ? generateRandomNickname() : localStorage.getItem('chatUsername'));
   const [askingName, setAskingName] = useState(false);
   const chatRef = useRef(null);
@@ -363,6 +395,7 @@ const ChatApp = () => {
     setAuthLoading(false);
     setAuthError('');
     setSuccessMessage('');
+    setUsernameError('');
   };
 
   // ==================================================================
@@ -399,32 +432,33 @@ const ChatApp = () => {
   const handleLogin = async (loginId, password) => {
     setAuthLoading(true);
     setAuthError('');
+    setSuccessMessage('');
     try {
       const response = await fetch(LOGIN_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: loginId, password }),
       });
-
-      if (!response.ok) {
-        throw new Error('로그인에 실패했습니다.');
-      }
-
       const data = await response.json();
-      const receivedToken = data.message; // 서버 응답에 따라 'token' 필드를 확인
-      const receivedCode = data.code;
 
-      if(receivedCode !== "0000") {
-        throw new Error('로그인에 실패했습니다.');
+      if (!response.ok || data.code !== "0000") {
+        throw new Error(data.message || '아이디 또는 비밀번호가 잘못되었습니다.');
       }
 
-      if (receivedToken) {
+      const receivedToken = data.message;
+      // 서버 응답에 data.id, data.chatName이 포함되어 있다고 가정
+      const { id, chatName } = data.data;
+
+      if (receivedToken && id) {
         localStorage.setItem('jwtToken', receivedToken);
         setToken(receivedToken);
+        setUserId(id); // 사용자 ID 상태 설정
+        localStorage.setItem('userId', id);
+        setUsername(chatName || ''); // 닉네임 상태 설정 (없으면 빈 문자열)
+        localStorage.setItem('chatUsername', chatName || '');
       } else {
-        throw new Error('토큰을 받지 못했습니다.');
+        throw new Error('로그인 응답이 올바르지 않습니다.');
       }
-
     } catch (error) {
       setAuthError(error.message);
     } finally {
@@ -472,6 +506,40 @@ const ChatApp = () => {
     // 필요하다면 다른 로컬 스토리지 정보도 초기화
     // localStorage.removeItem('chatUsername');
     resetChatStates();
+  };
+
+  // ★★★ 닉네임 변경(업데이트) 핸들러 추가 ★★★
+  const handleUpdateUsername = async (newUsername) => {
+    setUsernameError('');
+    if (!newUsername.trim()) {
+      alert('닉네임은 공백일 수 없습니다.');
+      return;
+    }
+    try {
+      const response = await fetchWithAuth(USERNAME_API, {
+        method: 'PUT',
+        body: JSON.stringify({
+          id: userId,
+          chatName: newUsername
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error('닉네임 변경에 실패했습니다.');
+      }
+      if (result.id == null && result.code !== "0000") {
+        throw new Error(result.message);
+      }
+
+      // 성공 시 로컬 상태 업데이트 및 모달 닫기
+      setUsername(newUsername);
+      setAskingName(false);
+
+    } catch (error) {
+      setUsernameError(error.message);
+    }
   };
 
   const handlePaste = (event) => {
@@ -546,6 +614,8 @@ const ChatApp = () => {
     // ★★★ 로그인 상태일 때만 방 목록 로드 ★★★
     if (token) {
       loadRooms();
+    } else {
+      localStorage.setItem('userId', '');
     }
   }, [token]); // token이 변경될 때 (로그인 성공 시) 실행
 
@@ -971,20 +1041,14 @@ const ChatApp = () => {
     }
   }
 
+  // 닉네임 변경 화면
   if (askingName) {
-    return (
-        <div className="google-ui-app">
-          <div className="username-prompt">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{ width: '150px', marginBottom: '20px' }} />
-            <svg style={{ width: '150px', marginBottom: '20px' }} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-            <h2>서비스 사용을 위해 닉네임을 입력하세요.</h2>
-            <div className="search-bar-container" style={{ maxWidth: '400px', margin: '20px auto' }}>
-              <input type="text" value={username || ''} onChange={(e) => setUsername(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()} placeholder="닉네임 입력" autoFocus />
-            </div>
-            <button className="search-button" onClick={handleSetUsername}>변경하기</button>
-          </div>
-        </div>
-    );
+    return <ChangeUsernameScreen
+        currentUsername={username}
+        onUpdateUsername={handleUpdateUsername}
+        onCancel={() => {setAskingName(false); setUsernameError('')}}
+        error={usernameError}
+    />;
   }
 
   if (!currentRoom) {
@@ -994,8 +1058,14 @@ const ChatApp = () => {
             <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light" />
             <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
             <div style={{ flexGrow: 1 }}></div>
-            <div className="user-profile-icon" onClick={changeUsername}>
-              {username.charAt(0).toUpperCase()}
+            {/* ★★★ 프로필 아이콘 & 툴팁 래퍼 ★★★ */}
+            <div className="user-profile-icon-wrapper">
+              <div className="user-profile-icon" onClick={() => setAskingName(true)}>
+                {username ? username.charAt(0).toUpperCase() : '?'}
+              </div>
+              {!username && (
+                  <div className="nickname-tooltip">닉네임이 없어요!</div>
+              )}
             </div>
             {/* ★★★ 로그아웃 버튼 추가 ★★★ */}
             <button onClick={handleLogout} className="result-action-button" style={{marginLeft: '10px'}}>로그아웃</button>
@@ -1050,8 +1120,14 @@ const ChatApp = () => {
             </div>
           </div>
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
-          <div className="user-profile-icon" onClick={changeUsername}>
-            {username.charAt(0).toUpperCase()}
+          {/* ★★★ 프로필 아이콘 & 툴팁 래퍼 ★★★ */}
+          <div className="user-profile-icon-wrapper">
+            <div className="user-profile-icon" onClick={() => setAskingName(true)}>
+              {username ? username.charAt(0).toUpperCase() : '?'}
+            </div>
+            {!username && (
+                <div className="nickname-tooltip">닉네임이 없어요!</div>
+            )}
           </div>
         </div>
         <div className="search-results-container" ref={chatRef}>

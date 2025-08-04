@@ -4,9 +4,11 @@ import { over } from 'stompjs';
 import { v4 as uuidv4 } from 'uuid';
 import './ChatApp.css';
 
-// (API 주소 및 외부 함수는 기존과 동일)
-// const SERVER_HOST = 'http://localhost:8080';
+// (기존 상수 및 함수들은 그대로 유지)
 const SERVER_HOST = 'https://chitchat.pastelcloud.store';
+// const SERVER_HOST = 'http://localhost:8080';
+const LOGIN_API = SERVER_HOST + '/authenticate/login'; // 로그인 API 주소 추가
+const SIGNUP_API = SERVER_HOST + '/authenticate';
 const SERVER_URL = SERVER_HOST + '/chat';
 const ROOM_API = SERVER_HOST + '/room';
 const ROOM_LIST_API = SERVER_HOST + '/room/list';
@@ -16,7 +18,7 @@ const COUNT_API = SERVER_HOST + '/message/count';
 const PAGE_SIZE = 50;
 const NOTIFICATION_FAVICON_URL = `https://cc.pastelcloud.store/favicon.ico`;
 
-// 닉네임 앞부분에 사용될 '꾸미는 말' 목록 (100개)
+// (기존의 descriptors, nouns, javaSearchResultTitles 등 모든 데이터 배열은 그대로 유지)
 const descriptors = [
   "피리부는", "파도타는", "코딩하는", "여행하는", "춤추는", "게으른", "용감한", "슬픈", "배고픈", "잠자는",
   "화성가는", "노래하는", "그림그리는", "책읽는", "커피마시는", "생각하는", "점프하는", "수영하는", "요리하는", "달리는",
@@ -29,7 +31,6 @@ const descriptors = [
   "시를쓰는", "소설읽는", "영화보는", "음악듣는", "코드짜는", "커밋하는", "푸시하는", "머지하는", "배포하는", "롤백하는",
   "최적화된", "느려터진", "우아한", "단단한", "유연한", "투명한", "불투명한", "오래된", "새로운", "미래의"
 ];
-// 닉네임 뒷부분에 사용될 '명사' 목록 (100개)
 const nouns = [
   "거북이", "두루미", "불어펜", "개발자", "감자튀김", "알파카", "쿼카", "라이언", "컴퓨터", "외계인",
   "고양이", "강아지", "유령", "히어로", "의자", "책상", "모니터", "키보드", "마우스", "충전기",
@@ -42,7 +43,6 @@ const nouns = [
   "자전거", "스쿠터", "자동차", "트럭", "로켓", "위성", "블랙홀", "은하수", "초신성", "성운",
   "먼지", "구름", "안개", "바람", "폭풍", "번개", "지진", "화산", "빙하", "사막"
 ];
-// 고정된 자바 검색 결과 제목 배열
 const javaSearchResultTitles = [
   "Java NullPointerException: 원인과 해결 방법 총정리",
   "Spring Boot @Transactional 어노테이션의 올바른 사용법 - Stack Overflow",
@@ -65,7 +65,6 @@ const javaSearchResultTitles = [
   "디자인 패턴: 싱글턴(Singleton) 패턴 구현 방법 5가지",
   "Docker와 Jenkins를 이용한 Spring Boot 애플리케이션 CI/CD 파이프라인 구축"
 ];
-// 고정된 자바 검색 결과 내용 배열 추가
 const javaSearchResultSnippets = [
   "2025. 7. 31. — NullPointerException은 객체 참조가 null일 때 발생합니다. 객체 사용 전 null 체크를 추가하거나 Optional 클래스를 사용하",
   "2025. 6. 10. — Spring의 @Transactional은 AOP 프록시를 통해 작동하므로, public 메서드에만 적용되며 클래스 내부 호출에는 적용되지 않습",
@@ -88,7 +87,6 @@ const javaSearchResultSnippets = [
   "2024. 1. 18. — Docker 이미지는 애플리케이션과 그 실행 환경을 패키징한 것이며, Jenkins 파이프라인을 통해 이 이미지의 빌드 및 배포를 자동화할 수 있",
   "2023. 12. 1. — Lombok 라이브러리의 @Data 어노테이션은 @Getter, @Setter, @ToString 등을 모두 포함하지만, 불필요한 Setter 생성을 유발할 수 있어 주의"
 ]
-// 가짜 검색 출처 정보 배열 추가
 const javaSourceData = [
   { name: 'Tistory', url: 'https://johndoe.tistory.com', icon: 'T', color: '#E96312' },
   { name: 'velog', url: 'https://velog.io/@jane.doe', icon: 'v', color: '#20C997' },
@@ -100,7 +98,7 @@ const javaSourceData = [
   { name: 'Medium', url: 'https://medium.com/tag/java', icon: 'M', color: '#121212' }
 ];
 
-// 링크 만드는 함수
+
 const renderTextWithLinks = (text) => {
   if (typeof text !== 'string') return text;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -116,19 +114,14 @@ const renderTextWithLinks = (text) => {
       )
   );
 };
-// 닉네임 만드는 함수
+
 const generateRandomNickname = () => {
-  // 1. 각 배열에서 무작위로 단어를 선택합니다.
   const descriptor = descriptors[Math.floor(Math.random() * descriptors.length)];
   const noun = nouns[Math.floor(Math.random() * nouns.length)];
-
-  // 2. 현재 시간을 밀리초 단위의 숫자로 가져옵니다. (고유성 보장)
   const timestamp = Date.now();
-
-  // 3. 단어와 타임스탬프를 조합하여 반환합니다.
   return `${descriptor}_${noun}_${timestamp}`;
 }
-// 파비콘(탭 아이콘)을 가져오거나 새로 만드는 헬퍼 함수
+
 const getOrCreateFaviconLink = () => {
   let link = document.querySelector("link[rel*='icon']");
   if (link) {
@@ -145,94 +138,355 @@ const randomlyStyledText = (probability = 0.1) => {
   return Math.random() < probability;
 };
 
+// ==================================================================
+// ★★★ 로그인 화면 컴포넌트 추가 ★★★
+// ==================================================================
+const LoginScreen = ({ onLogin, loading, error, onSwitchToSignUp, successMessage }) => {
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
+    onLogin(loginId, password);
+  };
+
+  return (
+      <div className="google-login-container">
+        <div className="google-login-card horizontal-card">
+          <div className="google-login-content-wrapper">
+            {/* 왼쪽 패널 */}
+            <div className="google-login-left-panel">
+              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                <path d="M1 1h22v22H1z" fill="none"></path>
+              </svg>
+              <h1>로그인</h1>
+              <p>Gmail로 이동</p>
+            </div>
+
+            <div className="google-login-right-panel">
+              <form onSubmit={handleLoginSubmit} className="google-login-form">
+                {successMessage && <p className="google-success-message">{successMessage}</p>}
+                <div className="form-input-group">
+                  <input id="loginId" type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)} required autoComplete="username" placeholder=" "/>
+                  <label htmlFor="loginId">아이디</label>
+                </div>
+                <div className="form-input-group">
+                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" placeholder=" "/>
+                  <label htmlFor="password">비밀번호 입력</label>
+                </div>
+                {error && <p className="google-error-message">{error}</p>}
+
+                <a href="#" className="form-link">아이디를 잊으셨나요?</a>
+
+                <p className="guest-mode-info">
+                  내 컴퓨터가 아닌가요? 게스트 모드를 사용하여 비공개로 로그인하세요.
+                  <a href="#">자세히 알아보기</a>
+                </p>
+
+                <div className="form-actions">
+                  <button type="button" className="google-button-secondary" onClick={onSwitchToSignUp}>계정 만들기</button>
+                  <button type="submit" className="google-button-primary" disabled={loading}>
+                    {loading ? '로그인 중...' : '다음'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <footer className="google-login-footer horizontal-footer">
+          <select defaultValue="ko">
+            <option value="ko">한국어</option>
+            <option value="en">English (United States)</option>
+          </select>
+          <ul>
+            <li><a href="#">도움말</a></li>
+            <li><a href="#">개인정보처리방침</a></li>
+            <li><a href="#">약관</a></li>
+          </ul>
+        </footer>
+      </div>
+  );
+};
+
+// ==================================================================
+// ★★★ 새로 추가된 회원가입 화면 컴포넌트 ★★★
+// ==================================================================
+const SignUpScreen = ({ onSignUp, loading, error, onSwitchToLogin }) => {
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  useEffect(() => {
+    if (password && confirmPassword && password !== confirmPassword) {
+      setPasswordError('비밀번호가 일치하지 않습니다.');
+    } else {
+      setPasswordError('');
+    }
+  }, [password, confirmPassword]);
+
+  const handleSignUpSubmit = (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setPasswordError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (!passwordError) {
+      onSignUp(id, password);
+    }
+  };
+
+  return (
+      <div className="google-login-container">
+        <div className="google-login-card horizontal-card">
+          <div className="google-login-content-wrapper">
+            <div className="google-login-left-panel">
+              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path><path d="M1 1h22v22H1z" fill="none"></path></svg>
+              <h1>Google 계정 만들기</h1>
+              <p>계정 생성을 위해 정보를 입력하세요</p>
+            </div>
+            <div className="google-login-right-panel">
+              <form onSubmit={handleSignUpSubmit} className="google-login-form">
+                <div className="form-input-group">
+                  <input id="id" type="text" value={id} onChange={(e) => setId(e.target.value)} required placeholder=" " />
+                  <label htmlFor="id">아이디</label>
+                </div>
+                <div className="form-input-group">
+                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder=" "/>
+                  <label htmlFor="password">비밀번호</label>
+                </div>
+                <div className="form-input-group">
+                  <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required placeholder=" "/>
+                  <label htmlFor="confirmPassword">비밀번호 확인</label>
+                </div>
+
+                {passwordError && <p className="google-error-message">{passwordError}</p>}
+                {error && <p className="google-error-message">{error}</p>}
+
+                <div className="form-actions">
+                  <button type="button" className="google-button-secondary" onClick={onSwitchToLogin}>로그인</button>
+                  <button type="submit" className="google-button-primary" disabled={loading || passwordError}>
+                    {loading ? '가입 중...' : '다음'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <footer className="google-login-footer horizontal-footer">
+          <select defaultValue="ko"><option value="ko">한국어</option><option value="en">English (United States)</option></select>
+          <ul><li><a href="#">도움말</a></li><li><a href="#">개인정보처리방침</a></li><li><a href="#">약관</a></li></ul>
+        </footer>
+      </div>
+  );
+};
+
 const ChatApp = () => {
-  // (상태 선언 및 모든 함수는 기존과 동일)
+  // ==================================================================
+  // ★★★ 인증 관련 상태 추가 ★★★
+  // ==================================================================
+  const [token, setToken] = useState(localStorage.getItem('jwtToken'));
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  // ★★★ 화면 전환을 위한 상태 추가 ('login' | 'signup') ★★★
+  const [view, setView] = useState('login');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // (기존 상태 선언 및 모든 함수는 그대로 유지)
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [stompClient, setStompClient] = useState(null);
   const [username, setUsername] = useState(localStorage.getItem('chatUsername') == null ? generateRandomNickname() : localStorage.getItem('chatUsername'));
   const [askingName, setAskingName] = useState(false);
-
   const chatRef = useRef(null);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
-
   const [nextPage, setNextPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showLoadMoreButton, setShowLoadMoreButton] = useState(true);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
-
   const [rooms, setRooms] = useState([]);
   const [currentRoom, setCurrentRoom] = useState(null);
   const [passwordModal, setPasswordModal] = useState({ visible: false, room: null, error: '' });
   const [passwordInput, setPasswordInput] = useState('');
-
   const [createRoomModal, setCreateRoomModal] = useState({ visible: false, error: '' });
   const [newRoomName, setNewRoomName] = useState('');
   const [newRoomPassword, setNewRoomPassword] = useState('');
-
   const [deleteRoomModal, setDeleteRoomModal] = useState({ visible: false, room: null, error: '' });
   const [deletePasswordInput, setDeletePasswordInput] = useState('');
-
   const [messageArrived, setMessageArrived] = useState(false);
   const [isModalAlert, setIsModalAlert] = useState(false);
-
   const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
-
   const [isContentsBold, setIsContentsBold] = useState(false);
-
-  // 검색 결과 제목 인덱스를 추적할 ref 생성
   const searchResultTitleIndex = useRef(0);
   const searchResultSnippetIndex = useRef(0);
   const sourceIndex = useRef(0);
-
-  // 알림 효과를 위한 Ref 추가
   const originalTitleRef = useRef(document.title);
   const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
-
-  // 윈도우 포커스 여부를 저장하는 state
   const isWindowFocused = useRef(true);
-
   const inputRef = useRef(null);
 
-  // 붙여넣기 이벤트를 처리하는 핸들러 함수
-  const handlePaste = (event) => {
-    // 클립보드에 있는 아이템들을 가져옵니다.
-    const items = event.clipboardData.items;
+  // 모든 채팅 관련 상태를 초기값으로 되돌리는 함수
+  const resetChatStates = () => {
+    // 활성화된 Stomp 연결이 있다면 먼저 연결을 끊습니다.
+    if (stompClient) {
+      stompClient.disconnect();
+    }
 
-    // 아이템들을 순회하며 이미지 파일이 있는지 확인합니다.
+    // 상태들을 모두 초기값으로 설정
+    setMessages([]);
+    setRooms([]);
+    setCurrentRoom(null);
+    setInput('');
+    setStompClient(null);
+    setAskingName(false);
+    setNextPage(0);
+    setHasMore(true);
+    setLoading(false);
+    setShowLoadMoreButton(true);
+    setIsModalOpen(false);
+    setModalImageSrc('');
+    setPasswordModal({ visible: false, room: null, error: '' });
+    setPasswordInput('');
+    setCreateRoomModal({ visible: false, error: '' });
+    setNewRoomName('');
+    setNewRoomPassword('');
+    setDeleteRoomModal({ visible: false, room: null, error: '' });
+    setDeletePasswordInput('');
+    setMessageArrived(false);
+    setAuthLoading(false);
+    setAuthError('');
+    setSuccessMessage('');
+  };
+
+  // ==================================================================
+  // ★★★ API 호출 래퍼 함수 (헤더 자동 추가) ★★★
+  // ==================================================================
+  const fetchWithAuth = useCallback(async (url, options = {}) => {
+    const currentToken = localStorage.getItem('jwtToken');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    if (currentToken) {
+      headers['Authorization'] = `Bearer ${currentToken}`;
+    } else {
+      console.warn('[헤더 스킵] 토큰이 없어 Authorization 헤더를 추가하지 않습니다.');
+    }
+
+    const response = await fetch(url, { ...options, headers });
+
+    if (response.status === 401 || response.status === 403) {
+      // 토큰 만료 또는 인증 실패 시 로그아웃 처리
+      handleLogout();
+      return Promise.reject(new Error('인증이 만료되었습니다. 다시 로그인해주세요.'));
+    }
+
+    return response;
+  }, []);
+
+
+  // ==================================================================
+  // ★★★ 로그인 및 로그아웃 함수 추가 ★★★
+  // ==================================================================
+  const handleLogin = async (loginId, password) => {
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const response = await fetch(LOGIN_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: loginId, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('로그인에 실패했습니다.');
+      }
+
+      const data = await response.json();
+      const receivedToken = data.message; // 서버 응답에 따라 'token' 필드를 확인
+      const receivedCode = data.code;
+
+      if(receivedCode !== "0000") {
+        throw new Error('로그인에 실패했습니다.');
+      }
+
+      if (receivedToken) {
+        localStorage.setItem('jwtToken', receivedToken);
+        setToken(receivedToken);
+      } else {
+        throw new Error('토큰을 받지 못했습니다.');
+      }
+
+    } catch (error) {
+      setAuthError(error.message);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // ★★★ 회원가입 처리 함수 추가 ★★★
+  const handleSignUp = async (id, password) => {
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const response = await fetch(SIGNUP_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || '회원가입에 실패했습니다. 다른 아이디로 시도해주세요.');
+      }
+
+      // 3. HTTP 상태가 200이더라도, 응답 본문의 code 값을 확인합니다.
+      //    "0000"이 아닐 경우, API 비즈니스 로직상 실패로 간주합니다.
+      if (result.id == null && result.code !== "0000") {
+        throw new Error(result.message);
+      }
+
+      // 회원가입 성공
+      setSuccessMessage('회원가입이 완료되었습니다. 로그인해주세요.');
+      setView('login'); // 로그인 화면으로 전환
+
+    } catch (error) {
+      setAuthError(error.message);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('jwtToken');
+    setToken(null);
+    // 필요하다면 다른 로컬 스토리지 정보도 초기화
+    // localStorage.removeItem('chatUsername');
+    resetChatStates();
+  };
+
+  const handlePaste = (event) => {
+    const items = event.clipboardData.items;
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       if (item.kind === 'file' && item.type.startsWith('image/')) {
-
-        // input에 파일 경로 같은 텍스트가 붙여넣어지는 기본 동작을 막습니다.
         event.preventDefault();
-
-        // 이미지 파일을 File 객체로 가져옵니다.
         const imageFile = item.getAsFile();
-        if (!imageFile) {
-          return;
-        }
-
-        // FileReader를 사용해 파일을 Base64 데이터 URL로 읽습니다.
+        if (!imageFile) return;
         const reader = new FileReader();
-
-        // 파일 읽기가 완료되면 실행될 콜백 함수
         reader.onload = (e) => {
-          const base64Image = e.target.result;
-
-          // 부모 컴포넌트로 인코딩된 데이터를 전달합니다.
-          // 이 데이터를 웹소켓으로 보내면 됩니다.
-          sendMessage(base64Image, "IMAGE");
+          sendMessage(e.target.result, "IMAGE");
         };
-
-        // 파일 읽기를 시작합니다.
         reader.readAsDataURL(imageFile);
-
-        // 이미지 파일을 찾았으므로 반복을 중단합니다.
         break;
       }
     }
@@ -241,11 +495,8 @@ const ChatApp = () => {
   useEffect(() => {
     const inputElement = inputRef.current;
     if (inputElement) {
-      // 컴포넌트가 마운트될 때 input에 paste 이벤트 리스너를 추가합니다.
       inputElement.addEventListener('paste', handlePaste);
     }
-
-    // 컴포넌트가 언마운트될 때 이벤트 리스너를 제거합니다. (메모리 누수 방지)
     return () => {
       if (inputElement) {
         inputElement.removeEventListener('paste', handlePaste);
@@ -259,33 +510,24 @@ const ChatApp = () => {
       setMessageArrived(false);
       stopNotification();
     };
-
-    const handleBlur = () => {
-      isWindowFocused.current = false;
-    };
-
-    // 이벤트 리스너 등록
+    const handleBlur = () => { isWindowFocused.current = false; };
     window.addEventListener('focus', handleFocus);
     window.addEventListener('blur', handleBlur);
-
-    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거 (메모리 누수 방지)
     return () => {
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('blur', handleBlur);
     };
-  }, []); // 빈 배열을 전달하여 컴포넌트 마운트 시 한 번만 실행
+  }, []);
 
-  // 알림 종료 함수 추가
   const stopNotification = useCallback(() => {
-      document.title = originalTitleRef.current;
+    document.title = originalTitleRef.current;
     if (originalFaviconRef.current) {
       getOrCreateFaviconLink().href = originalFaviconRef.current;
     }
   }, []);
 
-  // 알림 시작 함수 추가
   const startNotification = useCallback(() => {
-      getOrCreateFaviconLink().href = NOTIFICATION_FAVICON_URL;
+    getOrCreateFaviconLink().href = NOTIFICATION_FAVICON_URL;
   }, []);
 
   useEffect(() => {
@@ -297,31 +539,28 @@ const ChatApp = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
-  const toggleAlert = () => {
-    setIsModalAlert(prevAlert => !prevAlert);
-  };
-
-  const toggleBold = () => {
-    setIsContentsBold(prevBold => !prevBold);
-  };
+  const toggleAlert = () => { setIsModalAlert(prevAlert => !prevAlert); };
+  const toggleBold = () => { setIsContentsBold(prevBold => !prevBold); };
 
   useEffect(() => {
-    loadRooms();
-  }, []);
+    // ★★★ 로그인 상태일 때만 방 목록 로드 ★★★
+    if (token) {
+      loadRooms();
+    }
+  }, [token]); // token이 변경될 때 (로그인 성공 시) 실행
 
   useEffect(() => {
-    if (currentRoom) {
+    if (currentRoom && token) { // ★★★ 토큰이 있을 때만 연결 시도 ★★★
       initializeChat();
       connect();
     }
-
     return () => {
       if (stompClient) {
         stompClient.disconnect();
         setStompClient(null);
       }
     };
-  }, [currentRoom]);
+  }, [currentRoom, token]); // token도 의존성에 추가
 
   useEffect(() => {
     const chatElement = chatRef.current;
@@ -341,7 +580,6 @@ const ChatApp = () => {
         loadMessages(nextPage);
       }
     };
-
     if (chatElement) {
       chatElement.addEventListener('scroll', handleScroll);
     }
@@ -352,10 +590,13 @@ const ChatApp = () => {
     };
   }, [loading, hasMore, nextPage]);
 
+  // ==================================================================
+  // ★★★ 기존 fetch 호출을 fetchWithAuth로 변경 ★★★
+  // ==================================================================
   const loadRooms = async () => {
     setLoading(true);
     try {
-      const res = await fetch(ROOM_LIST_API);
+      const res = await fetchWithAuth(ROOM_LIST_API); // 변경
       if (!res.ok) throw new Error('방 목록 로딩 실패');
       const data = await res.json();
       setRooms(data);
@@ -370,9 +611,8 @@ const ChatApp = () => {
     if (!currentRoom) return;
     setLoading(true);
     try {
-      const countRes = await fetch(COUNT_API + "?roomId="+currentRoom.id);
+      const countRes = await fetchWithAuth(COUNT_API + "?roomId=" + currentRoom.id); // 변경
       const totalCount = await countRes.json();
-
       if (totalCount > 0) {
         const lastPage = Math.floor((totalCount - 1) / PAGE_SIZE);
         await loadMessages(lastPage, true);
@@ -401,21 +641,18 @@ const ChatApp = () => {
     setPasswordInput('');
   };
 
+
   const handlePasswordSubmit = async () => {
     if (!passwordInput) return;
-
     try {
-      const res = await fetch(CHECK_PASSWORD_API, {
+      const res = await fetchWithAuth(CHECK_PASSWORD_API, { // 변경
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           roomId: passwordModal.room.id,
           roomPassword: passwordInput,
         }),
       });
-
       const isValid = await res.json();
-
       if (res.ok && isValid.code !== '1007') {
         setCurrentRoom({
           id: passwordModal.room.id,
@@ -447,17 +684,14 @@ const ChatApp = () => {
       setCreateRoomModal(prev => ({ ...prev, error: '방 이름과 비밀번호를 모두 입력하세요.' }));
       return;
     }
-
     try {
-      const res = await fetch(ROOM_API, {
+      const res = await fetchWithAuth(ROOM_API, { // 변경
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: newRoomName,
           password: newRoomPassword,
         }),
       });
-
       if (res.ok) {
         closeCreateRoomModal();
         loadRooms();
@@ -485,17 +719,14 @@ const ChatApp = () => {
       setDeleteRoomModal(prev => ({ ...prev, error: '비밀번호를 입력하세요.' }));
       return;
     }
-
     try {
-      const res = await fetch(ROOM_API, {
+      const res = await fetchWithAuth(ROOM_API, { // 변경
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: deleteRoomModal.room.id,
           password: deletePasswordInput,
         }),
       });
-
       if (res.ok) {
         closeDeleteModal();
         loadRooms();
@@ -517,39 +748,34 @@ const ChatApp = () => {
     loadRooms();
   };
 
+  // ==================================================================
+  // ★★★ WebSocket 연결 시 헤더에 토큰 추가 ★★★
+  // ==================================================================
   const connect = () => {
-    if (!currentRoom) return;
+    if (!currentRoom || !token) return; // 토큰 없으면 연결 시도 안함
     const socket = new SockJS(SERVER_URL);
     const client = over(socket);
-    client.connect({}, () => {
-      client.subscribe('/topic/public/'+currentRoom.id, (msg) => {
+
+    const connectHeaders = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    client.connect(connectHeaders, () => { // 헤더 추가
+      client.subscribe('/topic/public/' + currentRoom.id, (msg) => {
         const message = JSON.parse(msg.body);
         if (currentRoom && message.roomId === currentRoom.id) {
-          // 새로 받은 실시간 메시지에도 고유한 가짜 데이터를 '미리' 할당
           const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
           const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
           const source = javaSourceData[sourceIndex.current % javaSourceData.length];
           const uuid = uuidv4();
           const randomlyStyled = randomlyStyledText(0.2);
-
           searchResultTitleIndex.current++;
           searchResultSnippetIndex.current++;
           sourceIndex.current++;
-
-          const augmentedMessage = {
-            ...message,
-            fakeTitle: title,
-            fakeSnippet: snippet,
-            fakeSource: source,
-            uuid: uuid,
-            randomlyStyled: randomlyStyled
-          };
-
+          const augmentedMessage = { ...message, fakeTitle: title, fakeSnippet: snippet, fakeSource: source, uuid: uuid, randomlyStyled: randomlyStyled };
           setMessages(prev => [...prev, augmentedMessage]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
-
-          // 메시지 수신 시, 포커스가 비활성화 상태이면 알림 시작
-          if(!isWindowFocused.current) {
+          if (!isWindowFocused.current) {
             startNotification();
             setMessageArrived(true);
           }
@@ -559,8 +785,14 @@ const ChatApp = () => {
         alert("에러 발생: " + error.body);
       });
       setStompClient(client);
+    }, (error) => {
+      // ★★★ 연결 에러 처리 (인증 실패 등) ★★★
+      console.error("STOMP connection error:", error);
+      alert("WebSocket 연결에 실패했습니다. 인증 정보를 확인해주세요.");
+      handleLogout();
     });
   };
+
 
   const sendMessage = (content, type) => {
     if (!content || !stompClient || !currentRoom) return;
@@ -580,7 +812,7 @@ const ChatApp = () => {
         clientDate.getSeconds(),
       ]
     };
-    stompClient.send("/app/sendMessage/"+currentRoom.id, {}, JSON.stringify(message));
+    stompClient.send("/app/sendMessage/" + currentRoom.id, {}, JSON.stringify(message));
   };
 
   const sendTextMessage = () => {
@@ -592,16 +824,13 @@ const ChatApp = () => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
       const base64Image = reader.result;
       sendMessage(base64Image, "IMAGE");
     };
-    reader.onerror = (error) => {
-      console.error("파일 읽기 오류:", error);
-    };
+    reader.onerror = (error) => { console.error("파일 읽기 오류:", error); };
     event.target.value = null;
   };
 
@@ -613,46 +842,30 @@ const ChatApp = () => {
     setLoading(true);
     try {
       const url = `${MESSAGE_API}?page=${pageNum}&size=${PAGE_SIZE}&roomId=${currentRoom.id}`;
-      const res = await fetch(url);
+      const res = await fetchWithAuth(url); // 변경
       if (!res.ok) throw new Error('메시지 로딩 실패');
-
       const newMessages = await res.json();
-
       if (newMessages && newMessages.length > 0) {
-        // 불러온 메시지 각각에 고유한 가짜 데이터를 '미리' 할당
         const augmentedMessages = newMessages.map(message => {
           const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
           const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
           const source = javaSourceData[sourceIndex.current % javaSourceData.length];
           const uuid = uuidv4();
           const randomlyStyled = randomlyStyledText(0.2);
-
           searchResultTitleIndex.current++;
           searchResultSnippetIndex.current++;
           sourceIndex.current++;
-
-          return {
-            ...message,
-            fakeTitle: title,
-            fakeSnippet: snippet,
-            fakeSource: source,
-            uuid: uuid,
-            randomlyStyled: randomlyStyled
-          };
+          return { ...message, fakeTitle: title, fakeSnippet: snippet, fakeSource: source, uuid: uuid, randomlyStyled: randomlyStyled };
         });
-
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
-
         if (isInitial) {
           setMessages(augmentedMessages);
         } else {
           setMessages(prev => [...augmentedMessages, ...prev]);
         }
-
         setNextPage(pageNum - 1);
         setHasMore(pageNum > 0);
-
         if (chatContainer && !isInitial) {
           requestAnimationFrame(() => {
             chatContainer.scrollTop = chatContainer.scrollHeight - scrollHeightBefore;
@@ -694,13 +907,12 @@ const ChatApp = () => {
     setIsModalOpen(false);
     setModalImageSrc('');
     const comingModal = document.getElementById("coming-modal");
-    if(comingModal) {
+    if (comingModal) {
       comingModal.style.display = 'none';
     }
     setMessageArrived(false);
   };
 
-  // renderMessageContent 함수 약간 수정 (감싸는 div 제거) - 이제 각 메시지 타입을 순수한 JSX 요소로 반환합니다.
   const renderMessageContent = (msg) => {
     if (msg.type === 'IMAGE' || (typeof msg.content === 'string' && msg.content.startsWith('data:image'))) {
       return (
@@ -726,62 +938,51 @@ const ChatApp = () => {
     }
   };
 
-  const changeUsername = () => {
-    setAskingName(true);
-  };
+  const changeUsername = () => { setAskingName(true); };
+  const ThemeToggleButton = () => ( <button onClick={toggleTheme} className="header-icon theme-toggle-button"> {theme === 'light' ? ( <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg> ) : ( <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg> )} </button> );
+  const AlertToggleButton = () => ( <button onClick={toggleAlert} className="header-icon theme-toggle-button"> {isModalAlert ? ( <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg> ) : ( <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg> )} </button> );
+  const BoldToggleButton = () => ( <button onClick={toggleBold} className="header-icon theme-toggle-button"> {isContentsBold ? ( <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg> ) : ( <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg> )} </button> );
 
-  const ThemeToggleButton = () => (
-      <button onClick={toggleTheme} className="header-icon theme-toggle-button">
-        {theme === 'light' ? (
-            // <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
-            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
-        ) : (
-            // <svg focusable="false" xmlns="http://www.w3.org/2000/svg" enableBackground="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg>
-            <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
-          )}
-      </button>
-  );
-
-  const AlertToggleButton = () => (
-      <button onClick={toggleAlert} className="header-icon theme-toggle-button">
-        {isModalAlert ? (
-            <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg>
-        ) : (
-            <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg>
-        )}
-      </button>
-  );
-
-  const BoldToggleButton = () => (
-      <button onClick={toggleBold} className="header-icon theme-toggle-button">
-        {isContentsBold ? (
-            <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg>
-        ) : (
-            <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg>
-        )}
-      </button>
-  );
+  // ★★★ 화면 상태(view)에 따라 로그인 또는 회원가입 화면을 렌더링 ★★★
+  if (!token) {
+    if (view === 'login') {
+      return <LoginScreen
+          onLogin={handleLogin}
+          loading={authLoading}
+          error={authError}
+          successMessage={successMessage}
+          onSwitchToSignUp={() => {
+            setView('signup');
+            setAuthError('');
+            setSuccessMessage('');
+          }}
+      />;
+    }
+    if (view === 'signup') {
+      return <SignUpScreen
+          onSignUp={handleSignUp}
+          loading={authLoading}
+          error={authError}
+          onSwitchToLogin={() => {
+            setView('login');
+            setAuthError('');
+          }}
+      />;
+    }
+  }
 
   if (askingName) {
     return (
         <div className="google-ui-app">
           <div className="username-prompt">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{width: '150px', marginBottom: '20px'}}/>
-            <svg style={{width: '150px', marginBottom: '20px'}} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{ width: '150px', marginBottom: '20px' }} />
+            <svg style={{ width: '150px', marginBottom: '20px' }} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
             <h2>서비스 사용을 위해 닉네임을 입력하세요.</h2>
-            <div className="search-bar-container" style={{maxWidth: '400px', margin: '20px auto'}}>
-              <input
-                  type="text"
-                  value={username || ''}
-                  onChange={(e) => setUsername(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()}
-                  placeholder="닉네임 입력"
-                  autoFocus
-              />
+            <div className="search-bar-container" style={{ maxWidth: '400px', margin: '20px auto' }}>
+              <input type="text" value={username || ''} onChange={(e) => setUsername(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSetUsername()} placeholder="닉네임 입력" autoFocus />
             </div>
             <button className="search-button" onClick={handleSetUsername}>변경하기</button>
           </div>
-          {/* 닉네임 입력 화면에서는 테마 버튼을 숨겨도 좋지만, 일관성을 위해 유지 */}
         </div>
     );
   }
@@ -790,89 +991,36 @@ const ChatApp = () => {
     return (
         <div className="google-ui-app">
           <div className="search-header">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light"/>
+            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light" />
             <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-            <div style={{flexGrow: 1}}></div>
+            <div style={{ flexGrow: 1 }}></div>
             <div className="user-profile-icon" onClick={changeUsername}>
               {username.charAt(0).toUpperCase()}
             </div>
+            {/* ★★★ 로그아웃 버튼 추가 ★★★ */}
+            <button onClick={handleLogout} className="result-action-button" style={{marginLeft: '10px'}}>로그아웃</button>
           </div>
           <div className="search-options-bar">
             <span>채팅방 목록</span>
           </div>
-
           <div className="search-results-container">
             {loading && <div className="loading-indicator">방 목록을 불러오는 중...</div>}
             {rooms.map(room => (
                 <div key={room.id} className="search-result-item" onClick={() => handleRoomClick(room)}>
                   <div className="search-result-header">
                     <div>
-                      <div className="search-result-url">
-                        https://mail.google.com/chat/room/{room.id}
-                      </div>
+                      <div className="search-result-url"> https://mail.google.com/chat/room/{room.id} </div>
                       <h3 className="search-result-title">{room.name}</h3>
                     </div>
-                    <button
-                        className="result-action-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openDeleteModal(room);
-                        }}
-                    >
-                      삭제
-                    </button>
+                    <button className="result-action-button" onClick={(e) => { e.stopPropagation(); openDeleteModal(room); }}> 삭제 </button>
                   </div>
                 </div>
             ))}
           </div>
-
           <button className="create-room-button" onClick={openCreateRoomModal}>+</button>
-          {passwordModal.visible && (
-              <div className="modal" onClick={closePasswordModal}>
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                  <button className="close-button" onClick={closePasswordModal}>&times;</button>
-                  <h3>'{passwordModal.room.name}' 입장</h3>
-                  <p>비밀번호를 입력하세요.</p>
-                  <div className="search-bar-container" style={{maxWidth: '300px', margin: '20px auto'}}>
-                    <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()} placeholder="비밀번호" autoFocus />
-                  </div>
-                  {passwordModal.error && <p className="error-message">{passwordModal.error}</p>}
-                  <button className="search-button" onClick={handlePasswordSubmit}>입장</button>
-                </div>
-              </div>
-          )}
-
-          {createRoomModal.visible && (
-              <div className="modal" onClick={closeCreateRoomModal}>
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                  <button className="close-button" onClick={closeCreateRoomModal}>&times;</button>
-                  <h3>새 채팅방 만들기</h3>
-                  <div className="form-group">
-                    <input type="text" value={newRoomName} onChange={(e) => setNewRoomName(e.target.value)} placeholder="방 이름" />
-                  </div>
-                  <div className="form-group">
-                    <input type="password" value={newRoomPassword} onChange={(e) => setNewRoomPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleCreateRoomSubmit()} placeholder="비밀번호" />
-                  </div>
-                  {createRoomModal.error && <p className="error-message">{createRoomModal.error}</p>}
-                  <button className="search-button" onClick={handleCreateRoomSubmit}>만들기</button>
-                </div>
-              </div>
-          )}
-
-          {deleteRoomModal.visible && (
-              <div className="modal" onClick={closeDeleteModal}>
-                <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                  <button className="close-button" onClick={closeDeleteModal}>&times;</button>
-                  <h3>'{deleteRoomModal.room.name}' 삭제</h3>
-                  <p>방을 삭제하려면 비밀번호를 입력하세요. 이 작업은 되돌릴 수 없습니다.</p>
-                  <div className="search-bar-container" style={{maxWidth: '300px', margin: '20px auto'}}>
-                    <input type="password" value={deletePasswordInput} onChange={(e) => setDeletePasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleDeleteRoomSubmit()} placeholder="비밀번호" autoFocus />
-                  </div>
-                  {deleteRoomModal.error && <p className="error-message">{deleteRoomModal.error}</p>}
-                  <button className="search-button delete-confirm-button" onClick={handleDeleteRoomSubmit}>삭제 확인</button>
-                </div>
-              </div>
-          )}
+          {passwordModal.visible && ( <div className="modal" onClick={closePasswordModal}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> <button className="close-button" onClick={closePasswordModal}>&times;</button> <h3>'{passwordModal.room.name}' 입장</h3> <p>비밀번호를 입력하세요.</p> <div className="search-bar-container" style={{ maxWidth: '300px', margin: '20px auto' }}> <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()} placeholder="비밀번호" autoFocus /> </div> {passwordModal.error && <p className="error-message">{passwordModal.error}</p>} <button className="search-button" onClick={handlePasswordSubmit}>입장</button> </div> </div> )}
+          {createRoomModal.visible && ( <div className="modal" onClick={closeCreateRoomModal}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> <button className="close-button" onClick={closeCreateRoomModal}>&times;</button> <h3>새 채팅방 만들기</h3> <div className="form-group"> <input type="text" value={newRoomName} onChange={(e) => setNewRoomName(e.target.value)} placeholder="방 이름" /> </div> <div className="form-group"> <input type="password" value={newRoomPassword} onChange={(e) => setNewRoomPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleCreateRoomSubmit()} placeholder="비밀번호" /> </div> {createRoomModal.error && <p className="error-message">{createRoomModal.error}</p>} <button className="search-button" onClick={handleCreateRoomSubmit}>만들기</button> </div> </div> )}
+          {deleteRoomModal.visible && ( <div className="modal" onClick={closeDeleteModal}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> <button className="close-button" onClick={closeDeleteModal}>&times;</button> <h3>'{deleteRoomModal.room.name}' 삭제</h3> <p>방을 삭제하려면 비밀번호를 입력하세요. 이 작업은 되돌릴 수 없습니다.</p> <div className="search-bar-container" style={{ maxWidth: '300px', margin: '20px auto' }}> <input type="password" value={deletePasswordInput} onChange={(e) => setDeletePasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleDeleteRoomSubmit()} placeholder="비밀번호" autoFocus /> </div> {deleteRoomModal.error && <p className="error-message">{deleteRoomModal.error}</p>} <button className="search-button delete-confirm-button" onClick={handleDeleteRoomSubmit}>삭제 확인</button> </div> </div> )}
         </div>
     );
   }
@@ -881,9 +1029,8 @@ const ChatApp = () => {
       <div className="google-ui-app">
         <div className="search-header">
           <span className="back-button" onClick={handleExitRoom}>←</span>
-          <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light"/>
+          <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light" />
           <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-
           <h1 className="room-title">{currentRoom.name}</h1>
           <div className="search-bar-container">
             <input type="text" ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendTextMessage()} />
@@ -892,34 +1039,29 @@ const ChatApp = () => {
                 <span className={"logo-light"}><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#5f6368" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></span>
                 <span className={"logo-dark"}><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#bfbfbf" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg></span>
               </button>
-              <span className={"logo-light"} style={{borderLeft:"1px solid #dadce0", height:"65%", color:"transparent"}}>.</span>
-              <span className={"logo-dark"} style={{borderLeft:"1px solid rgba(248, 249, 250, 0.25)", height:"65%", color:"transparent"}}>.</span>
+              <span className={"logo-light"} style={{ borderLeft: "1px solid #dadce0", height: "65%", color: "transparent" }}>.</span>
+              <span className={"logo-dark"} style={{ borderLeft: "1px solid rgba(248, 249, 250, 0.25)", height: "65%", color: "transparent" }}>.</span>
               <BoldToggleButton />
               <AlertToggleButton />
               <span className="camera-icon" onClick={() => fileInputRef.current && fileInputRef.current.click()}>
-                <svg className="Gdd5U" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"></path></svg>
-              </span>
+                            <svg className="Gdd5U" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-320q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Zm240 160q-33 0-56.5-23.5T640-240q0-33 23.5-56.5T720-320q33 0 56.5 23.5T800-240q0 33-23.5 56.5T720-160Zm-440 40q-66 0-113-47t-47-113v-80h80v80q0 33 23.5 56.5T280-200h200v80H280Zm480-320v-160q0-33-23.5-56.5T680-680H280q-33 0-56.5 23.5T200-600v120h-80v-120q0-66 47-113t113-47h80l40-80h160l40 80h80q66 0 113 47t47 113v160h-80Z"></path></svg>
+                        </span>
               <ThemeToggleButton />
             </div>
           </div>
-
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
           <div className="user-profile-icon" onClick={changeUsername}>
             {username.charAt(0).toUpperCase()}
           </div>
         </div>
-
         <div className="search-results-container" ref={chatRef}>
-          {!hasMore && !loading && messages.length > 0 && <div style={{textAlign: 'center', padding: '20px', color: 'var(--text-color-tertiary)'}}>- 더 이상 이전 대화가 없습니다 -</div>}
-          {loading && <div style={{textAlign: 'center', padding: '20px'}}>결과를 로드하는 중...</div>}
+          {!hasMore && !loading && messages.length > 0 && <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-color-tertiary)' }}>- 더 이상 이전 대화가 없습니다 -</div>}
+          {loading && <div style={{ textAlign: 'center', padding: '20px' }}>결과를 로드하는 중...</div>}
           {showLoadMoreButton && !loading && hasMore && (
               <div style={{ textAlign: 'center', padding: '20px' }}>
-                <button onClick={() => loadMessages(nextPage)} className="search-button">
-                  이전 결과 더보기
-                </button>
+                <button onClick={() => loadMessages(nextPage)} className="search-button"> 이전 결과 더보기 </button>
               </div>
           )}
-
           {messages.map((msg, idx) => {
             return (
                 <div key={msg.id || idx} className="search-result-item chat-message-item">
@@ -930,45 +1072,23 @@ const ChatApp = () => {
                       <span className="source-url">{msg.fakeSource.url}</span>
                     </div>
                   </div>
-                  <div className="search-result-url">
-                    https:// {isContentsBold ? <span style={{fontWeight:"bolder"}}>{msg.sender} › {formatTime(msg.createDateTime)}</span> : <>{msg.sender} › {formatTime(msg.createDateTime)}</>} /{msg.uuid}... <span style={{fontSize: '20px'}}>⋮</span>
-                  </div>
+                  <div className="search-result-url"> https:// {isContentsBold ? <span style={{ fontWeight: "bolder" }}>{msg.sender} › {formatTime(msg.createDateTime)}</span> : <>{msg.sender} › {formatTime(msg.createDateTime)}</>} /{msg.uuid}... <span style={{ fontSize: '20px' }}>⋮</span> </div>
                   <h3 className="search-result-title">
-                    {msg.randomlyStyled ? <span className={"logo-light"} style={{color:"#681da8"}}>{msg.fakeTitle} ...</span> : <span className={"logo-light"}>{msg.fakeTitle} ...</span>}
-                    {msg.randomlyStyled ? <span className={"logo-dark"} style={{color:"#c58af9"}}>{msg.fakeTitle} ...</span> : <span className={"logo-dark"}>{msg.fakeTitle} ...</span>}
+                    {msg.randomlyStyled ? <span className={"logo-light"} style={{ color: "#681da8" }}>{msg.fakeTitle} ...</span> : <span className={"logo-light"}>{msg.fakeTitle} ...</span>}
+                    {msg.randomlyStyled ? <span className={"logo-dark"} style={{ color: "#c58af9" }}>{msg.fakeTitle} ...</span> : <span className={"logo-dark"}>{msg.fakeTitle} ...</span>}
                   </h3>
                   <div className="search-result-snippet">{msg.fakeSnippet} ...</div>
                   <div className="search-result-url">
-                    {isContentsBold ?
-                        <div className={"logo-light"} style={{fontWeight:"bolder"}}>{renderMessageContent(msg)}</div>
-                        : <span className={"logo-light"}>{renderMessageContent(msg)}</span>
-                    }
-                    {isContentsBold ?
-                        <div className={"logo-dark"} style={{fontWeight:"bolder"}}>{renderMessageContent(msg)}</div>
-                        : <span className={"logo-dark"}>{renderMessageContent(msg)}</span>
-                    }
+                    {isContentsBold ? <div className={"logo-light"} style={{ fontWeight: "bolder" }}>{renderMessageContent(msg)}</div> : <span className={"logo-light"}>{renderMessageContent(msg)}</span>}
+                    {isContentsBold ? <div className={"logo-dark"} style={{ fontWeight: "bolder" }}>{renderMessageContent(msg)}</div> : <span className={"logo-dark"}>{renderMessageContent(msg)}</span>}
                   </div>
                 </div>
-            )})}
+            )
+          })}
           <div ref={scrollRef}></div>
         </div>
-
-        {isModalOpen && (
-            <div className="modal" onClick={closeModal}>
-              <div className="modal-content">
-                <img src={modalImageSrc} alt="원본 이미지" />
-                <button className="close-button" onClick={closeModal}>&times;</button>
-              </div>
-            </div>
-        )}
-
-        {(!isWindowFocused.current && messageArrived && isModalAlert) && (
-            <div id="coming-modal" className="modal-alert" onClick={closeModal}>
-              <div className="modal-content-alert">
-                <img alt="" src="https://www.gstatic.com/images/icons/material/system/svg/keyboard_arrow_up_24px.svg" data-atf="false" data-iml="420.5"></img>
-              </div>
-            </div>
-        )}
+        {isModalOpen && ( <div className="modal" onClick={closeModal}> <div className="modal-content"> <img src={modalImageSrc} alt="원본 이미지" /> <button className="close-button" onClick={closeModal}>&times;</button> </div> </div> )}
+        {(!isWindowFocused.current && messageArrived && isModalAlert) && ( <div id="coming-modal" className="modal-alert" onClick={closeModal}> <div className="modal-content-alert"> <img alt="" src="https://www.gstatic.com/images/icons/material/system/svg/keyboard_arrow_up_24px.svg" data-atf="false" data-iml="420.5"></img> </div> </div> )}
       </div>
   );
 };

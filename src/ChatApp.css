@@ -230,9 +230,10 @@
     filter: brightness(0.9);
 }
 
-/* --- 4. 컨텐츠 및 나머지 영역 (기존과 동일) --- */
+/* --- 4. 컨텐츠 및 나머지 영역 (수정된 부분) --- */
 .search-options-bar {
-    padding: 10px 40px;
+    /* padding의 좌우 값을 40px에서 180px로 수정 */
+    padding: 10px 180px;
     border-bottom: 1px solid var(--border-color-primary);
     color: var(--text-color-tertiary);
     font-size: 14px;
@@ -249,7 +250,8 @@
 }
 
 .search-results-container {
-    padding: 20px 40px;
+    /* padding의 좌우 값을 40px에서 180px로 수정 */
+    padding: 20px 180px;
     height: calc(100vh - 125px);
     overflow-y: auto;
 }
@@ -557,4 +559,555 @@
     .search-results-container {
         height: calc(100vh - 175px);
     }
+}
+
+@media (max-width: 1200px) {
+    .search-options-bar,
+    .search-results-container {
+        /* 이 부분은 화면이 1200px 이하일 때 적용되므로 그대로 둡니다. */
+        padding-left: 80px;
+        padding-right: 80px;
+    }
+}
+
+
+
+/* ===================================================== */
+/* ★★★ Google 로그인 화면 스타일 (가로 레이아웃 수정) ★★★ */
+/* ===================================================== */
+
+.google-login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 카드를 중앙으로 */
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: 'Google Sans', 'Noto Sans KR', sans-serif;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+[data-theme='dark'] .google-login-container {
+    background-color: #202124;
+}
+
+.google-login-card {
+    background-color: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 48px 40px 36px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* 가로형 카드 스타일 */
+.google-login-card.horizontal-card {
+    max-width: 840px; /* 가로 너비 증가 */
+    padding: 0; /* 내부에서 패딩 제어 */
+    align-items: stretch;
+}
+
+
+[data-theme='dark'] .google-login-card {
+    background-color: #2d2e30;
+    border-color: #5f6368;
+}
+
+/* 2단 레이아웃 래퍼 */
+.google-login-content-wrapper {
+    display: flex;
+    width: 100%;
+    padding: 48px 40px 36px;
+    box-sizing: border-box;
+    gap: 80px; /* 좌우 패널 사이 간격 */
+}
+
+/* 왼쪽 패널 (타이틀) */
+.google-login-left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 16px; /* 오른쪽과 수직 정렬을 위한 미세조정 */
+}
+.google-login-left-panel h1 {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #202124;
+    margin: 16px 0 8px 0;
+    text-align: left;
+}
+.google-login-left-panel p {
+    font-size: 16px;
+    color: #202124;
+    margin: 0;
+    text-align: left;
+    line-height: 1.5;
+}
+
+[data-theme='dark'] .google-login-left-panel h1,
+[data-theme='dark'] .google-login-left-panel p {
+    color: #e8eaed;
+}
+
+/* 오른쪽 패널 (폼) */
+.google-login-right-panel {
+    flex: 1;
+}
+
+
+.google-login-form {
+    width: 100%;
+}
+
+.form-input-group {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.form-input-group input {
+    width: 100%;
+    padding: 13px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: var(--text-color-primary);
+    transition: border-color 0.2s;
+}
+
+.form-input-group label {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    font-size: 16px;
+    color: #5f6368;
+    pointer-events: none;
+    transition: all 0.2s ease-out;
+    background-color: #fff;
+    padding: 0 4px;
+}
+
+[data-theme='dark'] .form-input-group label {
+    color: #969ba1;
+    background-color: #2d2e30;
+}
+
+.form-input-group input:focus {
+    outline: none;
+    border: 2px solid #1a73e8;
+    padding: 12px 14px;
+}
+
+.form-input-group input:focus + label,
+.form-input-group input:not(:placeholder-shown) + label {
+    top: -8px;
+    left: 12px;
+    font-size: 12px;
+    color: #1a73e8;
+}
+
+[data-theme='dark'] .form-input-group input:focus + label {
+    color: #8ab4f8;
+}
+
+
+.google-error-message {
+    color: #d93025;
+    font-size: 12px;
+    margin-top: -16px;
+    margin-bottom: 16px;
+    padding: 0 12px;
+}
+
+.form-link {
+    color: #1a73e8;
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 8px;
+}
+.form-link:hover {
+    text-decoration: underline;
+}
+
+[data-theme='dark'] .form-link {
+    color: #8ab4f8;
+}
+
+
+.guest-mode-info {
+    font-size: 14px;
+    color: #5f6368;
+    line-height: 1.4;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+[data-theme='dark'] .guest-mode-info {
+    color: #bdc1c6;
+}
+
+.guest-mode-info a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+.guest-mode-info a:hover {
+    text-decoration: underline;
+}
+
+[data-theme='dark'] .guest-mode-info a {
+    color: #8ab4f8;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.google-button-primary, .google-button-secondary {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.google-button-primary {
+    background-color: #1a73e8;
+    color: white;
+}
+.google-button-primary:hover {
+    background-color: #2b7de9;
+}
+.google-button-primary:disabled {
+    background-color: #9ac0f9;
+    cursor: not-allowed;
+}
+
+
+.google-button-secondary {
+    background-color: transparent;
+    color: #1a73e8;
+}
+.google-button-secondary:hover {
+    background-color: #f0f6ff;
+}
+
+[data-theme='dark'] .google-button-secondary {
+    color: #8ab4f8;
+}
+[data-theme='dark'] .google-button-secondary:hover {
+    background-color: rgba(138, 180, 248, 0.1);
+}
+
+.google-login-footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+    margin-top: 24px;
+}
+.google-login-footer.horizontal-footer {
+    max-width: 840px; /* 카드 너비와 맞춤 */
+}
+
+
+.google-login-footer select {
+    background: transparent;
+    border: none;
+    color: #5f6368;
+    font-size: 12px;
+}
+
+[data-theme='dark'] .google-login-footer select {
+    color: #bdc1c6;
+}
+
+
+.google-login-footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 24px;
+}
+.google-login-footer a {
+    color: #5f6368;
+    font-size: 12px;
+    text-decoration: none;
+}
+.google-login-footer a:hover {
+    text-decoration: underline;
+}
+
+[data-theme='dark'] .google-login-footer a {
+    color: #bdc1c6;
+}
+
+
+/* ===================================================== */
+/* ★★★ Google 로그인 & 회원가입 화면 스타일 ★★★         */
+/* ===================================================== */
+
+.google-login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    font-family: 'Google Sans', 'Noto Sans KR', sans-serif;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+[data-theme='dark'] .google-login-container {
+    background-color: #202124;
+}
+
+.google-login-card {
+    background-color: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.google-login-card.horizontal-card {
+    max-width: 840px;
+}
+
+
+[data-theme='dark'] .google-login-card {
+    background-color: #2d2e30;
+    border-color: #5f6368;
+}
+
+.google-login-content-wrapper {
+    display: flex;
+    width: 100%;
+    padding: 48px 40px 36px;
+    box-sizing: border-box;
+    gap: 80px;
+}
+
+.google-login-left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 16px;
+}
+.google-login-left-panel h1 {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: #202124;
+    margin: 16px 0 8px 0;
+    text-align: left;
+}
+.google-login-left-panel p {
+    font-size: 16px;
+    color: #202124;
+    margin: 0;
+    text-align: left;
+    line-height: 1.5;
+}
+
+[data-theme='dark'] .google-login-left-panel h1,
+[data-theme='dark'] .google-login-left-panel p {
+    color: #e8eaed;
+}
+
+.google-login-right-panel {
+    flex: 1;
+}
+
+.google-login-form {
+    width: 100%;
+}
+
+.form-input-group {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.form-input-group input {
+    width: 100%;
+    padding: 13px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: var(--text-color-primary);
+    transition: border-color 0.2s;
+}
+
+.form-input-group label {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    font-size: 16px;
+    color: #5f6368;
+    pointer-events: none;
+    transition: all 0.2s ease-out;
+    background-color: #fff;
+    padding: 0 4px;
+}
+
+[data-theme='dark'] .form-input-group label {
+    color: #969ba1;
+    background-color: #2d2e30;
+}
+
+.form-input-group input:focus {
+    outline: none;
+    border: 2px solid #1a73e8;
+    padding: 12px 14px;
+}
+
+.form-input-group input:focus + label,
+.form-input-group input:not(:placeholder-shown) + label {
+    top: -8px;
+    left: 12px;
+    font-size: 12px;
+    color: #1a73e8;
+}
+
+[data-theme='dark'] .form-input-group input:focus + label {
+    color: #8ab4f8;
+}
+
+.google-error-message {
+    color: #d93025;
+    font-size: 12px;
+    margin-top: -16px;
+    margin-bottom: 16px;
+    padding-left: 4px;
+}
+.google-success-message {
+    color: #1e8e3e;
+    background-color: #e6f4ea;
+    border: 1px solid #ceead6;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 10px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+[data-theme='dark'] .google-success-message {
+    background-color: #313b33;
+    border-color: #506d5a;
+    color: #a8dab5;
+}
+
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 32px;
+}
+
+.google-button-primary, .google-button-secondary {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.google-button-primary {
+    background-color: #1a73e8;
+    color: white;
+}
+.google-button-primary:hover {
+    background-color: #2b7de9;
+}
+.google-button-primary:disabled {
+    background-color: #9ac0f9;
+    color: #e8eaed;
+    cursor: not-allowed;
+}
+
+
+.google-button-secondary {
+    background-color: transparent;
+    color: #1a73e8;
+}
+.google-button-secondary:hover {
+    background-color: #f0f6ff;
+}
+
+[data-theme='dark'] .google-button-secondary {
+    color: #8ab4f8;
+}
+[data-theme='dark'] .google-button-secondary:hover {
+    background-color: rgba(138, 180, 248, 0.1);
+}
+
+.google-login-footer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+    margin-top: 24px;
+}
+.google-login-footer.horizontal-footer {
+    max-width: 840px;
+}
+
+
+.google-login-footer select {
+    background: transparent;
+    border: none;
+    color: #5f6368;
+    font-size: 12px;
+}
+
+[data-theme='dark'] .google-login-footer select {
+    color: #bdc1c6;
+}
+
+
+.google-login-footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 24px;
+}
+.google-login-footer a {
+    color: #5f6368;
+    font-size: 12px;
+    text-decoration: none;
+}
+.google-login-footer a:hover {
+    text-decoration: underline;
+}
+
+[data-theme='dark'] .google-login-footer a {
+    color: #bdc1c6;
 }

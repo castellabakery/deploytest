@@ -8,6 +8,7 @@ import './ChatApp.css';
 const SERVER_HOST = 'https://chitchat.pastelcloud.store';
 // const SERVER_HOST = 'http://localhost:8080';
 const LOGIN_API = SERVER_HOST + '/authenticate/login'; // 로그인 API 주소 추가
+const SIGNUP_API = SERVER_HOST + '/authenticate';
 const SERVER_URL = SERVER_HOST + '/chat';
 const ROOM_API = SERVER_HOST + '/room';
 const ROOM_LIST_API = SERVER_HOST + '/room/list';
@@ -140,7 +141,7 @@ const randomlyStyledText = (probability = 0.1) => {
 // ==================================================================
 // ★★★ 로그인 화면 컴포넌트 추가 ★★★
 // ==================================================================
-const LoginScreen = ({ onLogin, loading, error }) => {
+const LoginScreen = ({ onLogin, loading, error, onSwitchToSignUp, successMessage }) => {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
 
@@ -150,39 +151,139 @@ const LoginScreen = ({ onLogin, loading, error }) => {
   };
 
   return (
-      <div className="google-ui-app">
-        <div className="username-prompt" style={{ paddingTop: '80px' }}>
-          <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{ width: '150px', marginBottom: '20px' }} />
-          <svg style={{ width: '150px', marginBottom: '20px' }} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-          <form onSubmit={handleLoginSubmit}>
-            <div className="search-bar-container" style={{ maxWidth: '400px', margin: '20px auto', flexDirection: 'column', gap: '10px', padding: '10px', border: 'none', boxShadow: 'none' }}>
-              <input
-                  type="text"
-                  value={loginId}
-                  onChange={(e) => setLoginId(e.target.value)}
-                  placeholder="아이디"
-                  required
-                  style={{ width: '100%', border: '1px solid var(--border-color-primary)', borderRadius: '4px' }}
-              />
-              <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="비밀번호"
-                  required
-                  style={{ width: '100%', border: '1px solid var(--border-color-primary)', borderRadius: '4px' }}
-              />
+      <div className="google-login-container">
+        <div className="google-login-card horizontal-card">
+          <div className="google-login-content-wrapper">
+            {/* 왼쪽 패널 */}
+            <div className="google-login-left-panel">
+              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+                <path d="M1 1h22v22H1z" fill="none"></path>
+              </svg>
+              <h1>로그인</h1>
+              <p>Gmail로 이동</p>
             </div>
-            {error && <p className="error-message">{error}</p>}
-            <button className="search-button" type="submit" disabled={loading}>
-              {loading ? '로그인 중...' : '로그인'}
-            </button>
-          </form>
+
+            <div className="google-login-right-panel">
+              <form onSubmit={handleLoginSubmit} className="google-login-form">
+                {successMessage && <p className="google-success-message">{successMessage}</p>}
+                <div className="form-input-group">
+                  <input id="loginId" type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)} required autoComplete="username" placeholder=" "/>
+                  <label htmlFor="loginId">아이디</label>
+                </div>
+                <div className="form-input-group">
+                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" placeholder=" "/>
+                  <label htmlFor="password">비밀번호 입력</label>
+                </div>
+                {error && <p className="google-error-message">{error}</p>}
+
+                <a href="#" className="form-link">아이디를 잊으셨나요?</a>
+
+                <p className="guest-mode-info">
+                  내 컴퓨터가 아닌가요? 게스트 모드를 사용하여 비공개로 로그인하세요.
+                  <a href="#">자세히 알아보기</a>
+                </p>
+
+                <div className="form-actions">
+                  <button type="button" className="google-button-secondary" onClick={onSwitchToSignUp}>계정 만들기</button>
+                  <button type="submit" className="google-button-primary" disabled={loading}>
+                    {loading ? '로그인 중...' : '다음'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
+        <footer className="google-login-footer horizontal-footer">
+          <select defaultValue="ko">
+            <option value="ko">한국어</option>
+            <option value="en">English (United States)</option>
+          </select>
+          <ul>
+            <li><a href="#">도움말</a></li>
+            <li><a href="#">개인정보처리방침</a></li>
+            <li><a href="#">약관</a></li>
+          </ul>
+        </footer>
       </div>
   );
 };
 
+// ==================================================================
+// ★★★ 새로 추가된 회원가입 화면 컴포넌트 ★★★
+// ==================================================================
+const SignUpScreen = ({ onSignUp, loading, error, onSwitchToLogin }) => {
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  useEffect(() => {
+    if (password && confirmPassword && password !== confirmPassword) {
+      setPasswordError('비밀번호가 일치하지 않습니다.');
+    } else {
+      setPasswordError('');
+    }
+  }, [password, confirmPassword]);
+
+  const handleSignUpSubmit = (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setPasswordError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    if (!passwordError) {
+      onSignUp(id, password);
+    }
+  };
+
+  return (
+      <div className="google-login-container">
+        <div className="google-login-card horizontal-card">
+          <div className="google-login-content-wrapper">
+            <div className="google-login-left-panel">
+              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path><path d="M1 1h22v22H1z" fill="none"></path></svg>
+              <h1>Google 계정 만들기</h1>
+              <p>계정 생성을 위해 정보를 입력하세요</p>
+            </div>
+            <div className="google-login-right-panel">
+              <form onSubmit={handleSignUpSubmit} className="google-login-form">
+                <div className="form-input-group">
+                  <input id="id" type="text" value={id} onChange={(e) => setId(e.target.value)} required placeholder=" " />
+                  <label htmlFor="id">아이디</label>
+                </div>
+                <div className="form-input-group">
+                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder=" "/>
+                  <label htmlFor="password">비밀번호</label>
+                </div>
+                <div className="form-input-group">
+                  <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required placeholder=" "/>
+                  <label htmlFor="confirmPassword">비밀번호 확인</label>
+                </div>
+
+                {passwordError && <p className="google-error-message">{passwordError}</p>}
+                {error && <p className="google-error-message">{error}</p>}
+
+                <div className="form-actions">
+                  <button type="button" className="google-button-secondary" onClick={onSwitchToLogin}>로그인</button>
+                  <button type="submit" className="google-button-primary" disabled={loading || passwordError}>
+                    {loading ? '가입 중...' : '다음'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <footer className="google-login-footer horizontal-footer">
+          <select defaultValue="ko"><option value="ko">한국어</option><option value="en">English (United States)</option></select>
+          <ul><li><a href="#">도움말</a></li><li><a href="#">개인정보처리방침</a></li><li><a href="#">약관</a></li></ul>
+        </footer>
+      </div>
+  );
+};
 
 const ChatApp = () => {
   // ==================================================================
@@ -191,6 +292,9 @@ const ChatApp = () => {
   const [token, setToken] = useState(localStorage.getItem('jwtToken'));
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  // ★★★ 화면 전환을 위한 상태 추가 ('login' | 'signup') ★★★
+  const [view, setView] = useState('login');
+  const [successMessage, setSuccessMessage] = useState('');
 
   // (기존 상태 선언 및 모든 함수는 그대로 유지)
   const [messages, setMessages] = useState([]);
@@ -258,6 +362,7 @@ const ChatApp = () => {
     setMessageArrived(false);
     setAuthLoading(false);
     setAuthError('');
+    setSuccessMessage('');
   };
 
   // ==================================================================
@@ -319,6 +424,34 @@ const ChatApp = () => {
       } else {
         throw new Error('토큰을 받지 못했습니다.');
       }
+
+    } catch (error) {
+      setAuthError(error.message);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  // ★★★ 회원가입 처리 함수 추가 ★★★
+  const handleSignUp = async (id, password) => {
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const response = await fetch(SIGNUP_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, password }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || '회원가입에 실패했습니다. 다른 아이디로 시도해주세요.');
+      }
+
+      // 회원가입 성공
+      setSuccessMessage('회원가입이 완료되었습니다. 로그인해주세요.');
+      setView('login'); // 로그인 화면으로 전환
 
     } catch (error) {
       setAuthError(error.message);
@@ -804,12 +937,32 @@ const ChatApp = () => {
   const AlertToggleButton = () => ( <button onClick={toggleAlert} className="header-icon theme-toggle-button"> {isModalAlert ? ( <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg> ) : ( <svg height="24" width="24" className="goxjub" focusable="false" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"><path d="M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm-40 280v-123q-104-14-172-93t-68-184h80q0 83 58.5 141.5T480-320q83 0 141.5-58.5T680-520h80q0 105-68 184t-172 93v123h-80Z"></path></svg> )} </button> );
   const BoldToggleButton = () => ( <button onClick={toggleBold} className="header-icon theme-toggle-button"> {isContentsBold ? ( <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path fill="#bfbfbf" d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg> ) : ( <svg height="24px" viewBox="0 -960 960 960" width="24px" xmlns="http://www.w3.org/2000/svg"><path d="M160-200q-33 0-56.5-23.5T80-280v-400q0-33 23.5-56.5T160-760h640q33 0 56.5 23.5T880-680v400q0 33-23.5 56.5T800-200H160Zm160-120h320v-80H320v80ZM200-440h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80ZM200-560h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Zm120 0h80v-80h-80v80Z"></path></svg> )} </button> );
 
-
-  // ==================================================================
-  // ★★★ 인증 상태에 따라 렌더링 분기 ★★★
-  // ==================================================================
+  // ★★★ 화면 상태(view)에 따라 로그인 또는 회원가입 화면을 렌더링 ★★★
   if (!token) {
-    return <LoginScreen onLogin={handleLogin} loading={authLoading} error={authError} />;
+    if (view === 'login') {
+      return <LoginScreen
+          onLogin={handleLogin}
+          loading={authLoading}
+          error={authError}
+          successMessage={successMessage}
+          onSwitchToSignUp={() => {
+            setView('signup');
+            setAuthError('');
+            setSuccessMessage('');
+          }}
+      />;
+    }
+    if (view === 'signup') {
+      return <SignUpScreen
+          onSignUp={handleSignUp}
+          loading={authLoading}
+          error={authError}
+          onSwitchToLogin={() => {
+            setView('login');
+            setAuthError('');
+          }}
+      />;
+    }
   }
 
   if (askingName) {

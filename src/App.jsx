@@ -449,6 +449,12 @@ const ChatApp = () => {
         throw new Error(result.message || '회원가입에 실패했습니다. 다른 아이디로 시도해주세요.');
       }
 
+      // 3. HTTP 상태가 200이더라도, 응답 본문의 code 값을 확인합니다.
+      //    "0000"이 아닐 경우, API 비즈니스 로직상 실패로 간주합니다.
+      if (result.id == null && result.code !== "0000") {
+        throw new Error(result.message);
+      }
+
       // 회원가입 성공
       setSuccessMessage('회원가입이 완료되었습니다. 로그인해주세요.');
       setView('login'); // 로그인 화면으로 전환

@@ -1328,3 +1328,285 @@
     color: #155724;
     border: 1px solid #c3e6cb;
 }
+
+
+
+
+/* ================================================= */
+/* ★★★ 채팅방 목록 (Room List) 새 스타일 ★★★ */
+/* ================================================= */
+.room-list-background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    font-family: 'Inter', sans-serif;
+}
+
+.room-list-container {
+    width: 100%;
+    max-width: 800px;
+    height: 90vh;
+    max-height: 800px;
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.room-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.room-list-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    font-family: 'Poppins', sans-serif;
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.user-profile:hover {
+    background-color: #f1f3f5;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+}
+
+.user-profile span {
+    font-weight: 500;
+    color: #343a40;
+}
+
+.logout-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    background-color: #e9ecef;
+    color: #495057;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #dee2e6;
+}
+
+.logout-button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.room-list-main {
+    flex-grow: 1;
+    padding: 16px 32px 32px;
+    overflow-y: auto;
+}
+
+.room-list-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.room-list-title-bar h2 {
+    font-size: 1.4rem;
+    color: #495057;
+    font-weight: 600;
+}
+
+.room-list-title-bar p {
+    font-size: 0.9rem;
+    color: #868e96;
+}
+
+.room-list-main ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.room-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.room-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background-color: #f1f3f5;
+}
+
+.room-icon {
+    margin-right: 16px;
+    color: #868e96;
+}
+
+.room-info {
+    flex-grow: 1;
+}
+
+.room-info h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.unread-badge {
+    background-color: #764ba2;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: 16px;
+}
+
+.delete-room-button {
+    background: none;
+    border: none;
+    color: #adb5bd;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    margin-left: 8px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.delete-room-button:hover {
+    color: #f03e3e;
+    background-color: #fff0f0;
+}
+
+.delete-room-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.create-room-fab {
+    position: absolute;
+    bottom: 32px;
+    right: 32px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.create-room-fab:hover {
+    transform: scale(1.05);
+}
+
+.empty-room-list {
+    text-align: center;
+    padding: 80px 20px;
+    color: #868e96;
+}
+
+.empty-room-list p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ================================================= */
+/* ★★★ 기존 스타일에서 수정/삭제할 부분 ★★★ */
+/* ================================================= */
+/* 아래 클래스들은 더 이상 채팅방 목록에서 사용되지 않으므로,
+   ChatApp.css 파일에서 해당 클래스들을 찾아 삭제하거나
+   다른 곳에서 사용되지 않는다면 완전히 제거해도 좋습니다.
+   - .google-ui-app .search-header
+   - .google-ui-app .search-options-bar
+   - .google-ui-app .search-results-container (채팅방 목록에만 해당)
+   - .google-ui-app .search-result-item (채팅방 목록에만 해당)
+   - .google-ui-app .create-room-button
+*/
+
+
+
+
+/* ================================================= */
+/* ★★★ 닉네임 변경 화면 새 스타일 ★★★ */
+/* ================================================= */
+.username-form-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.username-form-actions .auth-button {
+    flex: 1;
+    margin-top: 0; /* 기존 auth-button의 margin-top을 초기화 */
+}
+
+/* 취소 버튼을 위한 보조 스타일 */
+.auth-button.secondary {
+    background: #e9ecef;
+    color: #495057;
+    /* 그림자 효과는 선택적으로 제거하거나 유지할 수 있습니다. */
+    box-shadow: none;
+}
+
+.auth-button.secondary:hover {
+    background: #dee2e6;
+}

@@ -3,6 +3,7 @@ import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
 import { v4 as uuidv4 } from 'uuid';
 import './ChatApp.css';
+import shhh from './shhh.png';
 
 // (기존 상수 및 함수들은 그대로 유지)
 const SERVER_HOST = 'https://chitchat.pastelcloud.store';
@@ -181,6 +182,7 @@ const LoginScreen = ({ onLogin, loading, error, onSwitchToSignUp, successMessage
           <div className="auth-card">
             <div className="auth-header">
               <h1>Shhh...</h1>
+              <img src={shhh} style={{ width: '150px', marginBottom: '20px' }} />
               <p>우리만 아는 대화! 지금 즐겨보세요.</p>
             </div>
             <form onSubmit={handleLoginSubmit} className="auth-form">
@@ -257,6 +259,7 @@ const SignUpScreen = ({ onSignUp, loading, error, onSwitchToLogin }) => {
           <div className="auth-card">
             <div className="auth-header">
               <h1>Shhh...</h1>
+              <img src={shhh} style={{ width: '150px', marginBottom: '20px' }} />
               <p>시작하려면 계정을 만드세요.</p>
             </div>
             <form onSubmit={handleSignUpSubmit} className="auth-form">
@@ -320,19 +323,94 @@ const ChangeUsernameScreen = ({ onUpdateUsername, currentUsername, onCancel, err
   };
 
   return (
-      <div className="google-ui-app">
-        <div className="username-prompt">
-          <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="logo-light" style={{ width: '150px', marginBottom: '20px' }} />
-          <svg style={{ width: '150px', marginBottom: '20px' }} className="logo-dark" height="92" viewBox="0 0 92 30" width="272" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-          <h2>사용할 닉네임을 입력하세요.</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="search-bar-container" style={{ maxWidth: '400px', margin: '20px auto' }}>
-              <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} placeholder="닉네임 입력" autoFocus />
+      <div className="auth-background">
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h1>닉네임 변경</h1>
+              <p>사용하실 새로운 닉네임을 입력해주세요.</p>
             </div>
-            {error && <p className="google-error-message">{error}</p>}
-            <button type="button" className="search-button" onClick={onCancel} style={{marginRight: '8px'}}>취소</button>
-            <button className="search-button" type="submit">변경하기</button>
-          </form>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="auth-input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+                <input
+                    type="text"
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    placeholder="새 닉네임"
+                    autoFocus
+                    required
+                />
+              </div>
+              {error && <p className="auth-error-message">{error}</p>}
+              <div className="username-form-actions">
+                <button type="button" className="auth-button secondary" onClick={onCancel}>취소</button>
+                <button type="submit" className="auth-button">변경하기</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+  );
+};
+
+
+// ==================================================================
+// ★★★ 신규: 채팅방 목록 화면 컴포넌트 ★★★
+// ==================================================================
+const RoomListScreen = ({ rooms, username, onLogout, onUsernameClick, onRoomClick, onCreateRoom, onDeleteRoom, loading }) => {
+  return (
+      <div className="room-list-background">
+        <div className="room-list-container">
+          <header className="room-list-header">
+            <h1>Shhh...</h1>
+            <div className="user-controls">
+              <div className="user-profile" onClick={onUsernameClick}>
+                <div className="user-avatar">{username ? username.charAt(0).toUpperCase() : '?'}</div>
+                <span>{username || '닉네임 설정'}</span>
+              </div>
+              <button className="logout-button" onClick={onLogout}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                로그아웃
+              </button>
+            </div>
+          </header>
+
+          <main className="room-list-main">
+            <div className="room-list-title-bar">
+              <h2>채팅방 목록</h2>
+              <p>{rooms.length}개의 채팅방</p>
+            </div>
+            {loading && <div className="loading-indicator">방 목록을 불러오는 중...</div>}
+            {!loading && rooms.length === 0 && (
+                <div className="empty-room-list">
+                  <p>아직 채팅방이 없어요.</p>
+                  <p>새로운 채팅방을 만들어보세요!</p>
+                </div>
+            )}
+            <ul>
+              {rooms.map(room => (
+                  <li key={room.id} className="room-item" onClick={() => onRoomClick(room)}>
+                    <div className="room-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <div className="room-info">
+                      <h3>{room.name}</h3>
+                    </div>
+                    {room.unreadCount > 0 && (
+                        <div className="unread-badge">{room.unreadCount}</div>
+                    )}
+                    <button className="delete-room-button" onClick={(e) => { e.stopPropagation(); onDeleteRoom(room); }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    </button>
+                  </li>
+              ))}
+            </ul>
+          </main>
+
+          <button className="create-room-fab" onClick={onCreateRoom}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
         </div>
       </div>
   );
@@ -380,9 +458,6 @@ const ChatApp = () => {
   const [isModalAlert, setIsModalAlert] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('chatTheme') || 'light');
   const [isContentsBold, setIsContentsBold] = useState(false);
-  const searchResultTitleIndex = useRef(0);
-  const searchResultSnippetIndex = useRef(0);
-  const sourceIndex = useRef(0);
   const originalTitleRef = useRef(document.title);
   const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
   const isWindowFocused = useRef(true);
@@ -726,53 +801,70 @@ const ChatApp = () => {
   // ==================================================================
   // ★★★ 기존 fetch 호출을 fetchWithAuth로 변경 ★★★
   // ==================================================================
+  // ==================================================================
+  // ★★★ 성능 개선: 채팅방 목록을 먼저 표시하고, 안 읽은 메시지 수를 개별적으로 로드 ★★★
+  // ==================================================================
   const loadRooms = async () => {
     setLoading(true);
     try {
-      // 1. 기본 방 목록을 가져옵니다.
+      // 1. 기본 방 목록을 즉시 가져와서 렌더링합니다.
       const res = await fetchWithAuth(ROOM_LIST_API);
       if (!res.ok) throw new Error('방 목록 로딩 실패');
       const initialRooms = await res.json();
 
-      // 2. 각 방의 안 읽은 메시지 수를 비동기적으로 가져옵니다.
-      const roomsWithUnreadCount = await Promise.all(
-          initialRooms.map(async (room) => {
-            try {
-              // 2-1. 나의 마지막 읽은 상태(lastReadMessageId)를 가져옵니다.
-              const stateRes = await fetchWithAuth(`${MY_STATE_API}/${room.id}/my-state/${localStorage.getItem('loginId')}`);
-              if (!stateRes.ok) {
-                return { ...room, unreadCount: 0 }; // 상태 조회 실패 시 0으로 처리
-              }
+      // 각 방에 unreadCount를 null (로딩 중 상태)로 초기화하여 먼저 화면에 표시합니다.
+      setRooms(initialRooms.map(room => ({ ...room, unreadCount: null })));
+      setLoading(false); // 로딩 인디케이터를 숨기고 기본 방 목록을 바로 보여줍니다.
 
-              const stateData = await stateRes.json();
-              const lastMessageId = stateData ? stateData.lastReadMessageId : null;
+      // 2. 각 방의 안 읽은 메시지 수를 비동기적으로, 개별적으로 가져옵니다.
+      for (const room of initialRooms) {
+        try {
+          const stateRes = await fetchWithAuth(`${MY_STATE_API}/${room.id}/my-state/${localStorage.getItem('loginId')}`);
+          if (!stateRes.ok) { // API 호출 실패 시
+            // 해당 방의 unreadCount만 0으로 업데이트 (에러 표시 대신)
+            setRooms(prevRooms =>
+                prevRooms.map(prevRoom =>
+                    prevRoom.id === room.id ? { ...prevRoom, unreadCount: 0 } : prevRoom
+                )
+            );
+            continue; // 다음 방으로 넘어감
+          }
 
-              // 2-2. lastMessageId로 안 읽은 메시지 개수를 가져옵니다.
-              // lastMessageId가 없으면(null) 전체 메시지 수를 가져옵니다.
-              const unreadCountRes = await fetchWithAuth(
-                  `${UNREAD_COUNT_API}/${room.id}/${lastMessageId}`
-              );
+          const stateData = await stateRes.json();
+          const lastMessageId = stateData ? stateData.lastReadMessageId : null;
 
-              if (!unreadCountRes.ok) {
-                return { ...room, unreadCount: 0 }; // 개수 조회 실패 시 0으로 처리
-              }
+          const unreadCountRes = await fetchWithAuth(`${UNREAD_COUNT_API}/${room.id}/${lastMessageId}`);
+          if (!unreadCountRes.ok) { // API 호출 실패 시
+            setRooms(prevRooms =>
+                prevRooms.map(prevRoom =>
+                    prevRoom.id === room.id ? { ...prevRoom, unreadCount: 0 } : prevRoom
+                )
+            );
+            continue;
+          }
 
-              const countData = await unreadCountRes.json();
-              return { ...room, unreadCount: countData.unreadCount || 0 };
+          const countData = await unreadCountRes.json();
+          const unreadCount = countData.unreadCount || 0;
 
-            } catch (e) {
-              console.error(`'${room.name}' 방의 안 읽은 메시지 수 로딩 실패:`, e);
-              return { ...room, unreadCount: 0 }; // 에러 발생 시 0으로 처리
-            }
-          })
-      );
-
-      // 3. 안 읽은 메시지 수가 포함된 최종 목록으로 상태를 업데이트합니다.
-      setRooms(roomsWithUnreadCount);
+          // 성공 시, 해당 방의 unreadCount만 업데이트하여 화면을 갱신합니다.
+          setRooms(prevRooms =>
+              prevRooms.map(prevRoom =>
+                  prevRoom.id === room.id ? { ...prevRoom, unreadCount: unreadCount } : prevRoom
+              )
+          );
+        } catch (e) {
+          console.error(`'${room.name}' 방의 안 읽은 메시지 수 로딩 실패:`, e);
+          // 네트워크 에러 등 예외 발생 시에도 UI를 업데이트합니다.
+          setRooms(prevRooms =>
+              prevRooms.map(prevRoom =>
+                  prevRoom.id === room.id ? { ...prevRoom, unreadCount: 0 } : prevRoom
+              )
+          );
+        }
+      }
 
     } catch (error) {
       console.error("방 목록 로딩 실패:", error);
-    } finally {
       setLoading(false);
     }
   };
@@ -1144,63 +1236,25 @@ const ChatApp = () => {
     />;
   }
 
+  // ★★★ 신규: 채팅방 목록 화면 렌더링 ★★★
   if (!currentRoom) {
     return (
-        <div className="google-ui-app">
-          <div className="search-header">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" className="header-logo logo-light" />
-            <svg className="header-logo logo-dark" height="30" viewBox="0 0 92 30" width="92" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M38.9 15.51c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zm-23.7 7.47C5.63 22.98.31 17.83.31 11.5S5.63.02 11.96.02c3.5 0 5.99 1.37 7.87 3.16L17.62 5.4c-1.34-1.26-3.16-2.24-5.66-2.24-4.62 0-8.23 3.72-8.23 8.34 0 4.62 3.61 8.34 8.23 8.34 3 0 4.7-1.2 5.79-2.3.9-.9 1.49-2.2 1.74-4.17H12v-3.14h10.52c.11.56.17 1.23.17 1.96 0 2.35-.64 5.49-2.72 7.56-2.02 2.11-4.59 3.23-8.01 3.23zm42.94-7.47c0 4.26-3.32 7.39-7.4 7.39s-7.4-3.14-7.4-7.39c0-4.28 3.32-7.39 7.4-7.39s7.4 3.1 7.4 7.39zm-3.24 0c0-2.66-1.93-4.48-4.16-4.48-2.23 0-4.16 1.82-4.16 4.48 0 2.63 1.93 4.48 4.16 4.48 2.23 0 4.16-1.85 4.16-4.48zM70 8.56v13.27c0 5.46-3.05 7.7-6.86 7.7-3.58 0-5.74-2.41-6.55-4.37l2.83-1.18c.5 1.2 1.74 2.63 3.72 2.63 2.44 0 3.78-1.51 3.78-4.34v-1.06h-.11c-.73.9-2.04 1.68-3.81 1.68-3.7 0-7-3.22-7-7.36 0-4.17 3.3-7.42 7-7.42 1.76 0 3.08.78 3.81 1.65h.11v-1.2H70zm-2.86 6.97c0-2.6-1.74-4.51-3.95-4.51-2.24 0-3.95 1.9-3.95 4.51 0 2.58 1.71 4.45 3.95 4.45 2.22.01 3.95-1.87 3.95-4.45zM75 1.17V22.9h-3V1.17h3zm12.5 16.77l2.48 1.68c-.8 1.2-2.73 3.28-6.06 3.28-4.13 0-7.22-3.25-7.22-7.39 0-4.4 3.11-7.39 6.86-7.39 3.78 0 5.62 3.05 6.23 4.7l.31.85-9.71 4.08c.74 1.48 1.9 2.24 3.53 2.24s2.76-.82 3.58-2.05zm-7.63-2.66l6.5-2.74c-.36-.92-1.43-1.57-2.7-1.57-1.62 0-3.88 1.46-3.8 4.31z"></path></svg>
-            <div style={{ flexGrow: 1 }}></div>
-            {/* ★★★ 프로필 아이콘 & 툴팁 래퍼 ★★★ */}
-            <div className="user-profile-icon-wrapper">
-              <div className="user-profile-icon" onClick={() => setAskingName(true)}>
-                {username ? username.charAt(0).toUpperCase() : '?'}
-              </div>
-              {!username && (
-                  <div className="nickname-tooltip">닉네임이 없어요!</div>
-              )}
-            </div>
-            {/* ★★★ 로그아웃 버튼 추가 ★★★ */}
-            <button onClick={handleLogout} className="result-action-button" style={{marginLeft: '10px'}}>로그아웃</button>
-          </div>
-          <div className="search-options-bar">
-            <span>채팅방 목록</span>
-          </div>
-          <div className="search-results-container">
-            {loading && <div className="loading-indicator">방 목록을 불러오는 중...</div>}
-            {rooms.map(room => (
-                <div key={room.id} className="search-result-item" onClick={() => handleRoomClick(room)}>
-                  <div className="search-result-header">
-                    <div>
-                      <div className="search-result-url"> https://mail.google.com/chat/room/{room.id} </div>
-                      <h3 className="search-result-title">
-                        {room.name}
-                        {/* ✨ 안 읽은 개수 표시 로직 추가 */}
-                        {room.unreadCount > 0 && (
-                            <span style={{
-                              marginLeft: '10px',
-                              backgroundColor: '#F48024',
-                              color: 'white',
-                              borderRadius: '12px',
-                              padding: '2px 8px',
-                              fontSize: '12px',
-                              fontWeight: 'bold'
-                            }}>
-                            {room.unreadCount}
-                          </span>
-                        )}
-                      </h3>
-                    </div>
-                    <button className="result-action-button" onClick={(e) => { e.stopPropagation(); openDeleteModal(room); }}> 삭제 </button>
-                  </div>
-                </div>
-            ))}
-          </div>
-          <button className="create-room-button" onClick={openCreateRoomModal}>+</button>
+        <>
+          <RoomListScreen
+              rooms={rooms}
+              username={username}
+              onLogout={handleLogout}
+              onUsernameClick={changeUsername}
+              onRoomClick={handleRoomClick}
+              onCreateRoom={openCreateRoomModal}
+              onDeleteRoom={openDeleteModal}
+              loading={loading}
+          />
+          {/* Modals are kept here to be displayed over the RoomListScreen */}
           {passwordModal.visible && ( <div className="modal" onClick={closePasswordModal}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> <button className="close-button" onClick={closePasswordModal}>&times;</button> <h3>'{passwordModal.room.name}' 입장</h3> <p>비밀번호를 입력하세요.</p> <div className="search-bar-container" style={{ maxWidth: '300px', margin: '20px auto' }}> <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()} placeholder="비밀번호" autoFocus /> </div> {passwordModal.error && <p className="error-message">{passwordModal.error}</p>} <button className="search-button" onClick={handlePasswordSubmit}>입장</button> </div> </div> )}
           {createRoomModal.visible && ( <div className="modal" onClick={closeCreateRoomModal}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> <button className="close-button" onClick={closeCreateRoomModal}>&times;</button> <h3>새 채팅방 만들기</h3> <div className="form-group"> <input type="text" value={newRoomName} onChange={(e) => setNewRoomName(e.target.value)} placeholder="방 이름" /> </div> <div className="form-group"> <input type="password" value={newRoomPassword} onChange={(e) => setNewRoomPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleCreateRoomSubmit()} placeholder="비밀번호" /> </div> {createRoomModal.error && <p className="error-message">{createRoomModal.error}</p>} <button className="search-button" onClick={handleCreateRoomSubmit}>만들기</button> </div> </div> )}
           {deleteRoomModal.visible && ( <div className="modal" onClick={closeDeleteModal}> <div className="modal-content" onClick={(e) => e.stopPropagation()}> <button className="close-button" onClick={closeDeleteModal}>&times;</button> <h3>'{deleteRoomModal.room.name}' 삭제</h3> <p>방을 삭제하려면 비밀번호를 입력하세요. 이 작업은 되돌릴 수 없습니다.</p> <div className="search-bar-container" style={{ maxWidth: '300px', margin: '20px auto' }}> <input type="password" value={deletePasswordInput} onChange={(e) => setDeletePasswordInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleDeleteRoomSubmit()} placeholder="비밀번호" autoFocus /> </div> {deleteRoomModal.error && <p className="error-message">{deleteRoomModal.error}</p>} <button className="search-button delete-confirm-button" onClick={handleDeleteRoomSubmit}>삭제 확인</button> </div> </div> )}
-        </div>
+        </>
     );
   }
 

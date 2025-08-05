@@ -164,7 +164,7 @@ const randomlyStyledText = (probability = 0.1) => {
 };
 
 // ==================================================================
-// ★★★ 로그인 화면 컴포넌트 추가 ★★★
+// ★★★ 신규: 세련된 디자인의 로그인 화면 컴포넌트 ★★★
 // ==================================================================
 const LoginScreen = ({ onLogin, loading, error, onSwitchToSignUp, successMessage }) => {
   const [loginId, setLoginId] = useState('');
@@ -176,69 +176,55 @@ const LoginScreen = ({ onLogin, loading, error, onSwitchToSignUp, successMessage
   };
 
   return (
-      <div className="google-login-container">
-        <div className="google-login-card horizontal-card">
-          <div className="google-login-content-wrapper">
-            {/* 왼쪽 패널 */}
-            <div className="google-login-left-panel">
-              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                <path d="M1 1h22v22H1z" fill="none"></path>
-              </svg>
-              <h1>로그인</h1>
-              <p>Gmail로 이동</p>
+      <div className="auth-background">
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h1>Shhh...</h1>
+              <p>우리만 아는 대화! 지금 즐겨보세요.</p>
             </div>
-
-            <div className="google-login-right-panel">
-              <form onSubmit={handleLoginSubmit} className="google-login-form">
-                {successMessage && <p className="google-success-message">{successMessage}</p>}
-                <div className="form-input-group">
-                  <input id="loginId" type="text" value={loginId} onChange={(e) => setLoginId(e.target.value)} required autoComplete="username" placeholder=" "/>
-                  <label htmlFor="loginId">아이디</label>
-                </div>
-                <div className="form-input-group">
-                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" placeholder=" "/>
-                  <label htmlFor="password">비밀번호 입력</label>
-                </div>
-                {error && <p className="google-error-message">{error}</p>}
-
-                <a href="#" className="form-link">아이디를 잊으셨나요?</a>
-
-                <p className="guest-mode-info">
-                  내 컴퓨터가 아닌가요? 게스트 모드를 사용하여 비공개로 로그인하세요.
-                  <a href="#">자세히 알아보기</a>
-                </p>
-
-                <div className="form-actions">
-                  <button type="button" className="google-button-secondary" onClick={onSwitchToSignUp}>계정 만들기</button>
-                  <button type="submit" className="google-button-primary" disabled={loading}>
-                    {loading ? '로그인 중...' : '다음'}
-                  </button>
-                </div>
-              </form>
+            <form onSubmit={handleLoginSubmit} className="auth-form">
+              {successMessage && <p className="auth-success-message">{successMessage}</p>}
+              <div className="auth-input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <input
+                    id="loginId"
+                    type="text"
+                    value={loginId}
+                    onChange={(e) => setLoginId(e.target.value)}
+                    required
+                    autoComplete="username"
+                    placeholder="로그인 아이디"
+                />
+              </div>
+              <div className="auth-input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    placeholder="비밀번호"
+                />
+              </div>
+              {error && <p className="auth-error-message">{error}</p>}
+              <button type="submit" className="auth-button" disabled={loading}>
+                {loading ? '로그인 중...' : '로그인'}
+              </button>
+            </form>
+            <div className="auth-switch">
+              <p>계정이 없으신가요? <span onClick={onSwitchToSignUp}>회원가입</span></p>
             </div>
           </div>
         </div>
-        <footer className="google-login-footer horizontal-footer">
-          <select defaultValue="ko">
-            <option value="ko">한국어</option>
-            <option value="en">English (United States)</option>
-          </select>
-          <ul>
-            <li><a href="#">도움말</a></li>
-            <li><a href="#">개인정보처리방침</a></li>
-            <li><a href="#">약관</a></li>
-          </ul>
-        </footer>
       </div>
   );
 };
 
 // ==================================================================
-// ★★★ 새로 추가된 회원가입 화면 컴포넌트 ★★★
+// ★★★ 신규: 세련된 디자인의 회원가입 화면 컴포넌트 ★★★
 // ==================================================================
 const SignUpScreen = ({ onSignUp, loading, error, onSwitchToLogin }) => {
   const [id, setId] = useState('');
@@ -266,46 +252,60 @@ const SignUpScreen = ({ onSignUp, loading, error, onSwitchToLogin }) => {
   };
 
   return (
-      <div className="google-login-container">
-        <div className="google-login-card horizontal-card">
-          <div className="google-login-content-wrapper">
-            <div className="google-login-left-panel">
-              <svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path><path d="M1 1h22v22H1z" fill="none"></path></svg>
-              <h1>Google 계정 만들기</h1>
-              <p>계정 생성을 위해 정보를 입력하세요</p>
+      <div className="auth-background">
+        <div className="auth-container">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h1>Shhh...</h1>
+              <p>시작하려면 계정을 만드세요.</p>
             </div>
-            <div className="google-login-right-panel">
-              <form onSubmit={handleSignUpSubmit} className="google-login-form">
-                <div className="form-input-group">
-                  <input id="id" type="text" value={id} onChange={(e) => setId(e.target.value)} required placeholder=" " />
-                  <label htmlFor="id">아이디</label>
-                </div>
-                <div className="form-input-group">
-                  <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder=" "/>
-                  <label htmlFor="password">비밀번호</label>
-                </div>
-                <div className="form-input-group">
-                  <input id="confirmPassword" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required placeholder=" "/>
-                  <label htmlFor="confirmPassword">비밀번호 확인</label>
-                </div>
+            <form onSubmit={handleSignUpSubmit} className="auth-form">
+              <div className="auth-input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <input
+                    id="id"
+                    type="text"
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    required
+                    placeholder="로그인 아이디"
+                />
+              </div>
+              <div className="auth-input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="비밀번호"
+                />
+              </div>
+              <div className="auth-input-group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    placeholder="비밀번호 확인"
+                />
+              </div>
 
-                {passwordError && <p className="google-error-message">{passwordError}</p>}
-                {error && <p className="google-error-message">{error}</p>}
+              {passwordError && <p className="auth-error-message">{passwordError}</p>}
+              {error && <p className="auth-error-message">{error}</p>}
 
-                <div className="form-actions">
-                  <button type="button" className="google-button-secondary" onClick={onSwitchToLogin}>로그인</button>
-                  <button type="submit" className="google-button-primary" disabled={loading || passwordError}>
-                    {loading ? '가입 중...' : '다음'}
-                  </button>
-                </div>
-              </form>
+              <button type="submit" className="auth-button" disabled={loading || !!passwordError}>
+                {loading ? '가입 중...' : '회원가입'}
+              </button>
+            </form>
+            <div className="auth-switch">
+              <p>이미 계정이 있으신가요? <span onClick={onSwitchToLogin}>로그인</span></p>
             </div>
           </div>
         </div>
-        <footer className="google-login-footer horizontal-footer">
-          <select defaultValue="ko"><option value="ko">한국어</option><option value="en">English (United States)</option></select>
-          <ul><li><a href="#">도움말</a></li><li><a href="#">개인정보처리방침</a></li><li><a href="#">약관</a></li></ul>
-        </footer>
       </div>
   );
 };

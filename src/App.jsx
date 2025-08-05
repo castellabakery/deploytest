@@ -1033,13 +1033,13 @@ const ChatApp = () => {
   const connect = () => {
     // if (isCurrentRoom) return;
     // if (currentRoomRef) return;
-    if (localStorage.getItem('isCurrentRoom') === 'true') {
-      localStorage.setItem('isCurrentRoom', 'false');
-      return;
-    }
-    setIsCurrentRoom(true);
-    currentRoomRef = true;
-    localStorage.setItem('isCurrentRoom', 'true');
+    // if (localStorage.getItem('isCurrentRoom') === 'true') {
+    //   localStorage.setItem('isCurrentRoom', 'false');
+    //   return;
+    // }
+    // setIsCurrentRoom(true);
+    // currentRoomRef = true;
+    // localStorage.setItem('isCurrentRoom', 'true');
     if (!currentRoom || !token) return; // 토큰 없으면 연결 시도 안함
     const socket = new SockJS(SERVER_URL);
     const client = over(socket);

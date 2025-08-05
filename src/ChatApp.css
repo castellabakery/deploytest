@@ -1150,3 +1150,38 @@
     border-style: solid;
     border-color: transparent transparent #616161 transparent;
 }
+
+
+/* 도메인 선택 드롭다운 스타일 */
+.domain-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    padding: 0 1em 0 0;
+    margin: 0;
+    margin-left: 12px;
+    width: auto;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: inherit;
+    color: var(--text-color-primary); /* 테마에 따라 색상 변경 */
+
+    /* 드롭다운 화살표 아이콘 */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.2em top 50%;
+    background-size: 1.2em auto;
+    padding-right: 1.5em; /* 화살표 공간 확보 */
+}
+
+/* 다크 모드일 때 화살표 색상 변경 */
+[data-theme="dark"] .domain-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bdc1c6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.domain-select:focus {
+    outline: none;
+}

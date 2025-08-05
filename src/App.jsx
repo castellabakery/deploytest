@@ -47,60 +47,81 @@ const nouns = [
   "자전거", "스쿠터", "자동차", "트럭", "로켓", "위성", "블랙홀", "은하수", "초신성", "성운",
   "먼지", "구름", "안개", "바람", "폭풍", "번개", "지진", "화산", "빙하", "사막"
 ];
-const javaSearchResultTitles = [
-  "Java NullPointerException: 원인과 해결 방법 총정리",
-  "Spring Boot @Transactional 어노테이션의 올바른 사용법 - Stack Overflow",
-  "이펙티브 자바 3/E - 아이템 1: 생성자 대신 정적 팩터리 메서드를 고려하라",
-  "ArrayList와 LinkedList의 차이점 및 성능 비교 (Java)",
-  "Java 8 Stream API 튜토리얼 및 실용 예제 | Baeldung",
-  "가비지 컬렉션(GC)의 동작 원리와 종류 (Serial, Parallel, G1GC)",
-  "Java의 정석 - 제네릭(Generics)이란 무엇인가?",
-  "Spring Security JWT 인증 구현하기 (step-by-step)",
-  "CompletableFuture를 이용한 Java 비동기 프로그래밍",
-  "JPA N+1 문제의 원인과 해결 방안 (fetch join, @EntityGraph)",
-  "객체지향의 5가지 원칙: SOLID - 로버트 C. 마틴",
-  "코딩 테스트를 위한 Java 문법 총정리 - programmers",
-  "IntelliJ 디버깅 모드 완벽 가이드: Breakpoint 활용하기",
-  "RESTful API 설계의 모범 사례 (Best Practices)",
-  "Java Reflection API: 동적으로 클래스 정보 수정하기",
-  "Checked Exception과 Unchecked Exception의 차이",
-  "TCP/IP 소켓 프로그래밍 in Java (예제 포함)",
-  "멀티스레드 환경에서의 동기화 문제 해결법 (synchronized, volatile)",
-  "디자인 패턴: 싱글턴(Singleton) 패턴 구현 방법 5가지",
-  "Docker와 Jenkins를 이용한 Spring Boot 애플리케이션 CI/CD 파이프라인 구축"
-];
-const javaSearchResultSnippets = [
-  "2025. 7. 31. — NullPointerException은 객체 참조가 null일 때 발생합니다. 객체 사용 전 null 체크를 추가하거나 Optional 클래스를 사용하",
-  "2025. 6. 10. — Spring의 @Transactional은 AOP 프록시를 통해 작동하므로, public 메서드에만 적용되며 클래스 내부 호출에는 적용되지 않습",
-  "2025. 5. 22. — ArrayList는 내부적으로 배열을 사용해 인덱스 조회 속도가 빠르고, LinkedList는 노드 연결로 이루어져 삽입/삭제가 빈번할 때 유리",
-  "2025. 4. 1. — Java 8의 Stream API는 데이터 컬렉션을 함수형으로 처리할 수 있게 해주는 강력한 도구입니다. map, filter, collect가 주로 사용",
-  "2025. 3. 18. — G1GC는 큰 힙 메모리에서 짧은 GC 일시 중지 시간을 목표로 하는 가비지 컬렉터로, 대부분의 최신 Java 애플리케이션에서 기본으로 사용",
-  "2025. 2. 2. — 제네릭(Generics)은 클래스 내부에서 사용할 데이터 타입을 외부에서 지정하는 기법으로, 컴파일 시 타입 체크를 가능하게 하고 코드 재사용성을 높",
-  "2025. 1. 15. — JWT(JSON Web Token)는 사용자 인증 정보를 안전하게 전송하기 위한 표준입니다. Header, Payload, Signature 세 부분으로 구성됩니",
-  "2024. 12. 5. — CompletableFuture는 자바 5의 Future를 개선한 것으로, 비동기 작업의 조합과 에러 처리를 위한 풍부한 API를 제공합니다.",
-  "2024. 11. 20. — JPA의 N+1 문제는 연관 관계가 설정된 엔티티를 조회할 때, 조회된 엔티티 수만큼 추가 쿼리가 발생하는 현상입니다. fetch join으로 해결할 수 있",
-  "2024. 10. 8. — SOLID 원칙은 유지보수와 확장이 쉬운 소프트웨어를 만들기 위한 다섯 가지 객체지향 설계 원칙(SRP, OCP, LSP, ISP, DIP)을",
-  "2024. 9. 13. — 코딩 테스트에서 시간 복잡도를 줄이는 것은 매우 중요합니다. Java의 HashMap은 평균 O(1)의 시간 복잡도로 데이터 조회/삽",
-  "2024. 8. 21. — IntelliJ의 디버깅 모드에서 'Evaluate Expression' 기능을 사용하면, 실행 중인 코드의 상태를 실시간으로 확인하고 변경할 수",
-  "2024. 7. 30. — RESTful API에서 리소스 상태 변경은 GET이 아닌 POST, PUT, PATCH, DELETE와 같은 HTTP 메서드를 사용해야 합니",
-  "2024. 6. 19. — Java Reflection은 런타임에 클래스의 메타데이터를 얻거나 수정하는 기능입니다. 프레임워크나 라이브러리에서 주로 사용되나, 성능 저하의 원인",
-  "2024. 5. 2. — Checked Exception은 반드시 처리(try-catch)해야 하는 예외이며, Unchecked Exception(RuntimeException)은 명시적인 처리를 강제",
-  "2024. 4. 11. — Java의 소켓 프로그래밍에서 ServerSocket은 클라이언트의 연결 요청을 기다리고, Socket은 실제 데이터 통신을 담당",
-  "2024. 3. 25. — 멀티스레드 환경에서 공유 자원에 대한 동시 접근을 제어하기 위해 synchronized 키워드나 ReentrantLock과 같은 동기화 기법이 사용됩",
-  "2024. 2. 7. — 싱글턴 패턴은 애플리케이션 전체에서 단 하나의 인스턴스만 생성되도록 보장하는 디자인 패턴입니다. private 생성자와 static 메서드로 구현할",
-  "2024. 1. 18. — Docker 이미지는 애플리케이션과 그 실행 환경을 패키징한 것이며, Jenkins 파이프라인을 통해 이 이미지의 빌드 및 배포를 자동화할 수 있",
-  "2023. 12. 1. — Lombok 라이브러리의 @Data 어노테이션은 @Getter, @Setter, @ToString 등을 모두 포함하지만, 불필요한 Setter 생성을 유발할 수 있어 주의"
-]
-const javaSourceData = [
-  { name: 'Tistory', url: 'https://johndoe.tistory.com', icon: 'T', color: '#E96312' },
-  { name: 'velog', url: 'https://velog.io/@jane.doe', icon: 'v', color: '#20C997' },
-  { name: 'Stack Overflow', url: 'https://stackoverflow.com/questions/12345', icon: 'S', color: '#F48024' },
-  { name: 'Baeldung', url: 'https://www.baeldung.com/java-tutorial', icon: 'B', color: '#2a9e54' },
-  { name: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/java', icon: 'G', color: '#2f9433' },
-  { name: '프로그래머스', url: 'https://school.programmers.co.kr/learn', icon: 'P', color: '#4E72B5' },
-  { name: 'DZone', url: 'https://dzone.com/java-jdk', icon: 'D', color: '#688e22' },
-  { name: 'Medium', url: 'https://medium.com/tag/java', icon: 'M', color: '#121212' }
-];
+
+// ==================================================================
+// ★★★ 신규: 도메인별 검색 결과 데이터 ★★★
+// ==================================================================
+const domainData = {
+  java: {
+    titles: [
+      "Java NullPointerException: 원인과 해결 방법 총정리", "Spring Boot @Transactional 어노테이션의 올바른 사용법 - Stack Overflow", "이펙티브 자바 3/E - 아이템 1: 생성자 대신 정적 팩터리 메서드를 고려하라", "ArrayList와 LinkedList의 차이점 및 성능 비교 (Java)", "Java 8 Stream API 튜토리얼 및 실용 예제 | Baeldung", "가비지 컬렉션(GC)의 동작 원리와 종류 (Serial, Parallel, G1GC)", "Java의 정석 - 제네릭(Generics)이란 무엇인가?", "Spring Security JWT 인증 구현하기 (step-by-step)", "CompletableFuture를 이용한 Java 비동기 프로그래밍", "JPA N+1 문제의 원인과 해결 방안 (fetch join, @EntityGraph)",
+      "객체지향의 5가지 원칙: SOLID - 로버트 C. 마틴", "코딩 테스트를 위한 Java 문법 총정리 - programmers", "IntelliJ 디버깅 모드 완벽 가이드: Breakpoint 활용하기", "RESTful API 설계의 모범 사례 (Best Practices)", "Java Reflection API: 동적으로 클래스 정보 수정하기", "Checked Exception과 Unchecked Exception의 차이", "TCP/IP 소켓 프로그래밍 in Java (예제 포함)", "멀티스레드 환경에서의 동기화 문제 해결법 (synchronized, volatile)", "디자인 패턴: 싱글턴(Singleton) 패턴 구현 방법 5가지", "Docker와 Jenkins를 이용한 Spring Boot 애플리케이션 CI/CD 파이프라인 구축"
+    ],
+    snippets: [
+      "2025. 7. 31. — NullPointerException은 객체 참조가 null일 때 발생합니다. 객체 사용 전 null 체크를 추가하거나 Optional 클래스를 사용하", "2025. 6. 10. — Spring의 @Transactional은 AOP 프록시를 통해 작동하므로, public 메서드에만 적용되며 클래스 내부 호출에는 적용되지 않습", "2025. 5. 22. — ArrayList는 내부적으로 배열을 사용해 인덱스 조회 속도가 빠르고, LinkedList는 노드 연결로 이루어져 삽입/삭제가 빈번할 때 유리", "2025. 4. 1. — Java 8의 Stream API는 데이터 컬렉션을 함수형으로 처리할 수 있게 해주는 강력한 도구입니다. map, filter, collect가 주로 사용", "2025. 3. 18. — G1GC는 큰 힙 메모리에서 짧은 GC 일시 중지 시간을 목표로 하는 가비지 컬렉터로, 대부분의 최신 Java 애플리케이션에서 기본으로 사용", "2025. 2. 2. — 제네릭(Generics)은 클래스 내부에서 사용할 데이터 타입을 외부에서 지정하는 기법으로, 컴파일 시 타입 체크를 가능하게 하고 코드 재사용성을 높", "2025. 1. 15. — JWT(JSON Web Token)는 사용자 인증 정보를 안전하게 전송하기 위한 표준입니다. Header, Payload, Signature 세 부분으로 구성됩니", "2024. 12. 5. — CompletableFuture는 자바 5의 Future를 개선한 것으로, 비동기 작업의 조합과 에러 처리를 위한 풍부한 API를 제공합니다.", "2024. 11. 20. — JPA의 N+1 문제는 연관 관계가 설정된 엔티티를 조회할 때, 조회된 엔티티 수만큼 추가 쿼리가 발생하는 현상입니다. fetch join으로 해결할 수 있", "2024. 10. 8. — SOLID 원칙은 유지보수와 확장이 쉬운 소프트웨어를 만들기 위한 다섯 가지 객체지향 설계 원칙(SRP, OCP, LSP, ISP, DIP)을",
+      "2024. 9. 13. — 코딩 테스트에서 시간 복잡도를 줄이는 것은 매우 중요합니다. Java의 HashMap은 평균 O(1)의 시간 복잡도로 데이터 조회/삽", "2024. 8. 21. — IntelliJ의 디버깅 모드에서 'Evaluate Expression' 기능을 사용하면, 실행 중인 코드의 상태를 실시간으로 확인하고 변경할 수", "2024. 7. 30. — RESTful API에서 리소스 상태 변경은 GET이 아닌 POST, PUT, PATCH, DELETE와 같은 HTTP 메서드를 사용해야 합니", "2024. 6. 19. — Java Reflection은 런타임에 클래스의 메타데이터를 얻거나 수정하는 기능입니다. 프레임워크나 라이브러리에서 주로 사용되나, 성능 저하의 원인", "2024. 5. 2. — Checked Exception은 반드시 처리(try-catch)해야 하는 예외이며, Unchecked Exception(RuntimeException)은 명시적인 처리를 강제", "2024. 4. 11. — Java의 소켓 프로그래밍에서 ServerSocket은 클라이언트의 연결 요청을 기다리고, Socket은 실제 데이터 통신을 담당", "2024. 3. 25. — 멀티스레드 환경에서 공유 자원에 대한 동시 접근을 제어하기 위해 synchronized 키워드나 ReentrantLock과 같은 동기화 기법이 사용됩", "2024. 2. 7. — 싱글턴 패턴은 애플리케이션 전체에서 단 하나의 인스턴스만 생성되도록 보장하는 디자인 패턴입니다. private 생성자와 static 메서드로 구현할", "2024. 1. 18. — Docker 이미지는 애플리케이션과 그 실행 환경을 패키징한 것이며, Jenkins 파이프라인을 통해 이 이미지의 빌드 및 배포를 자동화할 수 있", "2023. 12. 1. — Lombok 라이브러리의 @Data 어노테이션은 @Getter, @Setter, @ToString 등을 모두 포함하지만, 불필요한 Setter 생성을 유발할 수 있어 주의"
+    ],
+    sources: [
+      { name: 'Tistory', url: 'https://johndoe.tistory.com', icon: 'T', color: '#E96312' }, { name: 'velog', url: 'https://velog.io/@jane.doe', icon: 'v', color: '#20C997' }, { name: 'Stack Overflow', url: 'https://stackoverflow.com/questions/12345', icon: 'S', color: '#F48024' }, { name: 'Baeldung', url: 'https://www.baeldung.com/java-tutorial', icon: 'B', color: '#2a9e54' }, { name: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/java', icon: 'G', color: '#2f9433' }, { name: '프로그래머스', url: 'https://school.programmers.co.kr/learn', icon: 'P', color: '#4E72B5' }, { name: 'DZone', url: 'https://dzone.com/java-jdk', icon: 'D', color: '#688e22' }, { name: 'Medium', url: 'https://medium.com/tag/java', icon: 'M', color: '#121212' }
+    ]
+  },
+  frontend: {
+    titles: [
+      "React Hooks: useState와 useEffect의 완벽 가이드", "CSS-in-JS 라이브러리 비교: styled-components vs Emotion", "Webpack과 Vite, 당신의 선택은? (번들러 성능 비교)", "TypeScript를 React 프로젝트에 도입하는 가장 쉬운 방법", "Next.js 13의 App Router 파헤치기 (서버 컴포넌트 포함)", "Zustand: Redux를 대체할 가볍고 빠른 상태 관리 라이브러리", "프론트엔드 면접 질문 리스트 (2025년 최신판)", "웹 성능 최적화: Core Web Vitals 점수 올리기", "CSS Flexbox와 Grid, 언제 무엇을 써야 할까?", "Storybook으로 UI 컴포넌트 문서 자동화하기",
+    ],
+    snippets: [
+      "2025. 7. 22. — useState는 함수형 컴포넌트에서 상태를 관리하게 해주고, useEffect는 렌더링 이후에 비동기 작업이나 부수 효과를 처리하는 데 사용됩", "2025. 6. 15. — styled-components는 태그된 템플릿 리터럴을 사용하는 반면, Emotion은 CSS prop을 통해 더 유연한 스타일링을 제공합", "2025. 5. 1. — Vite는 개발 서버에서 네이티브 ES 모듈을 사용하여 Webpack보다 훨씬 빠른 HMR(Hot Module Replacement) 속도를 자랑합", "2025. 4. 10. — 기존 CRA 프로젝트에 TypeScript를 추가하려면, `npm install --save typescript @types/node @types/react @types/react-dom @types/jest`를 실행", "2025. 3. 25. — Next.js 13의 App Router는 `app` 디렉토리 기반 라우팅을 도입하여 서버 컴포넌트와 클라이언트 컴포넌트의 혼용을 가능하게 합", "2025. 2. 18. — Zustand는 Context API를 기반으로 하지만, 불필요한 리렌더링을 방지하는 최적화 기능이 내장되어 있어 성능에 유리합", "2025. 1. 29. — 프론트엔드 면접에서는 JavaScript의 이벤트 루프, 클로저, 프로토타입과 같은 핵심 개념에 대한 질문이 자주 등장합", "2024. 12. 7. — LCP(가장 큰 콘텐츠풀 페인트) 시간을 줄이려면 이미지 최적화 및 리소스 로딩 우선순위 설정이 중요합", "2024. 11. 11. — 1차원 레이아웃에는 Flexbox가 적합하고, 2차원의 복잡한 그리드 구조에는 CSS Grid를 사용하는 것이 일반적입", "2024. 10. 3. — Storybook을 사용하면 각 UI 컴포넌트를 독립적인 환경에서 개발하고 테스트할 수 있어 재사용성과 유지보수성이 향상됩",
+    ],
+    sources: [
+      { name: 'velog', url: 'https://velog.io/@fe-master', icon: 'v', color: '#20C997' }, { name: 'MDN', url: 'https://developer.mozilla.org', icon: 'M', color: '#000000' }, { name: 'Tistory', url: 'https://dev-yakuza.tistory.com', icon: 'T', color: '#E96312' }, { name: 'CSS-Tricks', url: 'https://css-tricks.com', icon: 'C', color: '#ff8a00' }, { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com', icon: 'S', color: '#e95c33' }, { name: 'dev.to', url: 'https://dev.to', icon: 'D', color: '#0a0a0a' }, { name: 'React Blog', url: 'https://react.dev/blog', icon: 'R', color: '#61DAFB' }, { name: 'Naver D2', url: 'https://d2.naver.com/home', icon: 'N', color: '#03C75A' }
+    ]
+  },
+  marketing: {
+    titles: [
+      "초보자를 위한 SEO(검색엔진최적화) 시작하기", "2025년 주목해야 할 디지털 마케팅 트렌드 5가지", "Google Analytics 4 (GA4) 완벽 활용 가이드", "콘텐츠 마케팅 성공 사례: '오늘의집'은 어떻게 성장했나", "퍼포먼스 마케팅의 핵심, A/B 테스트 설계 방법", "인스타그램 마케팅: 팔로워를 고객으로 만드는 전략", "CRM 마케팅이란? 고객 관계 관리의 모든 것", "브랜드 마케팅 vs 퍼포먼스 마케팅, 차이점은?", "네이버 블로그 상위노출, 이것만은 꼭 지키세요 (로직 분석)", "이메일 마케팅 오픈율을 높이는 10가지 팁",
+    ],
+    snippets: [
+      "2025. 7. 28. — SEO의 기본은 사용자가 검색할 만한 키워드를 콘텐츠에 자연스럽게 포함하고, 사이트의 기술적 요소를 최적화하는 것입", "2025. 6. 20. — 2025년에는 AI 기반 개인화 마케팅, 숏폼 비디오 콘텐츠, 커뮤니티 중심의 브랜드 구축이 더욱 중요해질 전망입", "2025. 5. 13. — GA4는 이벤트 기반 데이터 모델을 사용하여 웹과 앱 사용자의 행동을 통합적으로 분석할 수 있는 강력한 도구입", "2025. 4. 9. — '오늘의집'은 유저들이 직접 만든 인테리어 콘텐츠(UGC)를 활용하여 커뮤니티를 활성화하고, 이를 통해 자연스러운 바이럴 마케팅", "2025. 3. 19. — 성공적인 A/B 테스트를 위해서는 명확한 가설을 설정하고, 한 번에 하나의 변수만 변경하여 테스트를 진행해야 합", "2025. 2. 21. — 인스타그램에서는 시각적으로 매력적인 콘텐츠와 함께, 스토리와 릴스를 활용하여 사용자와의 적극적인 소통이 중요합", "2025. 1. 17. — CRM(Customer Relationship Management)은 고객 데이터를 기반으로 개인화된 메시지를 전달하여 고객 충성도를 높이는 마케팅 전략", "2024. 12. 3. — 브랜드 마케팅이 장기적인 관점에서 브랜드 인지도를 쌓는 것이라면, 퍼포먼스 마케팅은 단기적인 매출, 전환 등 측정 가능한 성과", "2024. 11. 8. — 네이버 C-Rank 로직에 따라 전문성 있고 신뢰도 높은 정보를 담은 포스팅이 상위 노출에 유리합", "2024. 10. 14. — 수신자의 이름을 넣거나, 흥미를 유발하는 질문형 제목을 사용하는 등 개인화된 접근이 이메일 오픈율을 높이는 데 효과적",
+    ],
+    sources: [
+      { name: 'Brunch', url: 'https://brunch.co.kr/magazine/marketing', icon: 'B', color: '#333' }, { name: '아이보스', url: 'https://www.i-boss.co.kr', icon: 'I', color: '#254ef8' }, { name: 'HubSpot', url: 'https://blog.hubspot.com', icon: 'H', color: '#ff7a59' }, { name: 'ㅍㅍㅅㅅ', url: 'https://ppss.kr/category/biz-2/marketing', icon: 'ㅍ', color: '#000' }, { name: 'Google Ads', url: 'https://ads.google.com/intl/ko_kr/home/', icon: 'G', color: '#4285F4' }, { name: 'Tistory', url: 'https://marketer-kim.tistory.com', icon: 'T', color: '#E96312' }, { name: 'openads', url: 'https://www.openads.co.kr/content/topic', icon: 'o', color: '#2d2d2d' }, { name: 'surfit', url: 'https://www.surfit.io/channel/marketing', icon: 's', color: '#0078ff' }
+    ]
+  },
+  accounting: {
+    titles: [
+      "법인세 신고 기간 및 필요 서류 총정리", "부가가치세 매입세액공제, 받을 수 있는 항목과 없는 항목", "재무상태표와 손익계산서, 쉽게 이해하는 방법", "신입 경리를 위한 전표 작성법 (차변과 대변)", "한국채택국제회계기준(K-IFRS) 주요 변경 사항 (2025년)", "더존 Smart A 프로그램 사용법 기초", "원천징수와 연말정산의 차이점은 무엇인가요?", "가지급금 인정이자 계산 및 처리 방안", "감가상각이란? 정액법과 정률법 비교", "스타트업을 위한 정부지원금 회계처리 가이드",
+    ],
+    snippets: [
+      "2025. 3. 5. — 12월 결산 법인의 법인세 신고·납부 기한은 다음 해 3월 31일까지이며, 재무상태표, 손익계산서, 이익잉여금처분계산서 등이 필", "2025. 1. 20. — 사업과 직접 관련이 없는 지출이나 접대비 관련 매입세액은 부가가치세법상 공제받을 수 없으므로 주의해야 합", "2024. 11. 1. — 재무상태표는 특정 시점의 자산, 부채, 자본 상태를 보여주는 '스냅샷'이고, 손익계산서는 특정 기간의 수익과 비용을 보여주는 '비디오'", "2024. 9. 10. — 회계의 기본 원리인 거래의 이중성에 따라 모든 거래는 차변(자산의 증가, 부채/자본의 감소)과 대변(자산의 감소, 부채/자본의 증가)으로 나누어 기입", "2024. 7. 2. — 2025년부터 적용되는 K-IFRS 제1115호 '고객과의 계약에서 생기는 수익'의 변경 내용을 숙지해야 합", "2024. 5. 15. — 더존 Smart A에서 일반전표입력 메뉴를 통해 일상적인 거래를 입력하고, 매입매출전표입력 메뉴를 통해 세금계산서 관련 거래를 입력", "2024. 3. 28. — 원천징수는 급여 지급 시 소득세를 미리 떼는 것이고, 연말정산은 1년 동안의 총소득에 대한 최종 세액을 확정하여 정산하는 절차", "2024. 2. 4. — 대표이사 가지급금은 법인 자금을 사적으로 유용한 것으로 간주되어, 세법상 인정이자를 계산하여 법인의 익금으로 산입해야 합", "2023. 12. 12. — 정액법은 매년 동일한 금액을 감가상각하는 방법이고, 정률법은 기초자산가액에 일정한 상각률을 곱하여 계산하므로 초기에 상각액이", "2023. 10. 26. — 정부지원금을 수령한 경우, 국고보조금(자산차감 또는 이연수익) 계정을 사용하여 기업회계기준에 맞게 처리해야 합",
+    ],
+    sources: [
+      { name: '국세청', url: 'https://www.nts.go.kr', icon: '국', color: '#0f4f9f' }, { name: '조세일보', url: 'https://www.joseilbo.com', icon: '조', color: '#00835a' }, { name: '삼일인포마인', url: 'https://www.samili.com', icon: 'S', color: '#003a71' }, { name: '이카운트', url: 'https://www.ecount.com', icon: 'e', color: '#f77c00' }, { name: '경리나라', url: 'https://www.serp.co.kr', icon: '경', color: '#1381ff' }, { name: 'Tistory', url: 'https://account-pro.tistory.com', icon: 'T', color: '#E96312' }, { name: '네이버 블로그', url: 'https://blog.naver.com/tax-expert', icon: 'N', color: '#03C75A' }, { name: 'DART', url: 'https://dart.fss.or.kr', icon: 'D', color: '#233f8e' }
+    ]
+  },
+  insurance: {
+    titles: [
+      "자동차보험료, 다이렉트로 가입하면 얼마나 저렴할까?", "실손의료보험(실비보험) 4세대 개편 내용 총정리", "사회초년생 필수 보험 3가지: 실비, 암, 그리고...", "보험금 청구, 필요한 서류와 절차 알아보기", "운전자보험과 자동차보험의 차이, 꼭 둘 다 가입해야 할까?", "내 보험 찾아줌(Zoom) 서비스로 숨은 보험금 찾기", "단독실손보험 vs 종합보험 특약, 어떤게 유리할까?", "치아보험 가입 전 반드시 확인할 5가지 주의사항", "해외여행자보험, 보장 내용 꼼꼼히 비교하는 법", "유병자 보험, 가입 조건과 심사 기준은?",
+    ],
+    snippets: [
+      "2025. 8. 1. — 다이렉트 자동차보험은 설계사 수수료가 없어 오프라인 대비 평균 15~20% 저렴한 보험료로 가입할 수 있는 장점이 있", "2025. 7. 5. — 4세대 실손보험은 비급여 진료 이용량에 따라 보험료가 할인·할증되는 것이 특징이며, 자기부담금 비율이 이전 세대보다 높습", "2025. 6. 11. — 사회초년생은 질병/상해 의료비를 보장하는 실손보험, 목돈이 드는 암 치료비를 대비하는 암보험, 그리고 최소한의 사망보장을 준비", "2025. 5. 16. — 보험금 청구 시에는 보험사 앱이나 홈페이지를 통해 진단서, 진료비 영수증, 약제비 영수증 등의 서류를 제출해야 합", "2025. 4. 22. — 자동차보험이 '민사적' 책임(대인/대물)을 보장한다면, 운전자보험은 '형사적/행정적' 책임(벌금, 변호사 선임비 등)을 보장", "2025. 3. 2. — 생명보험협회와 손해보험협회가 운영하는 '내보험찾아줌' 사이트에서 본인인증만으로 모든 가입 보험 내역과 숨은 보험금을 조회", "2025. 2. 9. — 보험료가 저렴한 단독실손보험으로 기본 의료비를 보장하고, 필요한 진단비나 수술비는 종합보험의 특약으로 추가하는 것이 합리적", "2025. 1. 24. — 치아보험은 대부분 가입 후 일정 기간의 면책기간 및 감액기간이 존재하므로 가입 즉시 보장이 되지 않을 수 있음을 유의", "2024. 12. 13. — 해외여행자보험은 휴대품 손해, 항공기 지연 보상 등 특약이 다양하므로, 여행 목적과 기간에 맞는 상품을 선택하는 것이 중요", "2024. 11. 19. — 고혈압, 당뇨 등 만성질환이 있어도 가입할 수 있는 유병자 보험은 일반 보험에 비해 가입 심사가 간소화된 대신 보험료가 비싼 편",
+    ],
+    sources: [
+      { name: '보험다모아', url: 'https://www.e-insmarket.or.kr', icon: '보', color: '#00a0e2' }, { name: '금융감독원', url: 'https://www.fss.or.kr', icon: '금', color: '#00478f' }, { name: '뱅크샐러드', url: 'https://www.banksalad.com', icon: '뱅', color: '#00d381' }, { name: '굿리치', url: 'https://www.goodrich.co.kr', icon: 'G', color: '#2b3bff' }, { name: '삼성화재', url: 'https://direct.samsungfire.com', icon: 'S', color: '#0071c8' }, { name: '현대해상', url: 'https://direct.hi.co.kr', icon: 'H', color: '#0097a7' }, { name: '교보생명', url: 'https://www.kyobo.com', icon: '교', color: '#e5007d' }, { name: '네이버 포스트', url: 'https://post.naver.com/insurance-info', icon: 'P', color: '#03C75A' }
+    ]
+  },
+  generalOffice: {
+    titles: [
+      "직장인 필수 스킬! 엑셀 VLOOKUP 함수 완벽 정복", "보고서 작성 시간을 반으로 줄여주는 5가지 팁", "센스있는 비즈니스 이메일 작성법 (feat. 상황별 예시)", "회의록, 더 이상 스트레스 받지 마세요! (회의록 템플릿 포함)", "업무 효율을 높이는 폴더 및 파일 정리 노하우", "구글 드라이브와 노션(Notion), 우리 팀에 맞는 협업툴은?", "PPT 디자인, '이것'만 피하면 중간은 간다!", "직장 내 괴롭힘 금지법, 어디까지 해당될까?", "알아두면 유용한 단축키 모음 (Windows & Mac)", "신입사원을 위한 전화 응대 매뉴얼",
+    ],
+    snippets: [
+      "2025. 7. 18. — VLOOKUP 함수는 방대한 데이터 목록에서 특정 조건에 맞는 값을 찾아올 때 사용하는 엑셀의 핵심 함수입", "2025. 6. 25. — 보고서는 결론부터 두괄식으로 작성하고, 개요를 먼저 구성한 뒤 내용을 채워나가는 것이 효율적입", "2025. 5. 29. — 명확한 제목, 정중한 인사, 본문 요약, 명확한 요청사항, 끝인사 순으로 작성하는 것이 비즈니스 이메일의 기본 형식입", "2025. 4. 30. — 회의록에는 회의 목적, 참석자, 결정된 사항(Action Item), 담당자, 기한을 명확하게 기재해야 합", "2025. 3. 26. — 파일명에 [날짜_프로젝트명_버전] 규칙을 적용하고, 업무 단계별로 폴더를 분류하면 자료를 체계적으로 관리할 수 있습", "2025. 2. 11. — 문서 공동 편집과 파일 공유가 중심이라면 구글 드라이브, 프로젝트 관리와 지식 아카이빙이 목적이라면 노션이 더 적합할 수 있습", "2025. 1. 8. — 한 슬라이드에 너무 많은 텍스트를 담거나, 통일성 없는 색상과 폰트를 남발하는 것은 피해야 할 대표적인 PPT 디자인 실수입", "2024. 12. 10. — 직장 내 괴롭힘은 직장에서의 지위 또는 관계 등의 우위를 이용하여 업무상 적정범위를 넘어 다른 근로자에게 신체적·정신적 고통", "2024. 11. 5. — Ctrl+C(복사), Ctrl+V(붙여넣기), Alt+Tab(창 전환) 등 기본적인 단축키만 잘 활용해도 업무 속도가 크게 향상됩", "2024. 10. 1. — 전화를 받을 때는 소속과 이름을 밝히고, 상대방의 용건을 메모하며, 담당자가 부재 시에는 메모를 전달하겠다고 안내하는 것이 기본",
+    ],
+    sources: [
+      { name: 'Microsoft 365', url: 'https://support.microsoft.com/ko-kr/office', icon: 'M', color: '#dc3e15' }, { name: '퍼블리', url: 'https://publy.co', icon: 'P', color: '#2e2e2e' }, { name: '원티드', url: 'https://www.wanted.co.kr/community/topics/40', icon: 'w', color: '#3366ff' }, { name: 'Brunch', url: 'https://brunch.co.kr/magazine/work', icon: 'B', color: '#333' }, { name: '가비아', url: 'https://library.gabia.com/contents/business/', icon: 'g', color: '#5956a8' }, { name: 'Tistory', url: 'https://office-worker.tistory.com', icon: 'T', color: '#E96312' }, { name: 'Notion', url: 'https://www.notion.so/ko-kr/help', icon: 'N', color: '#000000' }, { name: '고용노동부', url: 'https://www.moel.go.kr', icon: '고', color: '#0055a4' }
+    ]
+  }
+};
+
 
 
 const renderTextWithLinks = (text) => {
@@ -366,6 +387,25 @@ const ChatApp = () => {
   const originalFaviconRef = useRef('https://www.google.com/favicon.ico');
   const isWindowFocused = useRef(true);
   const inputRef = useRef(null);
+  const [selectedDomain, setSelectedDomain] = useState('java');
+  const selectedDomainRef = useRef(selectedDomain);
+
+  // ★★★ 신규: 메시지에 테마 데이터를 입히는 함수 ★★★
+  const augmentMessage = useCallback((msg, domainKey) => {
+    const currentData = domainData[domainKey];
+    if (!currentData) return msg; // 데이터 없으면 원본 메시지 반환
+
+    // 메시지의 고유 ID(id 또는 uuid)를 기반으로 일관된 인덱스를 생성
+    // DB에서 온 메시지는 숫자 id, 웹소켓 신규 메시지는 문자열 uuid를 사용
+    const uniqueId = typeof msg.id === 'number' ? msg.id : parseInt(msg.uuid.slice(-6), 16);
+
+    const title = currentData.titles[uniqueId % currentData.titles.length];
+    const snippet = currentData.snippets[uniqueId % currentData.snippets.length];
+    const source = currentData.sources[uniqueId % currentData.sources.length];
+    const randomlyStyled = randomlyStyledText(0.2);
+
+    return { ...msg, fakeTitle: title, fakeSnippet: snippet, fakeSource: source, randomlyStyled: randomlyStyled };
+  }, []); // 의존성 배열이 비어있으므로 함수는 한 번만 생성됩니다.
 
   // 모든 채팅 관련 상태를 초기값으로 되돌리는 함수
   const resetChatStates = () => {
@@ -506,6 +546,7 @@ const ChatApp = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('jwtToken');
+    localStorage.removeItem('userId');
     setToken(null);
     // 필요하다면 다른 로컬 스토리지 정보도 초기화
     // localStorage.removeItem('chatUsername');
@@ -523,7 +564,7 @@ const ChatApp = () => {
       const response = await fetchWithAuth(USERNAME_API, {
         method: 'PUT',
         body: JSON.stringify({
-          id: userId,
+          id: localStorage.getItem('userId'),
           chatName: newUsername
         }),
       });
@@ -563,6 +604,24 @@ const ChatApp = () => {
       }
     }
   };
+
+  // ★★★ 신규(2/2): selectedDomain 상태가 바뀔 때마다 ref의 .current 값을 업데이트 ★★★
+  useEffect(() => {
+    selectedDomainRef.current = selectedDomain;
+  }, [selectedDomain]);
+
+  // ★★★ 신규: 도메인 선택 시 기존 메시지를 새 테마로 즉시 업데이트 ★★★
+  useEffect(() => {
+    // 메시지가 없거나, 방에 들어오지 않았다면 실행하지 않음
+    if (messages.length === 0 || !currentRoom) return;
+
+    // 현재 메시지 배열(messages)을 순회하며,
+    // 각 메시지를 새로운 도메인 테마로 다시 꾸민(augment) 새 배열을 생성
+    setMessages(prevMessages =>
+        prevMessages.map(msg => augmentMessage(msg, selectedDomain))
+    );
+
+  }, [selectedDomain, augmentMessage]); // selectedDomain이 바뀔 때마다 이 효과를 실행
 
   useEffect(() => {
     const inputElement = inputRef.current;
@@ -618,9 +677,9 @@ const ChatApp = () => {
     // ★★★ 로그인 상태일 때만 방 목록 로드 ★★★
     if (token) {
       loadRooms();
-    } else {
+    }/* else {
       localStorage.setItem('userId', '');
-    }
+    }*/
   }, [token]); // token이 변경될 때 (로그인 성공 시) 실행
 
   useEffect(() => {
@@ -880,15 +939,11 @@ const ChatApp = () => {
       client.subscribe('/topic/public/' + currentRoom.id, (msg) => {
         const message = JSON.parse(msg.body);
         if (currentRoom && message.roomId === currentRoom.id) {
-          const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
-          const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
-          const source = javaSourceData[sourceIndex.current % javaSourceData.length];
-          const uuid = uuidv4();
-          const randomlyStyled = randomlyStyledText(0.2);
-          searchResultTitleIndex.current++;
-          searchResultSnippetIndex.current++;
-          sourceIndex.current++;
-          const augmentedMessage = { ...message, fakeTitle: title, fakeSnippet: snippet, fakeSource: source, uuid: uuid, randomlyStyled: randomlyStyled };
+          // ★★★ 선택된 도메인에 따라 데이터 소스를 동적으로 결정 ★★★
+          const currentData = domainData[selectedDomain];
+          if (!currentData) return; // 혹시 모를 오류 방지
+          const messageWithUuid = { ...message, uuid: uuidv4() };
+          const augmentedMessage = augmentMessage(messageWithUuid, selectedDomainRef.current);
           setMessages(prev => [...prev, augmentedMessage]);
           setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'auto' }), 50);
           if (!isWindowFocused.current) {
@@ -961,15 +1016,9 @@ const ChatApp = () => {
       const newMessages = await res.json();
       if (newMessages && newMessages.length > 0) {
         const augmentedMessages = newMessages.map(message => {
-          const title = javaSearchResultTitles[searchResultTitleIndex.current % javaSearchResultTitles.length];
-          const snippet = javaSearchResultSnippets[searchResultSnippetIndex.current % javaSearchResultSnippets.length];
-          const source = javaSourceData[sourceIndex.current % javaSourceData.length];
-          const uuid = uuidv4();
-          const randomlyStyled = randomlyStyledText(0.2);
-          searchResultTitleIndex.current++;
-          searchResultSnippetIndex.current++;
-          sourceIndex.current++;
-          return { ...message, fakeTitle: title, fakeSnippet: snippet, fakeSource: source, uuid: uuid, randomlyStyled: randomlyStyled };
+          // 각 메시지에 클라이언트에서 사용할 고유 uuid를 부여
+          const messageWithUuid = { ...message, uuid: message.uuid || uuidv4() };
+          return augmentMessage(messageWithUuid, selectedDomain);
         });
         const chatContainer = chatRef.current;
         const scrollHeightBefore = chatContainer?.scrollHeight;
@@ -1180,6 +1229,19 @@ const ChatApp = () => {
             </div>
           </div>
           <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleFileChange} />
+          {/* ★★★ 신규: 도메인 선택 Select Box 추가 ★★★ */}
+          <select
+              className="domain-select"
+              value={selectedDomain}
+              onChange={(e) => setSelectedDomain(e.target.value)}
+          >
+            <option value="java">☕️ Java 개발</option>
+            <option value="frontend">💻 프론트엔드</option>
+            <option value="marketing">📈 마케팅</option>
+            <option value="accounting">💰 회계</option>
+            <option value="insurance">🛡️ 보험</option>
+            <option value="generalOffice">📄 일반 사무</option>
+          </select>
           {/* ★★★ 프로필 아이콘 & 툴팁 래퍼 ★★★ */}
           <div className="user-profile-icon-wrapper">
             <div className="user-profile-icon" onClick={() => setAskingName(true)}>

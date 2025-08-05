@@ -446,7 +446,9 @@ const ChatApp = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImageSrc, setModalImageSrc] = useState('');
   const [rooms, setRooms] = useState([]);
-  const [currentRoom, setCurrentRoom] = useState(null);
+  const [currentRoom, setCurrentRoom] = useState(JSON.parse(localStorage.getItem('currentRoom')));
+  const [isCurrentRoom, setIsCurrentRoom] = useState(false);
+  let currentRoomRef = useRef(false);
   const [passwordModal, setPasswordModal] = useState({ visible: false, room: null, error: '' });
   const [passwordInput, setPasswordInput] = useState('');
   const [createRoomModal, setCreateRoomModal] = useState({ visible: false, error: '' });
@@ -493,6 +495,7 @@ const ChatApp = () => {
     setMessages([]);
     setRooms([]);
     setCurrentRoom(null);
+    localStorage.removeItem('currentRoom');
     setInput('');
     setStompClient(null);
     setAskingName(false);
@@ -514,6 +517,9 @@ const ChatApp = () => {
     setAuthError('');
     setSuccessMessage('');
     setUsernameError('');
+    setIsCurrentRoom(false);
+    currentRoomRef = false;
+    localStorage.setItem('isCurrentRoom', 'false');
   };
 
   // ==================================================================
@@ -916,11 +922,13 @@ const ChatApp = () => {
       });
       const isValid = await res.json();
       if (res.ok && isValid.code !== '1007') {
-        setCurrentRoom({
+        const nowCurrentRoom = {
           id: passwordModal.room.id,
           name: passwordModal.room.name,
           password: passwordInput,
-        });
+        }
+        setCurrentRoom(nowCurrentRoom);
+        localStorage.setItem('currentRoom', JSON.stringify(nowCurrentRoom));
         closePasswordModal();
       } else {
         setPasswordModal(prev => ({ ...prev, error: '비밀번호가 올바르지 않습니다.' }));
@@ -1009,9 +1017,13 @@ const ChatApp = () => {
       setStompClient(null); // 클라이언트 상태도 초기화해주는 것이 좋습니다.
     }
     setCurrentRoom(null);
+    localStorage.removeItem('currentRoom');
     setMessages([]);
     setNextPage(0);
     setHasMore(true);
+    setIsCurrentRoom(false);
+    currentRoomRef = false;
+    localStorage.setItem('isCurrentRoom', 'false');
     loadRooms();
   };
 
@@ -1019,6 +1031,15 @@ const ChatApp = () => {
   // ★★★ WebSocket 연결 시 헤더에 토큰 추가 ★★★
   // ==================================================================
   const connect = () => {
+    // if (isCurrentRoom) return;
+    // if (currentRoomRef) return;
+    if (localStorage.getItem('isCurrentRoom') === 'true') {
+      localStorage.setItem('isCurrentRoom', 'false');
+      return;
+    }
+    setIsCurrentRoom(true);
+    currentRoomRef = true;
+    localStorage.setItem('isCurrentRoom', 'true');
     if (!currentRoom || !token) return; // 토큰 없으면 연결 시도 안함
     const socket = new SockJS(SERVER_URL);
     const client = over(socket);

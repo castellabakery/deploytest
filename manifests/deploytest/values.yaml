@@ -1,4 +1,4 @@
-replicas: 3
+replicas: 1
 app: deploytest
 consumeBatch:
   externalName: consumebatch-ext

@@ -1309,6 +1309,7 @@ const ChatApp = () => {
               className="domain-select"
               value={selectedDomain}
               onChange={(e) => setSelectedDomain(e.target.value)}
+              style={{color: "transparent"}}
           >
             <option value="java">☕️ Java 개발</option>
             <option value="frontend">💻 프론트엔드</option>
